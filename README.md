@@ -15,5 +15,5 @@ Synonyms for different *product* values are listed in *cov_dictionary.yaml*.
 # To-do
 * Code to create alignments and HMMs
 * Remove duplicate sequences before creating alignments and HMMs
-* "trim" alignments before creating HMM
+* Trim alignments before creating HMM
 * Automate analysis of alignment and remove sequence without similarity
