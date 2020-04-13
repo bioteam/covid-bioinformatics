@@ -1,0 +1,11 @@
+---
+  download-gb-by-taxid.py:
+      taxid: 694009
+      email: briano@bioteam.net
+      min_len: 25000
+      max_len: 100000
+      recurse: True
+      retmax: 100
+      split: True
+      verbose: True
+      format: gb
