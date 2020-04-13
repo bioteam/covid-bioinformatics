@@ -1,7 +1,7 @@
 ---
   download-gb-by-taxid.py:
       taxid: 694009
-      email: briano@bioteam.net
+      email: name@organization.org
       min_len: 25000
       max_len: 100000
       recurse: True
