@@ -1,4 +1,4 @@
-# # covid-bioinformatics
+# covid-bioinformatics
 Software tools to collect and analyze Coronavirus sequences, including Python code to create gene and protein entries 
 starting with COV (coronavirus) genome files downloaded from NCBI.
 
