@@ -11,7 +11,7 @@ from Bio.Alphabet import IUPAC
 parser = argparse.ArgumentParser()
 parser.add_argument('-f', default='fasta', dest='format', help="Output format")
 parser.add_argument('-split', default=False, dest='split', help="Split into separate files")
-parser.add_argument('-no-split', action='store_true', dest='split', help="Create one file")
+parser.add_argument('-no-split', action='store_false', dest='split', help="Create one file")
 parser.add_argument('-analyze', default=False, action='store_true', help="Parse files without file creation")
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
 parser.add_argument('files', nargs='+', help='File names')
