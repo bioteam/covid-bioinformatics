@@ -8,8 +8,8 @@ Typical usage:
 
 *./feature-to-gene-and-protein.py taxid-694009.gb*
 
-The COV genes and proteins are parsed from the GenBank files and sorted by their *product* tags in the source NCBI files.
-Synonyms for different *product* values are listed in *cov_dictionary.yaml*.
+The COV genes and proteins are parsed from the GenBank files as features and assigned standard names based on their 
+*product* tags. The synonyms for these standard names are listed in *cov_dictionary.yaml*.
 
 
 # To-do
