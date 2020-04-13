@@ -70,7 +70,7 @@ class Feature_To_Gene_And_Protein:
         self.files = files
         # Initial collection of features
         self.accs = dict()
-        # Features sorted by gene/protein
+        # Features sorted by standard gene/protein names
         self.sorted_cds = dict()
         self.sorted_mats = dict()
         # Nucleotide and protein features for writing to fasta
