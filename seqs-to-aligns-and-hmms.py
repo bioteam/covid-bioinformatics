@@ -35,6 +35,7 @@ class Seqs_To_Aligns_And_Hmms:
         full_paths = [os.path.join(os.getcwd(), path) for path in self.files]
         for path in full_paths:
             seqs = []
+            # For example "S-aa"
             name = os.path.basename(path).split('.')[0]
             try:
                 # Each one of these is a multiple fasta file
@@ -55,8 +56,16 @@ class Seqs_To_Aligns_And_Hmms:
         for name in self.seqs:
             seqfile = tempfile.NamedTemporaryFile('w')
             SeqIO.write(self.seqs[name], seqfile, 'fasta')
-            subprocess.run([self.aligner, '-in', seqfile.name, '-out', name + '.aln'])
+            cmd = self.make_align_cmd(seqfile.name, name)
+            subprocess.run(cmd)
             self.alns[name] = name + '.aln'
+
+    def make_align_cmd(self):
+        if self.aligner == 'muscle':
+            cmd = [self.aligner, '-in', seqfile.name, '-out', name + '.aln']
+        if self.aligner == 'mafft':
+            cmd = [self.aligner, seqfile.name, '>', name + '.aln']
+        return cmd
 
     def make_hmm(self):
         for name in self.alns:
