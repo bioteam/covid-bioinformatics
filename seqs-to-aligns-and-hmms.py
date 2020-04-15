@@ -2,13 +2,11 @@
 
 import argparse
 import os.path
-import yaml
 import tempfile
 import subprocess
 from Bio import SeqIO
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-analyze', default=False, action='store_true', help="Parse files without file creation")
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
 parser.add_argument('-aligner', default='muscle', help="Alignment application")
 parser.add_argument('-hmmbuild', default='hmmbuild', help="HMM build application")
@@ -17,15 +15,14 @@ args = parser.parse_args()
 
 
 def main():
-    builder = Seqs_To_Aligns_And_Hmms(args.analyze, args.verbose, args.aligner, args.hmmbuild, args.files)
+    builder = Seqs_To_Aligns_And_Hmms(args.verbose, args.aligner, args.hmmbuild, args.files)
     builder.read()
     builder.make_align()
     builder.make_hmm()
 
 class Seqs_To_Aligns_And_Hmms:
 
-    def __init__(self, analyze, verbose, aligner, hmmbuild, files):
-        self.analyze = analyze
+    def __init__(self, verbose, aligner, hmmbuild, files):
         self.verbose = verbose
         self.aligner = aligner
         self.hmmbuild = hmmbuild
