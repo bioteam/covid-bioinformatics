@@ -9,13 +9,13 @@ from Bio import SeqIO
 parser = argparse.ArgumentParser()
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
 parser.add_argument('-aligner', default='muscle', help="Alignment application")
-parser.add_argument('-hmmbuild', default='hmmbuild', help="HMM build application")
+parser.add_argument('-hmmbuilder', default='hmmbuild', help="HMM build application")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
 
 def main():
-    builder = Seqs_To_Aligns_And_Hmms(args.verbose, args.aligner, args.hmmbuild, args.files)
+    builder = Seqs_To_Aligns_And_Hmms(args.verbose, args.aligner, args.hmmbuilder, args.files)
     builder.read()
     builder.make_align()
     builder.make_hmm()
@@ -27,9 +27,7 @@ class Seqs_To_Aligns_And_Hmms:
         self.aligner = aligner
         self.hmmbuild = hmmbuild
         self.files = files
-        self.seqs = dict()
-        self.alns = dict()
-        self.hmms = dict()
+        self.seqs, self.alns, self.hmms = dict(), dict(), dict()
 
     def read(self):
         full_paths = [os.path.join(os.getcwd(), path) for path in self.files]
@@ -54,17 +52,18 @@ class Seqs_To_Aligns_And_Hmms:
         
     def make_align(self):
         for name in self.seqs:
-            seqfile = tempfile.NamedTemporaryFile('w')
+            seqfile = tempfile.NamedTemporaryFile('w',delete=False)
+            print(seqfile.name)
             SeqIO.write(self.seqs[name], seqfile, 'fasta')
             cmd = self.make_align_cmd(seqfile.name, name)
             subprocess.run(cmd)
             self.alns[name] = name + '.aln'
 
-    def make_align_cmd(self):
+    def make_align_cmd(self, infile, name):
         if self.aligner == 'muscle':
-            cmd = [self.aligner, '-in', seqfile.name, '-out', name + '.aln']
+            cmd = [self.aligner, '-in', infile, '-out', name + '.aln']
         if self.aligner == 'mafft':
-            cmd = [self.aligner, seqfile.name, '>', name + '.aln']
+            cmd = [self.aligner, infile, '>', name + '.aln']
         return cmd
 
     def make_hmm(self):
