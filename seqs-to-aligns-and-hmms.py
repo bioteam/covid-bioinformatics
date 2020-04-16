@@ -33,7 +33,7 @@ class Seqs_To_Aligns_And_Hmms:
         full_paths = [os.path.join(os.getcwd(), path) for path in self.files]
         for path in full_paths:
             seqs = []
-            # For example "S-aa"
+            # Get baseneme, for example "S-aa"
             name = os.path.basename(path).split('.')[0]
             try:
                 # Each one of these is a multiple fasta file
@@ -52,11 +52,15 @@ class Seqs_To_Aligns_And_Hmms:
         
     def make_align(self):
         for name in self.seqs:
-            seqfile = tempfile.NamedTemporaryFile('w',delete=False)
-            print(seqfile.name)
-            SeqIO.write(self.seqs[name], seqfile, 'fasta')
-            cmd = self.make_align_cmd(seqfile.name, name)
-            subprocess.run(cmd)
+            # If all sequences are not identical 
+            if len(self.seqs[name]) > 1:
+                seqfile = tempfile.NamedTemporaryFile('w',delete=False)
+                SeqIO.write(self.seqs[name], seqfile, 'fasta')
+                cmd = self.make_align_cmd(seqfile.name, name)
+                subprocess.run(cmd)
+            else:
+                # Alignments are in fasta format, so just make a copy
+                subprocess.run(['cp', self.files[0], name + '.aln'])
             self.alns[name] = name + '.aln'
 
     def make_align_cmd(self, infile, name):
