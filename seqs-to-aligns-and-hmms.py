@@ -4,7 +4,10 @@ import argparse
 import os.path
 import tempfile
 import subprocess
+import sys
+from Bio import AlignIO
 from Bio import SeqIO
+from Bio.Align.Applications import MuscleCommandline
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
@@ -52,26 +55,47 @@ class Seqs_To_Aligns_And_Hmms:
         
     def make_align(self):
         for name in self.seqs:
-            # If all sequences are not identical 
-            if len(self.seqs[name]) > 1:
-                seqfile = tempfile.NamedTemporaryFile('w',delete=False)
-                SeqIO.write(self.seqs[name], seqfile, 'fasta')
-                cmd = self.make_align_cmd(seqfile.name, name)
-                subprocess.run(cmd)
-            else:
-                # Alignments are in fasta format, so just make a copy
-                subprocess.run(['cp', self.files[0], name + '.aln'])
+            seqfile = tempfile.NamedTemporaryFile('w', delete=False)
+            SeqIO.write(self.seqs[name], seqfile.name, 'fasta')
+            if self.verbose:
+                print("Alignment input sequence file: {}".format(seqfile.name))
+            cmd = self.make_align_cmd(seqfile.name, name)
+            if self.verbose:
+                print("Alignment command is '{}'".format(cmd))
+            try:
+                subprocess.run(cmd, check=True)
+            except (subprocess.CalledProcessError) as exception:
+                print("Error running '{}':".format(self.aligner) + str(exception))
             self.alns[name] = name + '.aln'
 
     def make_align_cmd(self, infile, name):
+        '''
+        time muscle -in M-aa.fasta -out M-aa.aln
+            real	0m19.963s
+            user	0m19.594s
+            sys	0m0.238s
+        time clustalo -i M-aa.fasta -o x.aln --outfmt=fasta
+            real	0m23.045s
+            user	0m18.665s
+            sys	0m4.255s
+        time mafft --auto M-aa.fasta > M-aa.aln
+            real	0m2.254s
+            user	0m2.036s
+            sys	0m0.170s
+        '''
         if self.aligner == 'muscle':
-            cmd = [self.aligner, '-in', infile, '-out', name + '.aln']
-        if self.aligner == 'mafft':
-            cmd = [self.aligner, infile, '>', name + '.aln']
-        return cmd
+            return [self.aligner, '-in', infile, '-out', name + '.aln']
+        elif self.aligner == 'mafft':
+            return [self.aligner, '--auto', infile, '>', name + '.aln']
+        elif self.aligner == 'clustalo':
+            return [self.aligner, '-i', infile, '-o', name + '.aln', '--outfmt=fasta']
+        else:
+            sys.exit("No command for aligner {}".format(self.aligner))
 
     def make_hmm(self):
         for name in self.alns:
+            if self.verbose:
+                print("hmmbuild input file is '{}'".format(self.alns[name]))
             # Either --amino or --dna
             opt = '--amino' if '-aa' in name else '--dna'
             subprocess.run([self.hmmbuild, opt, name + '.hmm', self.alns[name]])
