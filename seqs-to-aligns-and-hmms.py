@@ -7,7 +7,7 @@ import subprocess
 import sys
 from Bio import AlignIO
 from Bio import SeqIO
-from Bio.Align.Applications import MuscleCommandline
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
