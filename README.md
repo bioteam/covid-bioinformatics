@@ -5,9 +5,9 @@ collections, alignments, and HMMs.
 
 
 # typical usage
-*./download-gb-by-taxid.py
-*./feature-to-gene-and-protein.py *.gb
-*./seqs-to-aligns-and-hmms.py *.fasta
+* ./download-gb-by-taxid.py
+* ./feature-to-gene-and-protein.py *.gb
+* ./seqs-to-aligns-and-hmms.py *.fasta
 
 
 The COV genes and proteins are parsed from the GenBank files as features and assigned standard names based on 
