@@ -315,6 +315,11 @@ NS4:
 NS5:
   - 3C-like proteinase
   - 3CL-PRO
+  - 3CLPRO
+  - 3CLpro
+  - 3cLpro
+  - 3C-like protease
+  - coronavirus 3C-like protease
   - accessory protein 5
   - main proteinase
   - main proteinase (Mpro)
@@ -332,6 +337,14 @@ NS5:
   - putative NSP5
   - putative nsp5
   - putative Nsp5
+  - SARS 3C-like protease
+  - SARS coronavirus 3CL protease
+  - SARS coronavirus main peptidase
+  - SARS coronavirus main protease
+  - SARS-CoV 3CLpro enzyme
+  - SARS-CoV main protease
+  - SARS-CoV Mpro
+  - severe acute respiratory syndrome coronavirus main protease 
 NS6:
   - accessory protein 6
   - non-structural protein 6
