@@ -267,7 +267,6 @@ NS2:
   - putative NSP2
   - putative nsp2
   - putative Nsp2
-  - putative nsp2 3CL-PRO
 NS3:
   - accessory protein 3
   - non-structural protein 3
@@ -315,6 +314,7 @@ NS4:
   - putative Nsp4
 NS5:
   - 3C-like proteinase
+  - 3CL-PRO
   - accessory protein 5
   - main proteinase
   - main proteinase (Mpro)
@@ -328,6 +328,7 @@ NS5:
   - NSP5
   - nsp5
   - Nsp5
+  - putative nsp5 3CL-PRO
   - putative NSP5
   - putative nsp5
   - putative Nsp5
