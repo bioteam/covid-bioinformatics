@@ -3,7 +3,6 @@
 import re
 import os
 import argparse
-import itertools
 import numpy
 import yaml
 from Bio import Entrez
@@ -23,7 +22,8 @@ parser.add_argument('-min', default=25000, type=int, help="Minimum length")
 parser.add_argument('-max', type=int, help="Maximum length")
 parser.add_argument('-split', dest='split', default=True, help="Split into separate files")
 parser.add_argument('-no-split', dest='split', action='store_false', help="Create one 'taxid' file")
-parser.add_argument('-verbose', default=False, type=bool, help="Verbose")
+parser.add_argument('-verbose', action='store_true', dest='verbose', help="Verbose")
+parser.add_argument('-quiet', default=False, dest='verbose', help="Quiet")
 parser.add_argument('-cloud', default=False, type=bool, help="Cloud mode")
 args = parser.parse_args()
 
@@ -31,7 +31,7 @@ def main():
     entrez = DownloadGbByTaxid(args.email, args.taxid, args.format, args.min, args.max,
                                      args.split, args.recurse, args.verbose, args.cloud)
     entrez.search()
-    entrez.filter()
+    entrez.efetch()
     entrez.write()
 
 
@@ -47,7 +47,7 @@ class DownloadGbByTaxid:
         self.recurse = recurse
         self.verbose = verbose
         self.nt_ids = []
-        self.records = iter([])
+        self.records = []
         self.retmax = 100
         self.cloud = cloud
         if self.cloud:
@@ -110,8 +110,6 @@ class DownloadGbByTaxid:
             print("Esearch id count for Taxonomy id {0}: {1}".format(
                 self.taxid, len(self.nt_ids)))
 
-        self.efetch()
-
     def efetch(self):
         Entrez.email = self.email
         # Split the list of ids into "batches" of ids for Entrez
@@ -128,27 +126,36 @@ class DownloadGbByTaxid:
                     id=','.join(id_chunk)
                 )
                 # Creating the SeqRecord objects here makes filter() easier
-                self.records = itertools.chain(
-                    self.records, SeqIO.parse(handle, self.format))
+                records = SeqIO.parse(handle, self.format)
+                self.records = self.records + list(self.filter(records))
+                handle.close()
         except (RuntimeError) as exception:
             print("Error retrieving sequences using id '" +
                   str(self.taxid) + "':" + str(exception))
 
-    def filter(self):
+    def filter(self, records):
         if self.min_len:
             filtered = []
-            for record in self.records:
+            for record in records:
+                if self.verbose:
+                    print("Filtering {}".format(record.id))
                 if len(record) >= self.min_len:
                     filtered.append(record)
-            self.records = filtered
+            return filtered
+        else:
+            return records
 
     def write(self):
         if self.split:
             for record in self.records:
                 seqfile = record.name + '.' + self.format
+                if self.verbose:
+                    print("Writing {}".format(seqfile))
                 SeqIO.write(record, seqfile, self.format)
         else:
             seqfile = 'taxid-' + str(self.taxid) + '.' + self.format
+            if self.verbose:
+                print("Writing {}".format(seqfile))
             SeqIO.write(self.records, seqfile, self.format)
 
 
