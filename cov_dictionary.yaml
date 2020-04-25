@@ -28,9 +28,12 @@ E:
   - envelope protein E
   - envelope small membrane protein
   - envelope_protein
+  - envelope protein
+  - putative small envelope protein
   - putative envelope protein E
   - small envelope E protein
   - small envelope protein
+  - putative E2 glycoprotein precursor
 M:
   - M
   - M protein
@@ -61,7 +64,7 @@ N:
   - putative nucleocapsid protein
   - putative nucleocapsid protein N
 ORF1a:
-  - hypothetica protein orf1a
+  - hypothetical protein orf1a
   - hypothetical protein ORF1a
   - non-structural polyprotein 1a
   - non-structural polyprotein pp1a
@@ -87,7 +90,7 @@ ORF1a:
   - putative polyprotein orf1a
   - replicase polyprotein 1a
 ORF1ab:
-  - hypothetica protein orf1ab
+  - hypothetical protein orf1ab
   - hypothetical protein ORF1ab
   - hypothetical protein ORF1ab_polyprotein
   - non-structural polyprotein 1ab
@@ -115,8 +118,8 @@ ORF1ab:
   - replicase p1AB
   - replicase polyprotein 1ab
 ORF3:
-  - hypothetica protein orf3
-  - hypothetica protein Orf3
+  - hypothetical protein orf3
+  - hypothetical protein Orf3
   - hypothetical protein ORF3
   - ORF3
   - Orf3
@@ -128,7 +131,7 @@ ORF3:
 ORF3a:
   - 3a
   - 3a protein
-  - hypothetica protein orf3a
+  - hypothetical protein orf3a
   - hypothetical protein ORF3a
   - hypothetical protein Orf3a
   - ORF3a
@@ -142,8 +145,8 @@ ORF3a:
 ORF3b:
   - 3b
   - 3b protein
-  - hypothetica protein orf3b
-  - hypothetica protein Orf3b
+  - hypothetical protein orf3b
+  - hypothetical protein Orf3b
   - hypothetical protein ORF3b
   - ORF3b
   - Orf3b
@@ -154,8 +157,8 @@ ORF3b:
   - putative ORF3b
   - sars3b
 ORF6:
-  - hypothetica protein orf6
-  - hypothetica protein Orf6
+  - hypothetical protein orf6
+  - hypothetical protein Orf6
   - hypothetical protein ORF6
   - ORF6
   - Orf6
@@ -166,8 +169,8 @@ ORF6:
   - putative ORF6
   - sars6
 ORF7:
-  - hypothetica protein orf7
-  - hypothetica protein Orf7
+  - hypothetical protein orf7
+  - hypothetical protein Orf7
   - hypothetical protein ORF7
   - ORF7
   - Orf7
@@ -178,7 +181,7 @@ ORF7:
   - putative ORF7
   - sars7
 ORF7a:
-  - hypothetica protein orf7a
+  - hypothetical protein orf7a
   - hypothetical protein ORF7a
   - hypothetical protein Orf7a
   - ORF7a
@@ -190,7 +193,7 @@ ORF7a:
   - putative ORF7a
   - sars7a
 ORF7b:
-  - hypothetica protein orf7b
+  - hypothetical protein orf7b
   - hypothetical protein ORF7b
   - hypothetical protein Orf7b
   - ORF7b
@@ -202,7 +205,7 @@ ORF7b:
   - putative ORF7b
   - sars7b
 ORF8:
-  - hypothetica protein orf8
+  - hypothetical protein orf8
   - hypothetical protein ORF8
   - hypothetical protein Orf8
   - ORF8
@@ -213,7 +216,7 @@ ORF8:
   - ORF8_protein
   - putative ORF8
 ORF9b:
-  - hypothetica protein orf9b
+  - hypothetical protein orf9b
   - hypothetical protein ORF9b
   - hypothetical protein Orf9b
   - ORF9b
@@ -223,7 +226,7 @@ ORF9b:
   - Orf9b protein
   - putative ORF9b
 ORF10:
-  - hypothetica protein orf10
+  - hypothetical protein orf10
   - hypothetical protein ORF10
   - hypothetical protein Orf10
   - ORF10
@@ -307,6 +310,10 @@ NS4:
   - nonstructural protein 4
   - nonstructural protein NS4
   - NS4
+  - NSP4
+  - nsp4
+  - putative nsp4
+  - Nsp4
   - NS4_protein
   - NSP4 protein
   - nsp4-pp1a/pp1ab

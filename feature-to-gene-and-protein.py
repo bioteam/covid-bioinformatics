@@ -168,10 +168,10 @@ class Feature_To_Gene_And_Protein:
         for name in self.synonyms:
             if product in self.synonyms[name]:
                 if self.verbose:
-                    print("Product {0} from {1} found".format(product, acc))
+                    print("Product '{0}' from {1} found".format(product, acc))
                 return name
         if self.verbose:
-            print("Product {0} from {1} not found".format(product, acc))
+            print("Product '{0}' from {1} not found".format(product, acc))
         self.unidentified.append(product + '-' + acc)
         return None
 
@@ -251,10 +251,10 @@ class Feature_To_Gene_And_Protein:
                                   description=desc.replace('[', str(len(self.accs[acc]['seq'])) + 'nt [' , 1))
                 self.nt[name].append(nt)
                 # aa
-                aaseq = str(ntseq.translate().seq)
+                aaseq = str(nt.translate().seq)
                 aa = SeqRecord(Seq(aaseq, IUPAC.extended_protein),
                                   id=feat.id,
-                                  description=desc.replace('[', str(len(str(ntseq.translate().seq))) + 'aa [' , 1) )
+                                  description=desc.replace('[', str(len(str(nt.translate().seq))) + 'aa [' , 1) )
                 self.aa[name].append(aa)
 
     def make_desc(self, feat):

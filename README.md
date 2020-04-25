@@ -17,7 +17,7 @@ their *product* tags. The synonyms for these standard names are listed in *cov_d
 # requirements
 * Python3 and packages, including Biopython
 * Aligner (muscle, or clustalo, or mafft)
-* HMMER
+* HMMER 3.3
 
 
 # to-do

@@ -68,7 +68,6 @@ class DownloadGbByTaxid:
 
     def search(self):
         nummatch = re.match(r'^\d+$', str(self.taxid))
-
         if not nummatch and self.verbose:
             print("String '" + self.taxid + "' is not an NCBI taxon id")
             return
@@ -119,7 +118,7 @@ class DownloadGbByTaxid:
         for id_chunk in numpy.array_split(numpy.array(self.nt_ids), num_chunks):
             try:
                 if self.verbose:
-                    print("Going to download records: {}".format(id_chunk))
+                    print("Downloading records: {}".format(id_chunk))
                 handle = Entrez.efetch(
                     db="nucleotide",
                     rettype=self.format,
