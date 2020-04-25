@@ -3,6 +3,7 @@
 import argparse
 import os
 import yaml
+import re
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
@@ -220,15 +221,16 @@ class Feature_To_Gene_And_Protein:
             for feat in self.sorted_cds[name]:
                 desc = self.make_desc(feat)
                 acc = feat.id.split('-')[1]
+                # Add lengths like "55aa", "78nt" to the description
                 # nt
                 ntseq = SeqRecord(Seq(feat.extract(self.accs[acc]['seq']), IUPAC.ambiguous_dna),
                                   id=feat.id,
-                                  description=desc)
+                                  description=desc.replace('[', str(len(self.accs[acc]['seq'])) + 'nt [' , 1) )
                 self.nt[name].append(ntseq)
                 # aa
                 aaseq = SeqRecord(Seq(feat.qualifiers["translation"][0], IUPAC.extended_protein),
                                   id=feat.id,
-                                  description=desc)
+                                  description=desc.replace('[', str(len(feat.qualifiers["translation"][0])) + 'aa [' , 1))
                 self.aa[name].append(aaseq)
 
         for name in self.sorted_mats.keys():
@@ -267,8 +269,8 @@ class Feature_To_Gene_And_Protein:
                         "org='{}'".format(self.accs[acc]['organism']) ])
         if 'protein_id' in feat.qualifiers.keys():
             desc = desc + ' ' + feat.qualifiers["protein_id"][0]
-        if self.verbose:
-            print("Description: {}".format(desc))
+        # if self.verbose:
+        #     print("Description: {}".format(desc))
         return desc
 
     def write(self):

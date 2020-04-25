@@ -55,17 +55,21 @@ class Seqs_To_Aligns_And_Hmms:
         
     def make_align(self):
         for name in self.seqs:
-            seqfile = tempfile.NamedTemporaryFile('w', delete=False)
-            SeqIO.write(self.seqs[name], seqfile.name, 'fasta')
-            if self.verbose:
-                print("Alignment input sequence file: {}".format(seqfile.name))
-            cmd = self.make_align_cmd(seqfile.name, name)
-            if self.verbose:
-                print("Alignment command is '{}'".format(cmd))
-            try:
+            if len(self.seqs[name]) > 1:
+                seqfile = tempfile.NamedTemporaryFile('w', delete=False)
+                SeqIO.write(self.seqs[name], seqfile.name, 'fasta')
+                if self.verbose:
+                    print("Alignment input sequence file: {}".format(seqfile.name))
+                cmd = self.make_align_cmd(seqfile.name, name)
+                if self.verbose:
+                    print("Alignment command is '{}'".format(cmd))
+                try:
+                    subprocess.run(cmd, check=True)
+                except (subprocess.CalledProcessError) as exception:
+                    print("Error running '{}':".format(self.aligner) + str(exception))
+            else:
+                cmd = ['cp', name + '.fasta', name + '.aln']
                 subprocess.run(cmd, check=True)
-            except (subprocess.CalledProcessError) as exception:
-                print("Error running '{}':".format(self.aligner) + str(exception))
             self.alns[name] = name + '.aln'
 
     def make_align_cmd(self, infile, name):
