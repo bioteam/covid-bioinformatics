@@ -32,6 +32,7 @@ def main():
                                      args.split, args.recurse, args.verbose, args.cloud)
     entrez.search()
     entrez.efetch()
+    entrez.filter()
     entrez.write()
 
 
@@ -115,8 +116,8 @@ class DownloadGbByTaxid:
         # Split the list of ids into "batches" of ids for Entrez
         num_chunks = int(len(self.nt_ids)/self.retmax) + 1
 
-        try:
-            for id_chunk in numpy.array_split(numpy.array(self.nt_ids), num_chunks):
+        for id_chunk in numpy.array_split(numpy.array(self.nt_ids), num_chunks):
+            try:
                 if self.verbose:
                     print("Going to download records: {}".format(id_chunk))
                 handle = Entrez.efetch(
@@ -125,25 +126,23 @@ class DownloadGbByTaxid:
                     retmode="text",
                     id=','.join(id_chunk)
                 )
-                # Creating the SeqRecord objects here makes filter() easier
                 records = SeqIO.parse(handle, self.format)
-                self.records = self.records + list(self.filter(records))
+                self.records = self.records + list(records)
                 handle.close()
-        except (RuntimeError) as exception:
-            print("Error retrieving sequences using id '" +
+            except (RuntimeError) as exception:
+                print("Error retrieving sequences using id '" +
                   str(self.taxid) + "':" + str(exception))
 
-    def filter(self, records):
+    def filter(self):
         if self.min_len:
             filtered = []
-            for record in records:
+            for record in self.records:
                 if self.verbose:
                     print("Filtering {}".format(record.id))
                 if len(record) >= self.min_len:
                     filtered.append(record)
-            return filtered
-        else:
-            return records
+            self.records = filtered
+
 
     def write(self):
         if self.split:
