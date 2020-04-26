@@ -58,6 +58,7 @@ def main():
     extractor.read()
     extractor.standardize()
     extractor.create_objects()
+    extractor.sort_by_size()
     extractor.write()
 
 
@@ -66,26 +67,63 @@ class Feature_To_Gene_And_Protein:
     def __init__(self, seq_format, split, analyze, verbose, files):
         self.seq_format = seq_format
         self.split = split
+        # Do not write to any files
         self.analyze = analyze
         self.verbose = verbose
         self.files = files
-        # Initial collection of features
+        # Initial collection of all features keyed by accession
         self.accs = dict()
         # Features sorted by standard gene/protein names
         self.sorted_cds = dict()
         self.sorted_mats = dict()
         # Nucleotide and protein features for writing to fasta
-        self.nt = dict()
-        self.aa = dict()
+        self.feats = dict()
         # Features that cannot be identified by name
         self.unidentified = []
+        # Dictionaries
         self.synonyms = self.read_synonyms()
+        self.variants = self.read_variants()
 
     def read_synonyms(self):
         y = os.path.dirname(os.path.abspath(__file__)) + '/cov_dictionary.yaml'
         with open(y) as file:
             synonyms = yaml.load(file, Loader=yaml.FullLoader)
         return synonyms
+
+    def read_variants(self):
+        y = os.path.dirname(os.path.abspath(__file__)) + '/cov_gene_variants.yaml'
+        with open(y) as file:
+            variants = yaml.load(file, Loader=yaml.FullLoader)
+        return variants
+
+    def sort_by_size(self):
+        '''
+        A gene might have length variants, "major" and "minor", based on 
+        incidence. All major genes are written to files accordings to standard gene
+        name (e.g. "NS8") and all minor genes are written to separate files
+        named by standard name and amino acid length variation (e.g. "NS8-50", "NS8-55").
+        '''
+        for gene in self.variants:
+            if self.variants[gene] is not None:
+                if self.verbose:
+                    print("Gene '{}' has length variants".format(gene))
+                if gene in self.feats.keys():
+                    # Make copy by using list() since the self.feats dict may change
+                    feats = list(self.feats[gene].keys())
+                    for feat in feats:
+                        feat_len = len(self.feats[gene][feat]['aa'])
+                        if feat_len not in self.variants[gene]['major']:
+                            if self.verbose:
+                                print("'{0}' is a length variant: {1} ne {2}".format(feat,
+                                    feat_len, self.variants[gene]['major']))
+                            newgene = gene + '-' + str(feat_len)
+                            if newgene not in self.feats.keys():
+                                self.feats[newgene] = dict()
+                                self.feats[newgene][feat] = dict()
+                            # Move feature to a key for the variant, delete it from prior location
+                            self.feats[newgene][feat]['aa'] = self.feats[gene][feat]['aa']
+                            self.feats[newgene][feat]['nt'] = self.feats[gene][feat]['nt']
+                            self.feats[gene].pop(feat)
 
     def read(self):
         full_paths = [os.path.join(os.getcwd(), path) for path in self.files]
@@ -206,56 +244,49 @@ class Feature_To_Gene_And_Protein:
                 self.accs[acc]['organism'] = 'unknown'
 
     def create_objects(self):
-        if self.analyze:
-            return
         '''
             Create SeqRecords for aa and nt that will written out as fasta.
             Fasta format metadata is made up of "id" and "description".
             All other SeqRecord fields are ignored when Biopython makes fasta.
         '''
         for name in self.sorted_cds.keys():
-            if name not in self.aa.keys():
-                self.aa[name] = []
-            if name not in self.nt.keys():
-                self.nt[name] = []
+            self.feats[name] = dict()
             for feat in self.sorted_cds[name]:
+                self.feats[name][feat.id] = dict()
                 desc = self.make_desc(feat)
                 acc = feat.id.split('-')[1]
                 # nt
                 ntseq = feat.extract(self.accs[acc]['seq'])
                 nt = SeqRecord(Seq(ntseq, IUPAC.ambiguous_dna),
                                   id=feat.id,
-                                  # Add lengths like "78nt" to the description
-                                  description=desc.replace('[', str(len(ntseq)) + 'nt [' , 1) )
-                self.nt[name].append(nt)
+                                  description=str(len(ntseq)) + 'nt ' + desc)
+                self.feats[name][feat.id]['nt'] = nt
                 # aa
                 aaseq = feat.qualifiers["translation"][0]
                 aa = SeqRecord(Seq(aaseq, IUPAC.extended_protein),
                                   id=feat.id,
                                   # Add lengths like "55aa" to the description
-                                  description=desc.replace('[', str(len(aaseq)) + 'aa [' , 1))
-                self.aa[name].append(aa)
+                                  description=str(len(aaseq)) + 'aa ' + desc)
+                self.feats[name][feat.id]['aa'] = aa
 
         for name in self.sorted_mats.keys():
-            if name not in self.aa.keys():
-                self.aa[name] = []
-            if name not in self.nt.keys():
-                self.nt[name] = []
+            self.feats[name] = dict()
             for feat in self.sorted_mats[name]:
+                self.feats[name][feat.id] = dict()
                 desc = self.make_desc(feat)
                 acc = feat.id.split('-')[1]
                 # nt
                 ntseq = feat.extract(self.accs[acc]['seq'])
                 nt = SeqRecord(Seq(ntseq, IUPAC.ambiguous_dna),
                                   id=feat.id,
-                                  description=desc.replace('[', str(len(self.accs[acc]['seq'])) + 'nt [' , 1))
-                self.nt[name].append(nt)
+                                  description=str(len(ntseq)) + 'nt ' + desc)
+                self.feats[name][feat.id]['nt'] = nt
                 # aa
                 aaseq = str(nt.translate().seq)
                 aa = SeqRecord(Seq(aaseq, IUPAC.extended_protein),
                                   id=feat.id,
-                                  description=desc.replace('[', str(len(str(nt.translate().seq))) + 'aa [' , 1) )
-                self.aa[name].append(aa)
+                                  description=str(len(aaseq)) + 'aa ' + desc)
+                self.feats[name][feat.id]['aa'] = aa
 
     def make_desc(self, feat):
         '''
@@ -290,12 +321,18 @@ class Feature_To_Gene_And_Protein:
             # seqfile = record + '-CDS' + '.' + self.seq_format
             # SeqIO.write(seqs, seqfile, self.seq_format)
         else:
-            for name in self.aa.keys():
-                seqfile = name + '-aa.' + self.seq_format
-                SeqIO.write(self.aa[name], seqfile, self.seq_format)
-            for name in self.nt.keys():
-                seqfile = name + '-nt.' + self.seq_format
-                SeqIO.write(self.nt[name], seqfile, self.seq_format)
+            for name in self.feats.keys():
+                if not self.feats[name]:
+                    continue
+                aaseqfile = name + '-aa.' + self.seq_format
+                ntseqfile = name + '-nt.' + self.seq_format
+                aahandle = open(aaseqfile, "w")
+                nthandle = open(ntseqfile, "w")
+                for feat in self.feats[name].keys():
+                    SeqIO.write(self.feats[name][feat]['aa'], aahandle, self.seq_format)
+                    SeqIO.write(self.feats[name][feat]['nt'], nthandle, self.seq_format)
+                aahandle.close()
+                nthandle.close()
 
 if __name__ == "__main__":
     main()

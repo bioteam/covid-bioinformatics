@@ -21,6 +21,5 @@ their *product* tags. The synonyms for these standard names are listed in *cov_d
 
 
 # to-do
-* Analyze alignments and remove sequences without similarity
-* Trim alignments before creating HMMs
-* HMM-based annotation and visualization (e.g. for [IGV](https://igvteam.github.io/igv-webapp/fileFormats.html))
+* HMM-based annotation and QC
+* Visualization (e.g. for [IGV](https://igvteam.github.io/igv-webapp/fileFormats.html))
