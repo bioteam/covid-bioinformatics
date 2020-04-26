@@ -103,27 +103,36 @@ class Feature_To_Gene_And_Protein:
         name (e.g. "NS8") and all minor genes are written to separate files
         named by standard name and amino acid length variation (e.g. "NS8-50", "NS8-55").
         '''
+        # Copy from self.feats to an empty dict so we don't need to handle changes to self.feats
+        feats = dict()
         for gene in self.variants:
             if self.variants[gene] is not None:
+                # If a given gene might have length variants
                 if self.verbose:
                     print("Gene '{}' has length variants".format(gene))
-                if gene in self.feats.keys():
-                    # Make copy by using list() since the self.feats dict may change
-                    feats = list(self.feats[gene].keys())
-                    for feat in feats:
-                        feat_len = len(self.feats[gene][feat]['aa'])
-                        if feat_len not in self.variants[gene]['major']:
-                            if self.verbose:
-                                print("'{0}' is a length variant: {1} ne {2}".format(feat,
+                for feat in self.feats[gene].keys():
+                    feat_len = len(self.feats[gene][feat]['aa'])
+                    # If a given feature does vary by length
+                    if feat_len not in self.variants[gene]['major']:
+                        if self.verbose:
+                            print("'{0}' is a length variant: {1} ne {2}".format(feat,
                                     feat_len, self.variants[gene]['major']))
-                            newgene = gene + '-' + str(feat_len)
-                            if newgene not in self.feats.keys():
-                                self.feats[newgene] = dict()
-                                self.feats[newgene][feat] = dict()
-                            # Move feature to a key for the variant, delete it from prior location
-                            self.feats[newgene][feat]['aa'] = self.feats[gene][feat]['aa']
-                            self.feats[newgene][feat]['nt'] = self.feats[gene][feat]['nt']
-                            self.feats[gene].pop(feat)
+                        newgene = gene + '-minor'
+                        if newgene not in feats.keys():
+                            feats[newgene] = dict()
+                        if feat not in feats[newgene].keys():
+                            feats[newgene][feat] = dict()
+                        # Copy feature
+                        feats[newgene][feat]['aa'] = self.feats[gene][feat]['aa']
+                        feats[newgene][feat]['nt'] = self.feats[gene][feat]['nt']
+                    else:
+                        if gene not in feats.keys():
+                            feats[gene] = dict()
+                        feats[gene][feat] = self.feats[gene][feat]
+            else:
+                # Just copy the entire 'gene' branch
+                feats[gene] = self.feats[gene]
+        self.feats = feats
 
     def read(self):
         full_paths = [os.path.join(os.getcwd(), path) for path in self.files]
