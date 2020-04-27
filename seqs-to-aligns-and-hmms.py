@@ -11,7 +11,7 @@ from Bio import SeqIO
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
-parser.add_argument('-aligner', default='muscle', help="Alignment application")
+parser.add_argument('-aligner', default='clustalo', help="Alignment application")
 parser.add_argument('-hmmbuilder', default='hmmbuild', help="HMM build application")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
@@ -55,7 +55,11 @@ class Seqs_To_Aligns_And_Hmms:
         
     def make_align(self):
         for name in self.seqs:
-            if len(self.seqs[name]) > 1:
+            # Many aligners will reject a file with a single sequence so just copy
+            if len(self.seqs[name]) == 1:
+                cmd = ['cp', name + '.fasta', name + '.aln']
+                subprocess.run(cmd, check=True)
+            else:
                 seqfile = tempfile.NamedTemporaryFile('w', delete=False)
                 SeqIO.write(self.seqs[name], seqfile.name, 'fasta')
                 if self.verbose:
@@ -67,9 +71,6 @@ class Seqs_To_Aligns_And_Hmms:
                     subprocess.run(cmd, check=True)
                 except (subprocess.CalledProcessError) as exception:
                     print("Error running '{}':".format(self.aligner) + str(exception))
-            else:
-                cmd = ['cp', name + '.fasta', name + '.aln']
-                subprocess.run(cmd, check=True)
             self.alns[name] = name + '.aln'
 
     def make_align_cmd(self, infile, name):

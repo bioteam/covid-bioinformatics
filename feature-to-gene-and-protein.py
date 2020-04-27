@@ -98,10 +98,11 @@ class Feature_To_Gene_And_Protein:
 
     def sort_by_size(self):
         '''
-        A gene might have length variants, "major" and "minor", based on 
-        incidence. All major genes are written to files accordings to standard gene
-        name (e.g. "NS8") and all minor genes are written to separate files
-        named by standard name and amino acid length variation (e.g. "NS8-50", "NS8-55").
+        Some sequences have length variants, "major" and "minor", based on 
+        incidence. The "minor" variants are usually not-alignable with the "major"
+        sequences, though they share the same name. All "major" sequences are written to files 
+        using a standard gene name (e.g. "NS8") and all "minor" sequences are written to
+        "minor" files (e.g. "NS8-minor-nt.fasta").
         '''
         # Copy from self.feats to an empty dict so we don't need to handle changes to self.feats
         feats = dict()
