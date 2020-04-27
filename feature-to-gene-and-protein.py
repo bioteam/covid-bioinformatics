@@ -118,14 +118,14 @@ class Feature_To_Gene_And_Protein:
                         if self.verbose:
                             print("'{0}' is a length variant: {1} ne {2}".format(feat,
                                     feat_len, self.variants[gene]['major']))
-                        newgene = gene + '-minor'
-                        if newgene not in feats.keys():
-                            feats[newgene] = dict()
-                        if feat not in feats[newgene].keys():
-                            feats[newgene][feat] = dict()
+                        minorgene = gene + '-minor'
+                        if minorgene not in feats.keys():
+                            feats[minorgene] = dict()
+                        if feat not in feats[minorgene].keys():
+                            feats[minorgene][feat] = dict()
                         # Copy feature
-                        feats[newgene][feat]['aa'] = self.feats[gene][feat]['aa']
-                        feats[newgene][feat]['nt'] = self.feats[gene][feat]['nt']
+                        feats[minorgene][feat]['aa'] = self.feats[gene][feat]['aa']
+                        feats[minorgene][feat]['nt'] = self.feats[gene][feat]['nt']
                     else:
                         if gene not in feats.keys():
                             feats[gene] = dict()
