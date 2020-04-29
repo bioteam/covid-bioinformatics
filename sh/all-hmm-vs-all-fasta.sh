@@ -17,22 +17,22 @@ done
 
 for hmm in $hmms
 do
-    if [ ! -f $hmm ]; then
+    if [ ! -f $hmm ]
+    then
         echo HMM "$hmm" not found
         exit
     fi
     echo HMM is $hmm
-    hfile=$(basename $hmm)
-    hbase=$(echo $hfile | cut -d '.' -f 1 )
+    hbase=$( basename $hmm | cut -d '.' -f 1 )
     for fasta in $fastas
     do
-        if [ ! -f $fasta ]; then
+        if [ ! -f $fasta ]
+        then
             echo Fasta "$fasta" not found
             exit
         fi
         echo Fasta is $fasta
-        ffile=$(basename $fasta)
-        fbase=$(echo $ffile | cut -d '.' -f 1 )
+        fbase=$( basename $fasta | cut -d '.' -f 1 )
         out="${hbase}${UNDERSCORE}${fbase}.out"
         cmd="hmmsearch --noali -E $evalue --tblout $out $hmm $fasta"
         $cmd

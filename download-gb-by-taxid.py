@@ -2,6 +2,7 @@
 
 import re
 import os
+import sys
 import argparse
 import numpy
 import yaml
@@ -25,11 +26,13 @@ parser.add_argument('-no-split', dest='split', action='store_false', help="Creat
 parser.add_argument('-verbose', action='store_true', dest='verbose', help="Verbose")
 parser.add_argument('-quiet', default=False, dest='verbose', help="Quiet")
 parser.add_argument('-cloud', default=False, type=bool, help="Cloud mode")
+parser.add_argument('-no-fetch', action='store_false', dest='fetch', help="Do not download")
 args = parser.parse_args()
 
 def main():
     entrez = DownloadGbByTaxid(args.email, args.taxid, args.format, args.min, args.max,
-                                     args.split, args.recurse, args.verbose, args.cloud)
+                                     args.split, args.recurse, args.verbose, args.cloud,
+                                     args.fetch)
     entrez.search()
     entrez.efetch()
     entrez.filter()
@@ -38,7 +41,7 @@ def main():
 
 class DownloadGbByTaxid:
 
-    def __init__(self, email, taxid, format, min_len, max_len, split, recurse, verbose, cloud):
+    def __init__(self, email, taxid, format, min_len, max_len, split, recurse, verbose, cloud, fetch):
         self.email = email
         self.taxid = taxid
         self.format = format
@@ -51,6 +54,7 @@ class DownloadGbByTaxid:
         self.records = []
         self.retmax = 100
         self.cloud = cloud
+        self.fetch = fetch
         if self.cloud:
             with open('config.yaml') as file:
                 config = yaml.load(file, Loader=yaml.FullLoader)
@@ -111,6 +115,8 @@ class DownloadGbByTaxid:
                 self.taxid, len(self.nt_ids)))
 
     def efetch(self):
+        if self.fetch == False:
+            sys.exit(0)
         Entrez.email = self.email
         # Split the list of ids into "batches" of ids for Entrez
         num_chunks = int(len(self.nt_ids)/self.retmax) + 1
