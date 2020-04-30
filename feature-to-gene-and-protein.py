@@ -315,8 +315,6 @@ class Feature_To_Gene_And_Protein:
                         "org='{}'".format(self.accs[acc]['organism']) ])
         if 'protein_id' in feat.qualifiers.keys():
             desc = desc + ' ' + feat.qualifiers["protein_id"][0]
-        # if self.verbose:
-        #     print("Description: {}".format(desc))
         return desc
 
     def write(self):

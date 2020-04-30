@@ -2,7 +2,6 @@
 
 import argparse
 import os.path
-import subprocess
 import sys
 import re
 from Bio import SearchIO
