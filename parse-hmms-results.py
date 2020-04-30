@@ -4,12 +4,13 @@ import argparse
 import os.path
 import subprocess
 import sys
+import re
 from Bio import SearchIO
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
-# parser.add_argument('-aligner', default='clustalo', help="Alignment application")
+parser.add_argument('-verbose', default=False,
+                    action='store_true', help="Verbose")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
@@ -18,20 +19,25 @@ def main():
     builder = Parse_Hmms_Results(args.verbose, args.files)
     builder.read()
 
+
 class Parse_Hmms_Results:
 
     def __init__(self, verbose, files):
         self.verbose = verbose
         self.files = files
-        # self.seqs, self.alns, self.hmms = dict(), dict(), dict()
 
     def read(self):
-        full_paths = [os.path.join(os.getcwd(), path) for path in self.files]
-        for path in full_paths:
-            for qresult in SearchIO.parse(path, 'hmmer3-tab'):
-                print("{0}\t{1}\t{2}".format(qresult.id, qresult.accession, len(qresult.hits)))
-                hit = qresult.hits[0]
-                print("{0}\t{1}\t{2}".format(hit.id, hit.evalue, hit.description))
+        # full_paths = [os.path.join(os.getcwd(), path) for path in self.files]
+        for file in self.files:
+            matches = re.match(r'(\w+-\w+)_(\w+-\w+)', file)
+            # Turn a Generator into a list
+            qresult = list(SearchIO.parse(file, 'hmmer3-tab'))
+            if not qresult:
+                print("No match:\t{0}\t{1}".format(matches[1], matches[2]))
+            else:
+                print("{0}\t{1}\t{2}".format(qresult[0].id, qresult[0].accession, len(qresult[0].hits)))
+                hit = qresult[0].hits[0]
+                print("{0}\t{1}".format(hit.id, hit.evalue))
 
 
 if __name__ == "__main__":
