@@ -1,13 +1,13 @@
 ---
 S:
-E:
+E: { 'major': [76,75], 'minor': [1255] }
 M:
 N:
 ORF1a:
 ORF1ab:
 ORF3:
 ORF3a:
-ORF3b:
+ORF3b: { 'major': [154], 'minor': [114] }
 ORF6:
 ORF7:
 ORF7a:
@@ -16,12 +16,12 @@ ORF8: { 'major': [121,122], 'minor': [50,55] }
 ORF9b: { 'major': [97,98], 'minor': [70] }
 ORF10: { 'major': [38], 'minor': [39,122,121,70] }
 NS1: { 'major': [179,180], 'minor': [2422] }
-NS2:
+NS2: { 'major': [638,639], 'minor': [306] }
 NS3:
 NS3a:
 NS3b:
-NS4:
-NS5:
+NS4: { 'major': [500], 'minor': [83] }
+NS5: { 'major': [306], 'minor': [198] }
 NS6: { 'major': [290],'minor': [63,113] }
 NS7: { 'major': [83], 'minor': [139] }
 NS7a:
@@ -33,7 +33,7 @@ NS9: { 'major': [113],'minor': [932] }
 NS9b:
 NS10: { 'major': [139], 'minor': [601,70] }
 NS11: { 'major': [11], 'minor': [527] }
-NS12:
+NS12: { 'major': [932], 'minor': [346] }
 NS13:
 NS14:
 NS15:

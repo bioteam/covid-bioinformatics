@@ -26,7 +26,6 @@ E:
   - E_protein
   - E2
   - envelope protein E
-  - envelope small membrane protein
   - envelope_protein
   - envelope protein
   - putative small envelope protein
@@ -117,17 +116,6 @@ ORF1ab:
   - replicase 1AB polyprotein
   - replicase p1AB
   - replicase polyprotein 1ab
-ORF3:
-  - hypothetical protein orf3
-  - hypothetical protein Orf3
-  - hypothetical protein ORF3
-  - ORF3
-  - Orf3
-  - orf3
-  - orf3 protein
-  - ORF3 protein
-  - ORF3_protein
-  - putative ORF3
 ORF3a:
   - 3a
   - 3a protein
@@ -142,6 +130,16 @@ ORF3a:
   - ORF3a_protein
   - putative ORF3a
   - sars3a
+  - hypothetical protein orf3
+  - hypothetical protein Orf3
+  - hypothetical protein ORF3
+  - ORF3
+  - Orf3
+  - orf3
+  - orf3 protein
+  - ORF3 protein
+  - ORF3_protein
+  - putative ORF3
 ORF3b:
   - 3b
   - 3b protein
