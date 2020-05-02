@@ -17,7 +17,7 @@ ORF9b: { 'major': [97,98], 'minor': [70] }
 ORF10: { 'major': [38], 'minor': [39,122,121,70] }
 NS1: { 'major': [179,180], 'minor': [2422] }
 NS2: { 'major': [638,639], 'minor': [306] }
-NS3:
+NS3: { 'major': [1922, 1945], 'minor': [290] }
 NS3a:
 NS3b:
 NS4: { 'major': [500], 'minor': [83] }
@@ -33,9 +33,9 @@ NS9: { 'major': [113],'minor': [932] }
 NS9b:
 NS10: { 'major': [139], 'minor': [601,70] }
 NS11: { 'major': [11], 'minor': [527] }
-NS12: { 'major': [932], 'minor': [346] }
-NS13:
+NS12: { 'major': [932,936], 'minor': [346] }
+NS13: { 'major': [601,586], 'minor': [298] }
 NS14:
 NS15:
-NS16:
+NS16: { 'major': [298], 'minor': [183,102] }
 
