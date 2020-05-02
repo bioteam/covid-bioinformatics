@@ -5,7 +5,6 @@ M:
 N:
 ORF1a:
 ORF1ab:
-ORF3:
 ORF3a:
 ORF3b: { 'major': [154], 'minor': [114] }
 ORF6:
