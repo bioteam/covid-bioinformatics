@@ -13,22 +13,24 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
 parser.add_argument('-aligner', default='clustalo', help="Alignment application")
 parser.add_argument('-hmmbuilder', default='hmmbuild', help="HMM build application")
+parser.add_argument('-skip', default='ORF1a-aa,ORF1a-nt,ORF1ab-aa,ORF1ab-nt', help="Do not align")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
 
 def main():
-    builder = Seqs_To_Aligns_And_Hmms(args.verbose, args.aligner, args.hmmbuilder, args.files)
+    builder = Seqs_To_Aligns_And_Hmms(args.verbose, args.aligner, args.hmmbuilder, args.skip, args.files)
     builder.read()
     builder.make_align()
     builder.make_hmm()
 
 class Seqs_To_Aligns_And_Hmms:
 
-    def __init__(self, verbose, aligner, hmmbuild, files):
+    def __init__(self, verbose, aligner, hmmbuild, skip, files):
         self.verbose = verbose
         self.aligner = aligner
         self.hmmbuild = hmmbuild
+        self.skip = skip
         self.files = files
         self.seqs, self.alns, self.hmms = dict(), dict(), dict()
 
@@ -55,6 +57,8 @@ class Seqs_To_Aligns_And_Hmms:
         
     def make_align(self):
         for name in self.seqs:
+            if name in self.skip:
+                continue
             # Many aligners will reject a file with a single sequence so just copy
             if len(self.seqs[name]) == 1:
                 cmd = ['cp', name + '.fasta', name + '.aln']
