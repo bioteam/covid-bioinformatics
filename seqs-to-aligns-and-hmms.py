@@ -11,7 +11,7 @@ from Bio import SeqIO
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
-parser.add_argument('-aligner', default='clustalo', help="Alignment application")
+parser.add_argument('-aligner', default='muscle', help="Alignment application")
 parser.add_argument('-hmmbuilder', default='hmmbuild', help="HMM build application")
 parser.add_argument('-skip', default='ORF1a-aa,ORF1a-nt,ORF1ab-aa,ORF1ab-nt', help="Do not align")
 parser.add_argument('-json', action='store_true', help="Create JSON for Gen3")
