@@ -137,8 +137,8 @@ class Feature_To_Gene_And_Protein:
 
 
     def read(self):
-        full_paths = [f for f in self.files if os.path.isfile(f)]
-        for path in full_paths:
+        paths = [f for f in self.files if os.path.isfile(f)]
+        for path in paths:
             try:
                 gbs = [rec for rec in SeqIO.parse(path, "gb")]
             except (RuntimeError) as exception:
