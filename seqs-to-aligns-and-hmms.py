@@ -99,7 +99,7 @@ class Seqs_To_Aligns_And_Hmms:
             sys	0m0.170s
         '''
         if self.aligner == 'muscle':
-            return [self.aligner, '-in', infile, '-out', name + '.aln']
+            return [self.aligner, '-quiet','-in', infile, '-out', name + '.aln']
         elif self.aligner == 'mafft':
             return [self.aligner, '--auto', infile, '>', name + '.aln']
         elif self.aligner == 'clustalo':
