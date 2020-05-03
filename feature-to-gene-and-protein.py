@@ -15,6 +15,7 @@ parser.add_argument('-split', default=False, dest='split', help="Split into sepa
 parser.add_argument('-no-split', action='store_false', dest='split', help="Create one file")
 parser.add_argument('-analyze', default=False, action='store_true', help="Parse files without file creation")
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
+parser.add_argument('-json', default=False, action='store_true', help="Create JSON for Gen3")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
@@ -54,28 +55,32 @@ qualifiers:
 
 
 def main():
-    extractor = Feature_To_Gene_And_Protein(args.format, args.split, args.analyze, args.verbose, args.files)
+    extractor = Feature_To_Gene_And_Protein(args.format, args.split, args.analyze, 
+        args.verbose, args.json, args.files)
     extractor.read()
     extractor.standardize()
     extractor.create_objects()
-    extractor.sort_by_size()
+    extractor.remove_invalid()
     extractor.write()
 
 
 class Feature_To_Gene_And_Protein:
+    from make_json import make_sequence_json
 
-    def __init__(self, seq_format, split, analyze, verbose, files):
+    def __init__(self, seq_format, split, analyze, verbose, json, files):
         self.seq_format = seq_format
         self.split = split
         # Do not write to any files
         self.analyze = analyze
         self.verbose = verbose
+        self.make_json = json
         self.files = files
         # Initial collection of all features keyed by accession
         self.accs = dict()
         # Features sorted by standard gene/protein names
         self.sorted_cds = dict()
         self.sorted_mats = dict()
+        self.json = dict()
         # Nucleotide and protein features for writing to fasta
         self.feats = dict()
         # Features that cannot be identified by name
@@ -96,47 +101,43 @@ class Feature_To_Gene_And_Protein:
             variants = yaml.load(file, Loader=yaml.FullLoader)
         return variants
 
-    def sort_by_size(self):
+    def remove_invalid(self):
         '''
-        Some sequences have length variants, "major" and "minor", based on 
-        incidence. The "minor" variants are usually not-alignable with the "major"
-        sequences, though they share the same name. All "major" sequences are written to files 
-        using a standard gene name (e.g. "NS8") and all "minor" sequences are written to
-        "minor" files (e.g. "NS8-minor-nt.fasta").
+        Features may be incorrectly named, or named used older names, we'll call these
+        "invalid". The "invalid" sequences are usually different lengths from the "valid"
+        sequences and not alignable with the "valid" sequences, though they share the same name. 
+        All "valid" sequences are written to files using a standard gene name (e.g. "NS8") and all 
+        "invalid" sequences are written to "invalid" files (e.g. "NS8-nt-invalid.fasta").
         '''
         # Copy from self.feats to an empty dict so we don't need to handle changes to self.feats
         feats = dict()
-        for gene in self.variants:
-            if self.variants[gene] is not None:
-                # If a given gene might have length variants
-                if self.verbose:
-                    print("Gene '{}' has length variants".format(gene))
-                for feat in self.feats[gene].keys():
-                    feat_len = len(self.feats[gene][feat]['aa'])
-                    # If a given feature does vary by length
-                    if feat_len not in self.variants[gene]['major']:
-                        if self.verbose:
-                            print("'{0}' is a length variant: {1} ne {2}".format(feat,
-                                    feat_len, self.variants[gene]['major']))
-                        minorgene = gene + '-minor'
-                        if minorgene not in feats.keys():
-                            feats[minorgene] = dict()
-                        if feat not in feats[minorgene].keys():
-                            feats[minorgene][feat] = dict()
-                        # Copy feature
-                        feats[minorgene][feat]['aa'] = self.feats[gene][feat]['aa']
-                        feats[minorgene][feat]['nt'] = self.feats[gene][feat]['nt']
-                    else:
-                        if gene not in feats.keys():
-                            feats[gene] = dict()
-                        feats[gene][feat] = self.feats[gene][feat]
-            else:
-                # Just copy the entire 'gene' branch
-                feats[gene] = self.feats[gene]
+
+        for gene in self.feats:
+            for feat in self.feats[gene].keys():
+                feat_len = len(self.feats[gene][feat]['aa'])
+                # If a given feature does vary by length
+                if feat_len not in self.variants[gene]['valid']:
+                    if self.verbose:
+                        print("'{0}' is invalid: {1} ne {2}".format(feat,
+                                    feat_len, self.variants[gene]['valid']))
+                    invalid = gene + '-invalid'
+                    if invalid not in feats.keys():
+                        feats[invalid] = dict()
+                    if feat not in feats[invalid].keys():
+                        feats[invalid][feat] = dict()
+                    # Copy feature
+                    feats[invalid][feat]['aa'] = self.feats[gene][feat]['aa']
+                    feats[invalid][feat]['nt'] = self.feats[gene][feat]['nt']
+                else:
+                    if gene not in feats.keys():
+                        feats[gene] = dict()
+                    feats[gene][feat] = self.feats[gene][feat]
+
         self.feats = feats
 
+
     def read(self):
-        full_paths = [os.path.join(os.getcwd(), path) for path in self.files]
+        full_paths = [f for f in self.files if os.path.isfile(f)]
         for path in full_paths:
             try:
                 gbs = [rec for rec in SeqIO.parse(path, "gb")]
@@ -261,6 +262,8 @@ class Feature_To_Gene_And_Protein:
         '''
         for name in self.sorted_cds.keys():
             self.feats[name] = dict()
+            if self.make_json:
+                self.json[name] = dict()
             for feat in self.sorted_cds[name]:
                 self.feats[name][feat.id] = dict()
                 desc = self.make_desc(feat)
@@ -269,6 +272,7 @@ class Feature_To_Gene_And_Protein:
                 ntseq = feat.extract(self.accs[acc]['seq'])
                 nt = SeqRecord(Seq(ntseq, IUPAC.ambiguous_dna),
                                   id=feat.id,
+                                  # Add lengths like "552nt" to the description
                                   description=str(len(ntseq)) + 'nt ' + desc)
                 self.feats[name][feat.id]['nt'] = nt
                 # aa
@@ -279,8 +283,16 @@ class Feature_To_Gene_And_Protein:
                                   description=str(len(aaseq)) + 'aa ' + desc)
                 self.feats[name][feat.id]['aa'] = aa
 
+                if self.make_json:
+                    from make_json import make_sequence_json
+                    self.json[name][feat.id] = dict()
+                    self.json[name][feat.id]['aa'] = make_sequence_json(aa, 'aa')
+                    self.json[name][feat.id]['nt'] = make_sequence_json(nt, 'nt')
+
         for name in self.sorted_mats.keys():
             self.feats[name] = dict()
+            if self.make_json:
+                self.json[name] = dict()
             for feat in self.sorted_mats[name]:
                 self.feats[name][feat.id] = dict()
                 desc = self.make_desc(feat)
@@ -297,6 +309,12 @@ class Feature_To_Gene_And_Protein:
                                   id=feat.id,
                                   description=str(len(aaseq)) + 'aa ' + desc)
                 self.feats[name][feat.id]['aa'] = aa
+
+                if self.make_json:
+                    from make_json import make_sequence_json
+                    self.json[name][feat.id] = dict()
+                    self.json[name][feat.id]['aa'] = make_sequence_json(aa, 'aa')
+                    self.json[name][feat.id]['nt'] = make_sequence_json(nt, 'nt')
 
     def make_desc(self, feat):
         '''
@@ -330,8 +348,6 @@ class Feature_To_Gene_And_Protein:
             # SeqIO.write(seqs, seqfile, self.seq_format)
         else:
             for name in self.feats.keys():
-                if not self.feats[name]:
-                    continue
                 aaseqfile = name + '-aa.' + self.seq_format
                 ntseqfile = name + '-nt.' + self.seq_format
                 aahandle = open(aaseqfile, "w")
@@ -341,6 +357,18 @@ class Feature_To_Gene_And_Protein:
                     SeqIO.write(self.feats[name][feat]['nt'], nthandle, self.seq_format)
                 aahandle.close()
                 nthandle.close()
-
+                if self.make_json and 'invalid' not in name:
+                    # No JSON for invalid sequences
+                    aafile = name + '-aa-fasta.json'
+                    ntfile = name + '-nt-fasta.json'
+                    aahandle = open(aafile, "w")
+                    nthandle = open(ntfile, "w")
+                    for feat in self.feats[name].keys():
+                        aahandle.write(self.json[name][feat]['aa'])
+                        nthandle.write(self.json[name][feat]['nt'])
+                    aahandle.close()
+                    nthandle.close()
+                    
+    
 if __name__ == "__main__":
     main()

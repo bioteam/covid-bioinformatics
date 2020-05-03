@@ -10,7 +10,7 @@ from Bio import Entrez
 from Bio import SeqIO
 
 # NCBI Taxonomy ids:
-# 1042633: single record for testing
+# 333387: single record for testing
 # 2697049: Severe acute respiratory syndrome coronavirus 2
 # 694009 (parent of 2697049): Severe acute respiratory syndrome-related coronavirus
 # https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=694009
@@ -23,8 +23,8 @@ parser.add_argument('-min', default=25000, type=int, help="Minimum length")
 parser.add_argument('-max', type=int, help="Maximum length")
 parser.add_argument('-split', dest='split', default=True, help="Split into separate files")
 parser.add_argument('-no-split', dest='split', action='store_false', help="Create one 'taxid' file")
-parser.add_argument('-verbose', action='store_true', dest='verbose', help="Verbose")
-parser.add_argument('-quiet', default=False, dest='verbose', help="Quiet")
+parser.add_argument('-verbose', action='store_true', help="Verbose")
+parser.add_argument('-json', action='store_true', help="Create JSON for Gen3")
 parser.add_argument('-cloud', default=False, type=bool, help="Cloud mode")
 parser.add_argument('-no-fetch', action='store_false', dest='fetch', help="Do not download")
 args = parser.parse_args()
@@ -32,7 +32,7 @@ args = parser.parse_args()
 def main():
     entrez = DownloadGbByTaxid(args.email, args.taxid, args.format, args.min, args.max,
                                      args.split, args.recurse, args.verbose, args.cloud,
-                                     args.fetch)
+                                     args.json, args.fetch)
     entrez.search()
     entrez.efetch()
     entrez.filter()
@@ -41,7 +41,7 @@ def main():
 
 class DownloadGbByTaxid:
 
-    def __init__(self, email, taxid, format, min_len, max_len, split, recurse, verbose, cloud, fetch):
+    def __init__(self, email, taxid, format, min_len, max_len, split, recurse, verbose, cloud, json, fetch):
         self.email = email
         self.taxid = taxid
         self.format = format
@@ -55,6 +55,7 @@ class DownloadGbByTaxid:
         self.retmax = 100
         self.cloud = cloud
         self.fetch = fetch
+        self.json = json
         if self.cloud:
             with open('config.yaml') as file:
                 config = yaml.load(file, Loader=yaml.FullLoader)
@@ -156,6 +157,11 @@ class DownloadGbByTaxid:
                 if self.verbose:
                     print("Writing {}".format(seqfile))
                 SeqIO.write(record, seqfile, self.format)
+                if self.json:
+                    from make_json import make_genome_json
+                    genome_json = make_genome_json(record.name)
+                    with open(record.name + '.json', 'w') as out:
+                        out.write(genome_json)
         else:
             seqfile = 'taxid-' + str(self.taxid) + '.' + self.format
             if self.verbose:

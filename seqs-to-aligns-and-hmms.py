@@ -14,35 +14,39 @@ parser.add_argument('-verbose', default=False, action='store_true', help="Verbos
 parser.add_argument('-aligner', default='clustalo', help="Alignment application")
 parser.add_argument('-hmmbuilder', default='hmmbuild', help="HMM build application")
 parser.add_argument('-skip', default='ORF1a-aa,ORF1a-nt,ORF1ab-aa,ORF1ab-nt', help="Do not align")
+parser.add_argument('-json', action='store_true', help="Create JSON for Gen3")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
 
 def main():
-    builder = Seqs_To_Aligns_And_Hmms(args.verbose, args.aligner, args.hmmbuilder, args.skip, args.files)
+    builder = Seqs_To_Aligns_And_Hmms(args.verbose, args.aligner, args.hmmbuilder, args.skip, 
+        args.json, args.files)
     builder.read()
     builder.make_align()
     builder.make_hmm()
+    builder.write_json()
+
 
 class Seqs_To_Aligns_And_Hmms:
 
-    def __init__(self, verbose, aligner, hmmbuild, skip, files):
+    def __init__(self, verbose, aligner, hmmbuild, skip, json, files):
         self.verbose = verbose
         self.aligner = aligner
         self.hmmbuild = hmmbuild
         self.skip = skip
+        self.make_json = json
         self.files = files
         self.seqs, self.alns, self.hmms = dict(), dict(), dict()
 
     def read(self):
-        full_paths = [os.path.join(os.getcwd(), path) for path in self.files]
-        for path in full_paths:
+        for path in [f for f in self.files if os.path.isfile(f)]:
             seqs = []
             # Get baseneme, for example "S-aa"
             name = os.path.basename(path).split('.')[0]
             try:
                 # Each one of these is a multiple fasta file
-                for index, fa in enumerate(SeqIO.parse(path,"fasta")):
+                for index, fa in enumerate(SeqIO.parse(path, "fasta")):
                     seqs.append(fa)
                 self.seqs[name] = self.remove_dups(seqs)
             except (RuntimeError) as exception:
@@ -58,6 +62,8 @@ class Seqs_To_Aligns_And_Hmms:
     def make_align(self):
         for name in self.seqs:
             if name in self.skip:
+                continue
+            if 'invalid' in name:
                 continue
             # Many aligners will reject a file with a single sequence so just copy
             if len(self.seqs[name]) == 1:
@@ -109,6 +115,20 @@ class Seqs_To_Aligns_And_Hmms:
             opt = '--amino' if '-aa' in name else '--dna'
             subprocess.run([self.hmmbuild, opt, name + '.hmm', self.alns[name]])
             self.hmms[name] = name + '.hmm'
+
+    def write_json(self):
+        if not self.make_json:
+            return
+        from make_json import make_hmm_json
+        for name in self.hmms:
+            json = make_hmm_json(self.hmms[name])
+            with open(name + '-hmm.json', 'w') as out:
+                out.write(json)
+        from make_json import make_alignment_json
+        for name in self.alns:
+            json = make_alignment_json(self.alns[name], self.aligner)
+            with open(name + '-aln.json', 'w') as out:
+                out.write(json)
 
 if __name__ == "__main__":
     main()
