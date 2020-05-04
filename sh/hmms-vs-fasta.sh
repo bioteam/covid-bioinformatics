@@ -36,7 +36,8 @@ do
     echo HMM: $hmm Fasta:$fasta
     base=$( echo $hmm | cut -d '.' -f 1 )
     out="$base$UNDERSCORE$fasta.out"
-    cmd="hmmsearch --noali -E $evalue --tblout $out $hmm $fasta"
+    #cmd="hmmsearch --noali -E $evalue --tblout $out $hmm $fasta"
+    cmd="hmmsearch --noali --tblout $out $hmm $fasta"
     $cmd
     echo Output is $out
 done
