@@ -40,12 +40,13 @@ do
     if [ ! -f $out ]
     then
         echo HMM: $hmm Fasta:$fasta
-        if evalue == FALSE
+        if [[ $evalue == FALSE ]]
         then
             cmd="hmmsearch --noali --tblout $out $hmm $fasta"
         else
             cmd="hmmsearch --noali -E $evalue --tblout $out $hmm $fasta"
         fi
+	echo Command is $cmd
         $cmd
         echo Output is $out
     fi
