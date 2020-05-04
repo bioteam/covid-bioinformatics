@@ -1,19 +1,18 @@
 #!/bin/bash
 # Run HMMs against a Fasta file using hmmsearch,
-# create 'table' output files like S-aa_E-aa.out. Usage:
-# hmms-vs-fasta.sh -h 'NS*aa.hmm' -f nr
+# create 'table' output files like S-aa_nr.out.
 
 fasta=FALSE
 hmms=FALSE
 evalue=FALSE
 UNDERSCORE='_'
 
-while getopts ":h:f:" opt
+while getopts ":h:f:e:" opt
    do
      case $opt in
         h ) hmms=$OPTARG;;
         f ) fasta=$OPTARG;;
-        e ) fasta=$OPTARG;;
+        e ) evalue=$OPTARG;;
      esac
 done
 
