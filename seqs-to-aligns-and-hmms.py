@@ -67,7 +67,7 @@ class Seqs_To_Aligns_And_Hmms:
                 continue
             # Many aligners will reject a file with a single sequence so just copy
             if len(self.seqs[name]) == 1:
-                cmd = ['cp', name + '.fasta', name + '.aln']
+                cmd = ['cp', name + '.fasta', name + '.tmp']
                 subprocess.run(cmd, check=True)
             else:
                 seqfile = tempfile.NamedTemporaryFile('w', delete=False)
@@ -81,6 +81,10 @@ class Seqs_To_Aligns_And_Hmms:
                     subprocess.run(cmd, check=True)
                 except (subprocess.CalledProcessError) as exception:
                     print("Error running '{}':".format(self.aligner) + str(exception))
+            # Convert Fasta to Maf
+            AlignIO.convert(name + '.tmp', 'fasta', name + '.aln', 'maf', alphabet=None)
+            subprocess.run(['rm','-f',name + '.tmp'], check=True)
+
             self.alns[name] = name + '.aln'
 
     def make_align_cmd(self, infile, name):
@@ -99,11 +103,11 @@ class Seqs_To_Aligns_And_Hmms:
             sys	0m0.170s
         '''
         if self.aligner == 'muscle':
-            return [self.aligner, '-quiet','-in', infile, '-out', name + '.aln']
+            return [self.aligner, '-quiet','-in', infile, '-out', name + '.tmp']
         elif self.aligner == 'mafft':
-            return [self.aligner, '--auto', infile, '>', name + '.aln']
+            return [self.aligner, '--auto', infile, '>', name + '.tmp']
         elif self.aligner == 'clustalo':
-            return [self.aligner, '-i', infile, '-o', name + '.aln', '--outfmt=fasta']
+            return [self.aligner, '-i', infile, '-o', name + '.tmp', '--outfmt=fasta']
         else:
             sys.exit("No command for aligner {}".format(self.aligner))
 
