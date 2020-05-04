@@ -332,7 +332,7 @@ class Feature_To_Gene_And_Protein:
                         "host='{}'".format(self.accs[acc]['host']),
                         "org='{}'".format(self.accs[acc]['organism']) ])
         if 'protein_id' in feat.qualifiers.keys():
-            desc = desc + ' ' + feat.qualifiers["protein_id"][0]
+            desc = desc + ' pid=' + feat.qualifiers["protein_id"][0]
         return desc
 
     def write(self):
