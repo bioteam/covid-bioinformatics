@@ -46,7 +46,7 @@ do
         else
             cmd="hmmsearch --noali -E $evalue --tblout $out $hmm $fasta"
         fi
-	echo Command is $cmd
+	    echo Command is $cmd
         $cmd
         echo Output is $out
     fi
