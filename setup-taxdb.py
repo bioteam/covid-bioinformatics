@@ -16,7 +16,8 @@ class Sequp_Taxdb:
 
     def __init__(self, verbose):
         self.verbose = verbose
-	ncbi = NCBITaxa()
+        ncbi = NCBITaxa()
+
 
 if __name__ == "__main__":
     main()
