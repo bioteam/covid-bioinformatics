@@ -266,21 +266,18 @@ class Feature_To_Gene_And_Protein:
                 self.json[name] = dict()
             for feat in self.sorted_cds[name]:
                 self.feats[name][feat.id] = dict()
-                desc = self.make_desc(feat)
                 acc = feat.id.split('-')[1]
                 # nt
                 ntseq = feat.extract(self.accs[acc]['seq'])
                 nt = SeqRecord(Seq(ntseq, IUPAC.ambiguous_dna),
                                   id=feat.id,
-                                  # Add lengths like "552nt" to the description
-                                  description=str(len(ntseq)) + 'nt ' + desc)
+                                  description=self.make_desc(feat, ntseq, 'nt'))
                 self.feats[name][feat.id]['nt'] = nt
                 # aa
                 aaseq = feat.qualifiers["translation"][0]
                 aa = SeqRecord(Seq(aaseq, IUPAC.extended_protein),
                                   id=feat.id,
-                                  # Add lengths like "55aa" to the description
-                                  description=str(len(aaseq)) + 'aa ' + desc)
+                                  description=self.make_desc(feat, aaseq, 'aa'))
                 self.feats[name][feat.id]['aa'] = aa
 
                 if self.make_json:
@@ -295,19 +292,18 @@ class Feature_To_Gene_And_Protein:
                 self.json[name] = dict()
             for feat in self.sorted_mats[name]:
                 self.feats[name][feat.id] = dict()
-                desc = self.make_desc(feat)
                 acc = feat.id.split('-')[1]
                 # nt
                 ntseq = feat.extract(self.accs[acc]['seq'])
                 nt = SeqRecord(Seq(ntseq, IUPAC.ambiguous_dna),
                                   id=feat.id,
-                                  description=str(len(ntseq)) + 'nt ' + desc)
+                                  description=self.make_desc(feat, ntseq, 'nt'))
                 self.feats[name][feat.id]['nt'] = nt
                 # aa
                 aaseq = str(nt.translate().seq)
                 aa = SeqRecord(Seq(aaseq, IUPAC.extended_protein),
                                   id=feat.id,
-                                  description=str(len(aaseq)) + 'aa ' + desc)
+                                  description=self.make_desc(feat, aaseq, 'aa'))
                 self.feats[name][feat.id]['aa'] = aa
 
                 if self.make_json:
@@ -316,18 +312,21 @@ class Feature_To_Gene_And_Protein:
                     self.json[name][feat.id]['aa'] = make_sequence_json(aa, 'aa')
                     self.json[name][feat.id]['nt'] = make_sequence_json(nt, 'nt')
 
-    def make_desc(self, feat):
+    def make_desc(self, feat, seq, seqtype):
         '''
         The description will have:
+        - length ('aa' or 'nt')
         - nucleotide coordinates (all features)
         - date (annotation)
         - host (source feature)
         - organism (annotation)
         - protein id (CDS feature only)
         '''
+        slen = str(len(seq)) + seqtype
         acc = feat.id.split('-')[1]
         loc = str(feat.location).replace(' ','').replace('join{','').replace('}','').replace('(+)','')
-        desc = " ".join([loc,
+        desc = " ".join([slen,
+                        loc,
                         self.accs[acc]['date'],
                         "host='{}'".format(self.accs[acc]['host']),
                         "org='{}'".format(self.accs[acc]['organism']) ])
