@@ -2,7 +2,7 @@
 # taxadb - https://github.com/HadrienG/taxadb
 # pip3 install --user taxadb
 # export PATH=~/.local/bin:$PATH
-#
+# 
 
 TAXHOME=${HOME}/taxonomy
 
