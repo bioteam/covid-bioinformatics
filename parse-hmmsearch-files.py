@@ -3,6 +3,7 @@
 import argparse
 from pathlib import Path
 import os
+import re
 from taxadb.taxid import TaxID
 from taxadb.accessionid import AccessionID
 from Bio import SearchIO
@@ -37,8 +38,10 @@ class Query_Taxadb:
                 print("No match:\t{0}\t{1}".format(matches[1], matches[2]))
                 continue
             hit = qresult[0].hits[0]
-            taxids = self.accession.taxid(hit.id)
-            lineage = self.taxid.lineage_name(taxid, reverse=True)
+            pid = hit.id.split('.')[0]
+            for taxid in self.accession.taxid([pid]):
+                lineage = self.taxid.lineage_name(taxid, reverse=True)
+
 
             #     if qresult[0].id.split('-')[0] != hit.id.split('-')[0]:
             #         print("{0}\t{1}\t{2}".format(qresult[0].id, hit.id, hit.evalue))

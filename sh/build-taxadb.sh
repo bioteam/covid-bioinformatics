@@ -14,7 +14,7 @@ then
     mkdir taxadb
 fi
 
-taxadb download --outdir taxadb --type prot
-taxadb create --input taxadb --dbname taxadb.sqlite --chunk 100 --division prot
+taxadb download --outdir taxadb --type prot --quiet
+taxadb create --input taxadb --dbname taxadb.sqlite --chunk 100 --division prot --quiet
 
 rm -fr taxadb.bak
