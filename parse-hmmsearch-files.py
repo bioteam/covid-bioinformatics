@@ -40,11 +40,8 @@ class Query_Taxadb:
             taxids = accession.taxid(hit.id)
             lineage = taxid.lineage_name(taxid, reverse=True)
 
-            # if self.mismatch:
             #     if qresult[0].id.split('-')[0] != hit.id.split('-')[0]:
             #         print("{0}\t{1}\t{2}".format(qresult[0].id, hit.id, hit.evalue))
-            # else:
-            #     print("{0}\t{1}\t{2}".format(qresult[0].id, hit.id, hit.evalue))
 
 
 if __name__ == "__main__":
