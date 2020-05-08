@@ -21,7 +21,7 @@ do
     fi
 done
 
-taxadb download --outdir taxadb --type full --quiet
-taxadb create --input taxadb --dbname taxadb.sqlite --chunk 100 --division full --fast --quiet
+taxadb download --outdir taxadb --type prot --quiet
+taxadb create --input taxadb --dbname taxadb.sqlite --chunk 100 --division prot --fast --quiet
 
 rm -fr *.bak
