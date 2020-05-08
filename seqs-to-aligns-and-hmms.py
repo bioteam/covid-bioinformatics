@@ -83,7 +83,7 @@ class Seqs_To_Aligns_And_Hmms:
                     print("Error running '{}':".format(self.aligner) + str(exception))
             # Convert Fasta to Maf
             AlignIO.convert(name + '.tmp', 'fasta', name + '.aln', 'maf', alphabet=None)
-            subprocess.run(['rm','-f',name + '.tmp'], check=True)
+            subprocess.run(['rm','-f',name + '.tmpgit'], check=True)
 
             self.alns[name] = name + '.aln'
 
