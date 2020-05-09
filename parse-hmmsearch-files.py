@@ -9,7 +9,7 @@ from Bio import Entrez
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
-parser.add_argument('-taxfilter', default="Coronaviridae", help="Exclude")
+parser.add_argument('-taxfilter', help="Exclude")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
@@ -39,7 +39,7 @@ class Parse_Hmmsearch:
                     if self.verbose:
                         print("Hit taxonomy id: {}".format(taxid))
                     lineage = self.get_lineage(taxid)
-                    if self.verbose:
+                    if self.verbose and lineage:
                         print("Hit lineage: {}".format(lineage))
 
 
@@ -57,6 +57,9 @@ class Parse_Hmmsearch:
         handle = Entrez.efetch(db="taxonomy", id=taxid)
         records = Entrez.read(handle)
         # With "LineageEx" you’ll get the NCBI taxon identifiers of the lineage entries
+        if self.taxfilter:
+            if self.taxfilter in records[0]["Lineage"]:
+                return None
         return records[0]["Lineage"]
  
 
