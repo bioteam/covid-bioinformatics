@@ -4,33 +4,27 @@ import argparse
 from pathlib import Path
 import os
 import re
-from taxadb.taxid import TaxID
-from taxadb.accessionid import AccessionID
 from Bio import SearchIO
+from Bio import Entrez
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
-parser.add_argument('-db', default=os.path.join(Path.home(),'taxonomy','taxadb.sqlite'), 
-    help="Path to database")
-parser.add_argument('-filter', default="Viridae", help="Exclude")
+parser.add_argument('-filter', default="Coronaviridae", help="Exclude")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
 
 def main():
-    query = Query_Taxadb(args.verbose, args.db, args.filter, args.files)
+    query = Parse_Hmmsearch(args.verbose, args.filter, args.files)
     query.read()
 
-class Query_Taxadb:
+class Parse_Hmmsearch:
 
-    def __init__(self, verbose, db, filter, files):
+    def __init__(self, verbose, filter, files):
         self.verbose = verbose
-        self.db = db
         self.filter = filter
         self.files = files
-        self.taxid = TaxID(dbtype='sqlite', dbname=self.db)
-        self.accession = AccessionID(dbtype='sqlite', dbname=self.db)
- 
+        self.email = 'briano@bioteam.net'
  
     def read(self):
         for file in self.files:
@@ -40,19 +34,31 @@ class Query_Taxadb:
                     if self.verbose:
                         print("No match:\t{0}\t{1}".format(matches[1], matches[2]))
                     continue
-                hit = qresult[0].hits[0]
-                acc = hit.id.split('.')[0]
-                lineages = self.query(acc)
-                if self.verbose:
-                    print("Lineages: {}".format(lineages))
+                for hit in qresult:
+                    taxid = self.get_taxid(hit.id)
+                    if self.verbose:
+                        print("Hit taxonomy id: {}".format(taxid))
+                    lineage = self.get_lineage(taxid)
+                    if self.verbose:
+                        print("Hit lineage: {}".format(lineage))
 
-    def query(self, acc):
-        lineages = []
-        for taxid in self.accession.taxid([acc]):
-            lineage = self.taxid.lineage_name(taxid, reverse=True)
-            lineages.append(lineage)
-        return lineages
 
+    def get_taxid(self, pid):
+        Entrez.email = self.email
+        handle = Entrez.elink(dbfrom="protein", db="taxonomy", id=pid)
+        result = Entrez.read(handle)
+        handle.close()
+        taxid = result[0]["LinkSetDb"][0]["Link"][0]["Id"]
+        return taxid
+
+
+    def get_lineage(self, taxid):
+        Entrez.email = self.email
+        handle = Entrez.efetch(db="taxonomy", id=taxid)
+        records = Entrez.read(handle)
+        # With "LineageEx" you’ll get the NCBI taxon identifiers of the lineage entries
+        return records[0]["Lineage"]
+ 
 
 if __name__ == "__main__":
     main()
