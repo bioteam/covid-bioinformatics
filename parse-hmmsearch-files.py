@@ -9,20 +9,20 @@ from Bio import Entrez
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
-parser.add_argument('-filter', default="Coronaviridae", help="Exclude")
+parser.add_argument('-taxfilter', default="Coronaviridae", help="Exclude")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
 
 def main():
-    query = Parse_Hmmsearch(args.verbose, args.filter, args.files)
+    query = Parse_Hmmsearch(args.verbose, args.taxfilter, args.files)
     query.read()
 
 class Parse_Hmmsearch:
 
-    def __init__(self, verbose, filter, files):
+    def __init__(self, verbose, taxfilter, files):
         self.verbose = verbose
-        self.filter = filter
+        self.taxfilter = taxfilter
         self.files = files
         self.email = 'briano@bioteam.net'
  
