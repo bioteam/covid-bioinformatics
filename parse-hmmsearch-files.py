@@ -41,27 +41,28 @@ class Parse_Hmmsearch:
     def parse(self):
         for file in self.files:
             base = os.path.basename(file).split('.')[0]
-            self.hits[base] = dict()
+            # self.hits[base] = dict()
             matches = re.match(r'(\w+-\w+)_(\w+-\w+)', base)
             for qresult in SearchIO.parse(file, 'hmmer3-tab'):
                 if not qresult:
                     if self.verbose:
                         print("No match:\t{0}\t{1}".format(matches[1], matches[2]))
                     continue
-                for hit in qresult:
-                    taxid = self.get_taxid(hit.id)
-                    # if self.verbose:
-                    #     print("Hit taxonomy id: {}".format(taxid))
-                    self.hits[base][hit.id] = self.get_lineage(taxid)
+                pids = [ hit.id for hit in qresult]
+                taxarray = self.get_taxid(pids)
+                self.hits[base] = self.get_lineage(taxarray)
 
 
-    def get_taxid(self, pid):
+    def get_taxid(self, pids):
         Entrez.email = self.email
-        handle = Entrez.elink(dbfrom="protein", db="taxonomy", id=pid)
-        result = Entrez.read(handle)
+        handle = Entrez.elink(dbfrom="protein", db="taxonomy", id=pids)
+        results = Entrez.read(handle)
         handle.close()
-        taxid = result[0]["LinkSetDb"][0]["Link"][0]["Id"]
-        return taxid
+        # Protein id, Taxonomy id
+        taxarray = []
+        for num, result in enumerate(results):
+            taxarray.append([pids[num], result["LinkSetDb"][0]["Link"][0]["Id"]])
+        return taxarray
 
 
     def download_hits(self):
@@ -98,6 +99,7 @@ class Parse_Hmmsearch:
             return
         for file in self.hits:
             matches = re.match(r'(\w+-\w+)_\w+', file)
+            # No guarantee that the HMM is in the current dir so look for it
             hmms = [f for f in glob.glob('*/' + matches[1] + '.hmm', recursive=True)]
             subprocess.run(['hmmalign','--amino', '-o', file + '-hits.aln',
                 hmms[0], file + '-hits.fasta', ], check=True)
@@ -117,13 +119,17 @@ class Parse_Hmmsearch:
                     print("Lineage is: {}".format(self.hits[file][hit]))
 
 
-    def get_lineage(self, taxid):
+    def get_lineage(self, taxarray):
         Entrez.email = self.email
-        handle = Entrez.efetch(db="taxonomy", id=taxid)
-        records = Entrez.read(handle)
+        taxids = [ elem[1] for elem in taxarray ]
+        handle = Entrez.efetch(db="taxonomy", id=','.join(taxids))
+        results = Entrez.read(handle)
+        handle.close()
         # With "LineageEx" you get the NCBI taxon identifiers of the clades
-        return records[0]["Lineage"]
- 
+        taxdict = {}
+        for num, result in enumerate(results):
+            taxdict[taxarray[num][0]] = result["Lineage"]
+        return taxdict
 
 if __name__ == "__main__":
     main()
