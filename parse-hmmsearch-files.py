@@ -48,7 +48,8 @@ class Parse_Hmmsearch:
                     if self.verbose:
                         print("No match:\t{0}\t{1}".format(matches[1], matches[2]))
                     continue
-                pids = [ hit.id for hit in qresult if 'EST' not in hit.id and 'HHA' not in hit.id]
+                pids = [ hit.id for hit in qresult if 'EST' not in hit.id 
+                    and 'HHA' not in hit.id and 'EPB' not in hit.id]
                 if self.verbose:
                     print("Protein ids: {}".format(pids))
                 taxarray = self.get_taxid(pids)
