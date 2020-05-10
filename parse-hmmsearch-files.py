@@ -100,7 +100,7 @@ class Parse_Hmmsearch:
         for file in self.hits:
             matches = re.match(r'(\w+-\w+)_\w+', file)
             # No guarantee that the HMM is in the current dir so look for it
-            hmms = [f for f in glob.glob('*/' + matches[1] + '.hmm', recursive=True)]
+            hmms = [f for f in glob.glob('**/' + matches[1] + '.hmm', recursive=True)]
             subprocess.run(['hmmalign','--amino', '-o', file + '-hits.aln',
                 hmms[0], file + '-hits.fasta', ], check=True)
 
