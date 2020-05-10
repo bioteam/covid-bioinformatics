@@ -49,6 +49,8 @@ class Parse_Hmmsearch:
                         print("No match:\t{0}\t{1}".format(matches[1], matches[2]))
                     continue
                 pids = [ hit.id for hit in qresult]
+                if self.verbose:
+                    print("Protein ids: {}".format(pids))
                 taxarray = self.get_taxid(pids)
                 self.hits[base] = self.get_lineage(taxarray)
 
