@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
 
 import argparse
+import re
+import os
+import glob
+import subprocess
 from Bio import SearchIO
 from Bio import Entrez
+from Bio import SeqIO
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
@@ -28,12 +33,16 @@ class Parse_Hmmsearch:
         self.align = align
         self.taxfilter = taxfilter
         self.files = files
+        # The primary keys for hits{} and fasta{} are file names, the secondary keys are the hits
         self.hits = dict()
+        self.fasta = dict()
         self.email = 'briano@bioteam.net'
  
     def parse(self):
         for file in self.files:
-            matches = re.match(r'(\w+-\w+)_(\w+-\w+)', os.path.basename(file))
+            base = os.path.basename(file).split('.')[0]
+            self.hits[base] = dict()
+            matches = re.match(r'(\w+-\w+)_(\w+-\w+)', base)
             for qresult in SearchIO.parse(file, 'hmmer3-tab'):
                 if not qresult:
                     if self.verbose:
@@ -43,7 +52,7 @@ class Parse_Hmmsearch:
                     taxid = self.get_taxid(hit.id)
                     # if self.verbose:
                     #     print("Hit taxonomy id: {}".format(taxid))
-                    self.hits[hit.id] = self.get_lineage(taxid)
+                    self.hits[base][hit.id] = self.get_lineage(taxid)
 
 
     def get_taxid(self, pid):
@@ -54,38 +63,59 @@ class Parse_Hmmsearch:
         taxid = result[0]["LinkSetDb"][0]["Link"][0]["Id"]
         return taxid
 
+
     def download_hits(self):
         if not self.download:
             return
-        try:
-            if self.verbose:
-                print("Downloading records: {}".format(id_chunk))
-            handle = Entrez.efetch(
+        for file in self.hits:
+            pids = ','.join(self.hits[file].keys())
+            try:
+                if self.verbose:
+                    print("Downloading records: {}".format(pids))
+                handle = Entrez.efetch(
                     db="protein",
                     rettype='fasta',
                     retmode="text",
-                    id=','.join(self.hits.keys())
-            )
-            self.fasta = handle.read()
-            handle.close()
-        except (RuntimeError) as exception:
-            print("Error retrieving sequences using id '" +
-                  str(pids) + "':" + str(exception))
+                    id=pids )
+                self.fasta[file] = list(SeqIO.parse(handle, 'fasta'))
+                handle.close()
+            except (RuntimeError) as exception:
+                print("Error retrieving sequences using id '" +
+                    str(pids) + "':" + str(exception))
+        self.write()
+
+
+    def write(self):
+        for file in self.fasta:
+            seqfile = file + '-hits.fasta'
+            if self.verbose:
+                print("Writing {}".format(seqfile))
+            SeqIO.write(self.fasta[file], seqfile, 'fasta')
+
 
     def align_hits_to_hmm(self):
         if not self.align:
             return
+        for file in self.hits:
+            matches = re.match(r'(\w+-\w+)_\w+', file)
+            hmms = [f for f in glob.glob('*/' + matches[1] + '.hmm', recursive=True)]
+            subprocess.run(['hmmalign','--amino', '-o', file + '-hits.aln',
+                hmms[0], file + '-hits.fasta', ], check=True)
+
 
     def filter(self):
         if self.taxfilter:
-            filtered = dict()
-            for hit in self.hits:
-                if self.taxfilter not in self.hits[hit]:
-                    filtered[hit] = self.hits[hit]
-            self.hits = filtered
+            for file in self.hits:
+                filtered = dict()
+                for hit in self.hits[file]:
+                    if self.taxfilter not in self.hits[file][hit]:
+                        filtered[hit] = self.hits[file][hit]
+                self.hits[file] = filtered
         if self.verbose:
-            for hit in self.hits:
-                print("Lineage is: {}".format(self.hits[hit]))
+            for file in self.hits:
+                for hit in self.hits[file]:
+                    print("Lineage is: {}".format(self.hits[file][hit]))
+
 
     def get_lineage(self, taxid):
         Entrez.email = self.email
