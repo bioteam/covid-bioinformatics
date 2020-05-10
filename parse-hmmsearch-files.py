@@ -98,11 +98,15 @@ class Parse_Hmmsearch:
         if not self.align:
             return
         for file in self.hits:
-            matches = re.match(r'(\w+-\w+)_\w+', file)
-            # No guarantee that the HMM is in the current dir so look for it
-            hmms = [f for f in glob.glob('**/' + matches[1] + '.hmm', recursive=True)]
-            subprocess.run(['hmmalign','--amino', '-o', file + '-hits.aln',
-                hmms[0], file + '-hits.fasta', ], check=True)
+            fastafile = file + '-hits.fasta'
+            if os.path.exists(fastafile) and os.stat(fastafile).st_size != 0:
+                gene = re.match(r'(\w+-\w+)_\w+', file)[1]
+                # No guarantee that the HMM is in the current dir so look for it
+                hmm = [f for f in glob.glob('**/' + gene + '.hmm', recursive=True)][0]
+                if self.verbose:
+                    print("Aligning {}".format(fastafile))
+                subprocess.run(['hmmalign','--amino', '-o', file + '-hits.aln',
+                    hmm, fastafile, ], check=True)
 
 
     def filter(self):
