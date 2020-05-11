@@ -5,6 +5,7 @@ import re
 import os
 import glob
 import subprocess
+import numpy
 from Bio import SearchIO
 from Bio import Entrez
 from Bio import SeqIO
@@ -37,6 +38,7 @@ class Parse_Hmmsearch:
         self.hits = dict()
         self.fasta = dict()
         self.email = 'briano@bioteam.net'
+        self.chunk = 50
  
     def parse(self):
         for file in self.files:
@@ -50,21 +52,30 @@ class Parse_Hmmsearch:
                     continue
                 pids = [ hit.id for hit in qresult if 'EST' not in hit.id 
                     and 'HHA' not in hit.id and 'EPB' not in hit.id and 'EBP' not in hit.id]
-                if self.verbose:
-                    print("Protein ids: {}".format(pids))
                 taxarray = self.get_taxid(pids)
                 self.hits[base] = self.get_lineage(taxarray)
 
 
     def get_taxid(self, pids):
         Entrez.email = self.email
-        handle = Entrez.elink(dbfrom="protein", db="taxonomy", id=pids)
-        results = Entrez.read(handle)
-        handle.close()
-        # Protein id, Taxonomy id
+        # Split the list of ids into "batches" of ids for Entrez
+        num_chunks = int(len(pids)/self.chunk) + 1
         taxarray = []
-        for num, result in enumerate(results):
-            taxarray.append([pids[num], result["LinkSetDb"][0]["Link"][0]["Id"]])
+        errorarray =[]
+        for id_chunk in numpy.array_split(numpy.array(pids), num_chunks):
+            try:
+                if self.verbose:
+                    print("Protein ids: {}".format(id_chunk))
+                handle = Entrez.elink(dbfrom="protein", db="taxonomy", id=id_chunk)
+                results = Entrez.read(handle)
+                handle.close()
+                for num, result in enumerate(results):
+                    taxarray.append([id_chunk[num], result["LinkSetDb"][0]["Link"][0]["Id"]])
+            except:
+                if self.verbose:
+                    print("Problem getting taxids for: {}".format(id_chunk))
+                errorarray.append(id_chunk)
+            # Protein id, Taxonomy id
         return taxarray
 
 
