@@ -5,9 +5,9 @@ collections, alignments, and HMMs.
 
 
 # typical usage
-* ./download-gb-by-taxid.py
-* ./feature-to-gene-and-protein.py *.gb
-* ./seqs-to-aligns-and-hmms.py *.fasta
+* ./download_gb_by_taxid.py
+* ./feature_to_gene_and_protein.py *.gb
+* ./seqs_to_aligns_and_hmms.py *.fasta
 
 
 The COV genes and proteins are parsed from the GenBank files as features and assigned standard names based on 
@@ -20,6 +20,6 @@ their *product* tags. The synonyms for these standard names are listed in *cov_d
 * HMMER 3.3
 
 
-# to-do
+# to_do
 * HMM-based annotation and QC
 * Visualization (e.g. for [IGV](https://igvteam.github.io/igv-webapp/fileFormats.html))
