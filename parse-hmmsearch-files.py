@@ -61,7 +61,7 @@ class Parse_Hmmsearch:
         # Split the list of ids into "batches" of ids for Entrez
         num_chunks = int(len(pids)/self.chunk) + 1
         taxarray = []
-        errorarray =[]
+        self.errorarray =[]
         for id_chunk in numpy.array_split(numpy.array(pids), num_chunks):
             try:
                 if self.verbose:
@@ -69,13 +69,13 @@ class Parse_Hmmsearch:
                 handle = Entrez.elink(dbfrom="protein", db="taxonomy", id=id_chunk)
                 results = Entrez.read(handle)
                 handle.close()
+                # Protein id, Taxonomy id
                 for num, result in enumerate(results):
                     taxarray.append([id_chunk[num], result["LinkSetDb"][0]["Link"][0]["Id"]])
             except:
                 if self.verbose:
                     print("Problem getting taxids for: {}".format(id_chunk))
-                errorarray.append(id_chunk)
-            # Protein id, Taxonomy id
+                self.errorarray.append(id_chunk)
         return taxarray
 
 
