@@ -61,7 +61,7 @@ class Parse_Hmmsearch:
         # Split the list of ids into "batches" of ids for Entrez
         num_chunks = int(len(pids)/self.chunk) + 1
         taxarray = []
-        self.errorarray =[]
+        errorarray =[]
         for id_chunk in numpy.array_split(numpy.array(pids), num_chunks):
             try:
                 if self.verbose:
@@ -75,7 +75,13 @@ class Parse_Hmmsearch:
             except:
                 if self.verbose:
                     print("Problem getting taxids for: {}".format(id_chunk))
-                self.errorarray.append(id_chunk)
+                errorarray.append(id_chunk)
+            if errorarray:
+                oldchunk = self.chunk
+                self.chunk = 1
+                arr = self.get_taxid(errorarray)
+                taxarray = taxarray + arr
+                self.chunk = oldchunk
         return taxarray
 
 
