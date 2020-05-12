@@ -20,6 +20,14 @@ their *product* tags. The synonyms for these standard names are listed in *cov_d
 * HMMER 3.3
 
 
+# file formats created
+* GenBank sequence: .gb
+* Fasta sequence: .fa
+* Fasta alignment: .fasta
+* Stockholm alignment: .sto
+* MAF alignment: .maf
+
+
 # to_do
 * HMM-based annotation and QC
 * Visualization (e.g. for [IGV](https://igvteam.github.io/igv-webapp/fileFormats.html))
