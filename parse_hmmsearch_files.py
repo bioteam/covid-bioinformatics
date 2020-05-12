@@ -52,8 +52,7 @@ class Parse_Hmmsearch:
                     if self.verbose:
                         print("No match:\t{0}\t{1}".format(matches[1], matches[2]))
                     continue
-                pids = [ hit.id for hit in qresult if 'EST' not in hit.id 
-                    and 'HHA' not in hit.id and 'EPB' not in hit.id and 'EBP' not in hit.id]
+                pids = [ hit.id for hit in qresult]
                 taxarray = self.get_taxid(pids)
                 self.hits[base] = self.get_lineage(taxarray)
 
@@ -123,7 +122,7 @@ class Parse_Hmmsearch:
                 hmm = [f for f in glob.glob('**/' + gene + '.hmm', recursive=True)][0]
                 if self.verbose:
                     print("Aligning {}".format(fastafile))
-                subprocess.run(['hmmalign','--amino', '-o', file + '-hits.fasta',
+                subprocess.run(['hmmalign','--amino', '-o', file + '-hits.sto',
                     hmm, fastafile, ], check=True)
 
 
