@@ -15,12 +15,13 @@ parser.add_argument('-verbose', default=False, action='store_true', help="Verbos
 parser.add_argument('-download', default=False, action='store_true', help="Download hit sequences")
 parser.add_argument('-align', default=False, action='store_true', help="Align hits to HMM")
 parser.add_argument('-taxfilter', default=None, help="Exclude clade")
+parser.add_argument('-chunk', default=50, help="Number of ids to send to Elink")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
 
 def main():
-    query = Parse_Hmmsearch(args.verbose, args.download, args.align, args.taxfilter, args.files)
+    query = Parse_Hmmsearch(args.verbose, args.download, args.align, args.taxfilter, args.chunk, args.files)
     query.parse()
     query.filter()
     query.download_hits()
@@ -28,18 +29,19 @@ def main():
 
 class Parse_Hmmsearch:
 
-    def __init__(self, verbose, download, align, taxfilter, files):
+    def __init__(self, verbose, download, align, taxfilter, chunk, files):
         self.verbose = verbose
         self.download = download
         self.align = align
         self.taxfilter = taxfilter
+        self.chunk = chunk
         self.files = files
         # The primary keys for hits{} and fasta{} are file names, the secondary keys are the hits
         self.hits = dict()
         self.fasta = dict()
         self.email = 'briano@bioteam.net'
-        self.chunk = 50
- 
+
+
     def parse(self):
         for file in self.files:
             base = os.path.basename(file).split('.')[0]
@@ -63,6 +65,7 @@ class Parse_Hmmsearch:
         taxarray = []
         errorarray =[]
         for id_chunk in numpy.array_split(numpy.array(pids), num_chunks):
+            # Some protein ids do not have taxonomy ids according to Elink
             try:
                 if self.verbose:
                     print("Protein ids: {}".format(id_chunk))
@@ -75,13 +78,8 @@ class Parse_Hmmsearch:
             except:
                 if self.verbose:
                     print("Problem getting taxids for: {}".format(id_chunk))
-                errorarray.append(id_chunk)
-            if errorarray:
-                oldchunk = self.chunk
-                self.chunk = 1
-                arr = self.get_taxid(errorarray)
-                taxarray = taxarray + arr
-                self.chunk = oldchunk
+                # Collect protein ids without taxonomy ids
+                errorarray = errorarray + list(id_chunk)                
         return taxarray
 
 

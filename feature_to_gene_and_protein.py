@@ -347,8 +347,8 @@ class Feature_To_Gene_And_Protein:
             # SeqIO.write(seqs, seqfile, self.seq_format)
         else:
             for name in self.feats.keys():
-                aaseqfile = name + '-aa.' + self.seq_format
-                ntseqfile = name + '-nt.' + self.seq_format
+                aaseqfile = name + '-aa.fa'
+                ntseqfile = name + '-nt.fa'
                 aahandle = open(aaseqfile, "w")
                 nthandle = open(ntseqfile, "w")
                 for feat in self.feats[name].keys():
