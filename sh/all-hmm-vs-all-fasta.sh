@@ -41,7 +41,7 @@ do
         fi
         echo Fasta is $fasta
         fbase=$( basename $fasta | cut -d '.' -f 1 )
-        out="${hbase}${UNDERSCORE}${fbase}.out"
+        out="${hbase}${UNDERSCORE}${fbase}.hmmsearch"
         cmd="hmmsearch --noali -E $evalue --tblout $out $hmm $fasta"
         $cmd
         echo Output is $out
