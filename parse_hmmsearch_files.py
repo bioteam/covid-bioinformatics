@@ -106,7 +106,7 @@ class Parse_Hmmsearch:
 
     def write(self):
         for file in self.fasta:
-            seqfile = file + '-hits.fasta'
+            seqfile = file + '-hits.fa'
             if self.verbose:
                 print("Writing {}".format(seqfile))
             SeqIO.write(self.fasta[file], seqfile, 'fasta')
@@ -116,14 +116,14 @@ class Parse_Hmmsearch:
         if not self.align:
             return
         for file in self.hits:
-            fastafile = file + '-hits.fasta'
+            fastafile = file + '-hits.fa'
             if os.path.exists(fastafile) and os.stat(fastafile).st_size != 0:
                 gene = re.match(r'(\w+-\w+)_\w+', file)[1]
                 # No guarantee that the HMM is in the current dir so look for it
                 hmm = [f for f in glob.glob('**/' + gene + '.hmm', recursive=True)][0]
                 if self.verbose:
                     print("Aligning {}".format(fastafile))
-                subprocess.run(['hmmalign','--amino', '-o', file + '-hits.aln',
+                subprocess.run(['hmmalign','--amino', '-o', file + '-hits.fasta',
                     hmm, fastafile, ], check=True)
 
 

@@ -67,7 +67,7 @@ class Seqs_To_Aligns_And_Hmms:
                 continue
             # Many aligners will reject a file with a single sequence so just copy
             if len(self.seqs[name]) == 1:
-                cmd = ['cp', name + '.fa', name + '.tmp']
+                cmd = ['cp', name + '.fa', name + '.fasta']
                 subprocess.run(cmd, check=True)
             else:
                 seqfile = tempfile.NamedTemporaryFile('w', delete=False)
@@ -83,7 +83,7 @@ class Seqs_To_Aligns_And_Hmms:
                     print("Error running '{}':".format(self.aligner) + str(exception))
 
             # Convert Fasta to Maf
-            # AlignIO.convert(name + '.tmp', 'fasta', name + '.aln', 'maf', alphabet=None)
+            # AlignIO.convert(name + '.fasta', 'fasta', name + '.maf', 'maf', alphabet=None)
             # subprocess.run(['rm','-f',name + '.tmpgit'], check=True)
 
             self.alns[name] = name + '.fasta'
