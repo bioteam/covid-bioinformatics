@@ -36,7 +36,7 @@ do
         exit
     fi
     base=$( echo $hmm | cut -d '.' -f 1 )
-    out="$base$UNDERSCORE$fasta.out"
+    out="$base$UNDERSCORE$fasta.hmmsearch"
     if [ ! -f $out ]
     then
         echo HMM: $hmm Fasta:$fasta
