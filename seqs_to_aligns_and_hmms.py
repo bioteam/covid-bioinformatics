@@ -15,6 +15,7 @@ parser.add_argument('-aligner', default='muscle', help="Alignment application")
 parser.add_argument('-hmmbuilder', default='hmmbuild', help="HMM build application")
 parser.add_argument('-skip', default='ORF1a-aa,ORF1a-nt,ORF1ab-aa,ORF1ab-nt', help="Do not align")
 parser.add_argument('-json', action='store_true', help="Create JSON for Gen3")
+parser.add_argument('-maf', action='store_true', help="Create additional MAF format alignments")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
@@ -82,9 +83,9 @@ class Seqs_To_Aligns_And_Hmms:
                 except (subprocess.CalledProcessError) as exception:
                     print("Error running '{}':".format(self.aligner) + str(exception))
 
-            # Convert Fasta to Maf
-            # AlignIO.convert(name + '.fasta', 'fasta', name + '.maf', 'maf', alphabet=None)
-            # subprocess.run(['rm','-f',name + '.tmpgit'], check=True)
+            # Create additional Maf format alignment
+            if self.maf:
+                AlignIO.convert(name + '.fasta', 'fasta', name + '.maf', 'maf', alphabet=None)
 
             self.alns[name] = name + '.fasta'
 
