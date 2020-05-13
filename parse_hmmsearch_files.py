@@ -121,7 +121,7 @@ class Parse_Hmmsearch:
                 # No guarantee that the HMM is in the current dir so look for it
                 hmm = [f for f in glob.glob('**/' + gene + '.hmm', recursive=True)][0]
                 if self.verbose:
-                    print("Aligning {}".format(fastafile))
+                    print("Creating alignment with hmmalign: {}".format(file + '-hits.sto'))
                 subprocess.run(['hmmalign','--amino', '-o', file + '-hits.sto',
                     hmm, fastafile, ], check=True)
 

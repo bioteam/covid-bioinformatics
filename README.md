@@ -26,6 +26,7 @@ their *product* tags. The synonyms for these standard names are listed in *cov_d
 * Fasta alignment: .fasta
 * Stockholm alignment: .sto
 * MAF alignment: .maf
+* hmmsearch table: .tblout
 
 
 # to_do
