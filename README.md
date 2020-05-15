@@ -29,6 +29,6 @@ their *product* tags. The synonyms for these standard names are listed in *cov_d
 * hmmsearch table: .tblout
 
 
-# to_do
+# to do
 * HMM-based annotation and QC
 * Visualization (e.g. for [IGV](https://igvteam.github.io/igv-webapp/fileFormats.html))
