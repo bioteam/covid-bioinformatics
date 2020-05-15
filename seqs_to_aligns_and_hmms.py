@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 
-import argparse
-import os.path
 import tempfile
 import subprocess
-import sys
 from Bio import AlignIO
 from Bio import SeqIO
 

@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
 
-import argparse
-import os.path
-import sys
-import re
 from Bio import SearchIO
 
 

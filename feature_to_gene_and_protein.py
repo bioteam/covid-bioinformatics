@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 
-import argparse
-import os
 import yaml
-import re
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord

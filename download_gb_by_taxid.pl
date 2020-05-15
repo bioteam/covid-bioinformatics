@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
 
-import re
-import os
-import sys
-import argparse
 import numpy
 import yaml
 from Bio import Entrez

@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 
-import argparse
-import re
-import os
 import glob
 import subprocess
 import numpy
