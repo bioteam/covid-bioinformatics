@@ -5,9 +5,9 @@ collections, alignments, and HMMs.
 
 
 # typical usage
-* ./download_gb_by_taxid.py
-* ./feature_to_gene_and_protein.py *.gb
-* ./seqs_to_aligns_and_hmms.py *.fasta
+* `./download_gb_by_taxid.py`
+* `./feature_to_gene_and_protein.py *.gb`
+* `./seqs_to_aligns_and_hmms.py *.fa`
 
 
 The COV genes and proteins are parsed from the GenBank files as features and assigned standard names based on 
@@ -24,12 +24,12 @@ HMMs.
 
 
 # file formats created
-* GenBank sequence: .gb
-* Fasta sequence: .fa
-* Fasta alignment: .fasta
-* Stockholm alignment: .sto
-* MAF alignment: .maf
-* hmmsearch table: .tblout
+* GenBank sequence: `.gb`
+* Fasta sequence: `.fa`
+* Fasta alignment: `.fasta`
+* Stockholm alignment: `.sto`
+* MAF alignment: `.maf`
+* hmmsearch table: `.tblout`
 
 
 # to do
