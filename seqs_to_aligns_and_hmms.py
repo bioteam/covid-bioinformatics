@@ -88,7 +88,7 @@ class Seqs_To_Aligns_And_Hmms:
                     else:
                         subprocess.run(cmd, check=True)
                 except (subprocess.CalledProcessError) as exception:
-                    print("Error running '{}':".format(self.aligner) + str(exception))
+                    print("Error running '{}': ".format(self.aligner) + str(exception))
 
             # Create additional Maf format alignment
             if self.maf:
@@ -98,6 +98,10 @@ class Seqs_To_Aligns_And_Hmms:
 
     def make_align_cmd(self, infile, name):
         '''
+        time mafft --auto M-aa.fasta > M-aa.aln
+            real	0m2.254s
+            user	0m2.036s
+            sys	0m0.170s
         time muscle -in M-aa.fasta -out M-aa.aln
             real	0m19.963s
             user	0m19.594s
@@ -106,10 +110,6 @@ class Seqs_To_Aligns_And_Hmms:
             real	0m23.045s
             user	0m18.665s
             sys	0m4.255s
-        time mafft --auto M-aa.fasta > M-aa.aln
-            real	0m2.254s
-            user	0m2.036s
-            sys	0m0.170s
         '''
         if self.aligner == 'muscle':
             return [self.aligner, '-quiet','-in', infile, '-out', name + '.fasta'], None
@@ -123,10 +123,14 @@ class Seqs_To_Aligns_And_Hmms:
     def make_hmm(self):
         for name in self.alns:
             if self.verbose:
-                print("hmmbuild input file is '{}'".format(self.alns[name]))
+                print("{0} input file is '{1}'".format(self.hmmbuild, self.alns[name]))
             # Either --amino or --dna
             opt = '--amino' if '-aa' in name else '--dna'
-            subprocess.run([self.hmmbuild, opt, name + '.hmm', self.alns[name]])
+            try:
+                subprocess.run([self.hmmbuild, opt, name + '.hmm', self.alns[name]])
+            except (subprocess.CalledProcessError) as exception:
+                print("Error running {}: ".format(self.hmmbuild) + str(exception))
+
             self.hmms[name] = name + '.hmm'
 
     def write_json(self):

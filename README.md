@@ -1,7 +1,7 @@
 # covid-bioinformatics
-Software tools to collect and analyze Coronavirus sequences, including code to create gene and protein entries 
-starting with COV (coronavirus) genome files downloaded from NCBI, then create gene and protein-specific 
-collections, alignments, and HMMs.
+Software tools to collect and analyze Coronavirus sequences, including code that extracts gene and protein
+sequences from COV (coronavirus) genome files downloaded from NCBI, and creates gene and protein-specific 
+sequence collections, alignments, and HMMs.
 
 
 # typical usage
@@ -11,10 +11,9 @@ collections, alignments, and HMMs.
 
 
 The COV genes and proteins are parsed from the GenBank files as features and assigned standard names based on 
-their *product* tags. The synonyms for these standard names are listed in *cov_dictionary.yaml*. An additional
-QC step compares all the COV protein sequences to expected lengths listed in the *cov_variants.yaml* file and
-sequences that do not match expected lengths are not included in Fasta sequence (*.fa) files, alignments, or
-HMMs.
+their *product* tags. Possible synonyms for these standard names are listed in *cov_dictionary.yaml*. A
+QC step compares all the COV protein sequences to expected lengths listed in the *cov_variants.yaml* file, and
+sequences that do not match expected lengths are not included in sequence files, alignments, or HMMs.
 
 
 # requirements
@@ -29,6 +28,7 @@ HMMs.
 * Fasta alignment: `.fasta`
 * Stockholm alignment: `.sto`
 * MAF alignment: `.maf`
+* HMMER profile HMM: `.hmm`
 * hmmsearch table: `.tblout`
 
 
