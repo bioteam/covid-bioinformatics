@@ -97,7 +97,7 @@ class Feature_To_Gene_And_Protein:
         return synonyms
 
     def read_variants(self):
-        y = os.path.dirname(os.path.abspath(__file__)) + '/cov_gene_variants.yaml'
+        y = os.path.dirname(os.path.abspath(__file__)) + '/cov_variants.yaml'
         with open(y) as file:
             variants = yaml.load(file, Loader=yaml.FullLoader)
         return variants

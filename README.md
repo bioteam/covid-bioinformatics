@@ -11,7 +11,10 @@ collections, alignments, and HMMs.
 
 
 The COV genes and proteins are parsed from the GenBank files as features and assigned standard names based on 
-their *product* tags. The synonyms for these standard names are listed in *cov_dictionary.yaml*.
+their *product* tags. The synonyms for these standard names are listed in *cov_dictionary.yaml*. An additional
+QC step compares all the COV protein sequences to expected lengths listed in the *cov_variants.yaml* file and
+sequences that do not match expected lengths are not included in Fasta sequence (*.fa) files, alignments, or
+HMMs.
 
 
 # requirements
