@@ -23,7 +23,7 @@ args = parser.parse_args()
 
 def main():
     builder = Seqs_To_Aligns_And_Hmms(args.verbose, args.aligner, args.hmmbuilder, args.skip, 
-        args.json, args.files)
+        args.json, args.maf, args.files)
     builder.read()
     builder.make_align()
     builder.make_hmm()
@@ -31,13 +31,13 @@ def main():
 
 
 class Seqs_To_Aligns_And_Hmms:
-
-    def __init__(self, verbose, aligner, hmmbuild, skip, json, files):
+    def __init__(self, verbose, aligner, hmmbuild, skip, json, maf, files):
         self.verbose = verbose
         self.aligner = aligner
         self.hmmbuild = hmmbuild
         self.skip = skip
         self.make_json = json
+        self.maf = maf
         self.files = files
         self.seqs, self.alns, self.hmms = dict(), dict(), dict()
 
@@ -60,7 +60,7 @@ class Seqs_To_Aligns_And_Hmms:
         for seq in seqs:
             d[str(seq.seq)] = seq
         return list(d.values())
-        
+
     def make_align(self):
         for name in self.seqs:
             if name in self.skip:
@@ -76,11 +76,17 @@ class Seqs_To_Aligns_And_Hmms:
                 SeqIO.write(self.seqs[name], seqfile.name, 'fasta')
                 if self.verbose:
                     print("Alignment input sequence file: {}".format(seqfile.name))
-                cmd = self.make_align_cmd(seqfile.name, name)
+                # out_filename is used to redirect the STDOUT to file
+                # when self.aligner is "mafft" and it requires redirect to file
+                cmd, out_filename = self.make_align_cmd(seqfile.name, name)
                 if self.verbose:
                     print("Alignment command is '{}'".format(cmd))
                 try:
-                    subprocess.run(cmd, check=True)
+                    if out_filename:
+                        with open(out_filename, "w") as f:
+                            subprocess.run(cmd, check=True, stdout=f)
+                    else:
+                        subprocess.run(cmd, check=True)
                 except (subprocess.CalledProcessError) as exception:
                     print("Error running '{}':".format(self.aligner) + str(exception))
 
@@ -106,11 +112,11 @@ class Seqs_To_Aligns_And_Hmms:
             sys	0m0.170s
         '''
         if self.aligner == 'muscle':
-            return [self.aligner, '-quiet','-in', infile, '-out', name + '.fasta']
+            return [self.aligner, '-quiet','-in', infile, '-out', name + '.fasta'], None
         elif self.aligner == 'mafft':
-            return [self.aligner, '--auto', infile, '>', name + '.fasta']
+            return [self.aligner, '--auto', infile], name + '.fasta'
         elif self.aligner == 'clustalo':
-            return [self.aligner, '-i', infile, '-o', name + '.fasta', '--outfmt=fasta']
+            return [self.aligner, '-i', infile, '-o', name + '.fasta', '--outfmt=fasta'], None
         else:
             sys.exit("No command for aligner {}".format(self.aligner))
 
