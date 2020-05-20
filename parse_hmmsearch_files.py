@@ -16,7 +16,7 @@ parser.add_argument('-verbose', default=False, action='store_true', help="Verbos
 parser.add_argument('-download', default=False, action='store_true', help="Download hit sequences")
 parser.add_argument('-align', default=False, action='store_true', help="Align hits to HMM")
 parser.add_argument('-taxfilter', default=None, help="Exclude clade")
-parser.add_argument('-chunk', default=10, help="Number of ids to send to Elink")
+parser.add_argument('-chunk', default=10, type=int, help="Number of ids to send to Elink")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
