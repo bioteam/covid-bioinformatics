@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
 import argparse
-import re
+import sys
 import os
+import re
 import glob
 import subprocess
 import numpy
@@ -15,7 +16,7 @@ parser.add_argument('-verbose', default=False, action='store_true', help="Verbos
 parser.add_argument('-download', default=False, action='store_true', help="Download hit sequences")
 parser.add_argument('-align', default=False, action='store_true', help="Align hits to HMM")
 parser.add_argument('-taxfilter', default=None, help="Exclude clade")
-parser.add_argument('-chunk', default=50, type=int, help="Number of ids to send to Elink")
+parser.add_argument('-chunk', default=10, type=int, help="Number of ids to send to Elink")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
@@ -52,7 +53,7 @@ class Parse_Hmmsearch:
                     if self.verbose:
                         print("No match:\t{0}\t{1}".format(matches[1], matches[2]))
                     continue
-                pids = [ hit.id for hit in qresult]
+                pids = [hit.id for hit in qresult]
                 taxarray = self.get_taxid(pids)
                 self.hits[base] = self.get_lineage(taxarray)
 

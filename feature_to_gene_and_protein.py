@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
 import argparse
+import sys
 import os
-import yaml
 import re
+import yaml
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
@@ -20,7 +21,7 @@ parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
 '''
-SeqRecord:
+Example SeqRecord:
 
 ID: MT123293.2
 Name: MT123293
@@ -35,13 +36,15 @@ Number of features: 23
 /keywords=['']
 /source=Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2)
 /organism=Severe acute respiratory syndrome coronavirus 2
-/taxonomy=['Viruses', 'Riboviria', 'Nidovirales', 'Cornidovirineae', 'Coronaviridae', 'Orthocoronavirinae', 'Betacoronavirus', 'Sarbecovirus']
+/taxonomy=['Viruses', 'Riboviria', 'Nidovirales', 'Cornidovirineae', 'Coronaviridae', 'Orthocoronavirinae', 
+    'Betacoronavirus', 'Sarbecovirus']
 /references=[Reference(title='Direct Submission', ...)]
 /comment=On Mar 13, 2020 this sequence version replaced MT123293.1.
-/structured_comment=OrderedDict([('Assembly-Data', OrderedDict([('Assembly Method', 'SPAdes v. v3.13.0'), ('Sequencing Technology', 'Illumina')]))])
+/structured_comment=OrderedDict([('Assembly-Data', OrderedDict([('Assembly Method', 'SPAdes v. v3.13.0'), 
+    ('Sequencing Technology', 'Illumina')]))])
 Seq('GGTTTATACCTTCCCAGGTAACAAACCAACCAACTTTCGATCTCTTGTAGATCT...AAA', IUPACAmbiguousDNA())
 
-SeqRecord Features:
+Example SeqRecord CDS feature:
 
 type: CDS
 location: [29551:29668](+)
@@ -96,7 +99,7 @@ class Feature_To_Gene_And_Protein:
         return synonyms
 
     def read_variants(self):
-        y = os.path.dirname(os.path.abspath(__file__)) + '/cov_gene_variants.yaml'
+        y = os.path.dirname(os.path.abspath(__file__)) + '/cov_variants.yaml'
         with open(y) as file:
             variants = yaml.load(file, Loader=yaml.FullLoader)
         return variants

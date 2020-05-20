@@ -1,27 +1,29 @@
 #!/usr/bin/env python3
 
 import argparse
-import os.path
+import sys
+import os
+import re
 import tempfile
 import subprocess
-import sys
 from Bio import AlignIO
 from Bio import SeqIO
 
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
-parser.add_argument('-aligner', default='muscle', help="Alignment application")
+parser.add_argument('-aligner', default='mafft', help="Alignment application")
 parser.add_argument('-hmmbuilder', default='hmmbuild', help="HMM build application")
 parser.add_argument('-skip', default='ORF1a-aa,ORF1a-nt,ORF1ab-aa,ORF1ab-nt', help="Do not align")
 parser.add_argument('-json', action='store_true', help="Create JSON for Gen3")
+parser.add_argument('-maf', action='store_true', help="Create additional MAF format alignments")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
 
 def main():
     builder = Seqs_To_Aligns_And_Hmms(args.verbose, args.aligner, args.hmmbuilder, args.skip, 
-        args.json, args.files)
+        args.json, args.maf, args.files)
     builder.read()
     builder.make_align()
     builder.make_hmm()
@@ -29,13 +31,13 @@ def main():
 
 
 class Seqs_To_Aligns_And_Hmms:
-
-    def __init__(self, verbose, aligner, hmmbuild, skip, json, files):
+    def __init__(self, verbose, aligner, hmmbuild, skip, json, maf, files):
         self.verbose = verbose
         self.aligner = aligner
         self.hmmbuild = hmmbuild
         self.skip = skip
         self.make_json = json
+        self.maf = maf
         self.files = files
         self.seqs, self.alns, self.hmms = dict(), dict(), dict()
 
@@ -58,7 +60,7 @@ class Seqs_To_Aligns_And_Hmms:
         for seq in seqs:
             d[str(seq.seq)] = seq
         return list(d.values())
-        
+
     def make_align(self):
         for name in self.seqs:
             if name in self.skip:
@@ -74,22 +76,32 @@ class Seqs_To_Aligns_And_Hmms:
                 SeqIO.write(self.seqs[name], seqfile.name, 'fasta')
                 if self.verbose:
                     print("Alignment input sequence file: {}".format(seqfile.name))
-                cmd = self.make_align_cmd(seqfile.name, name)
+                # out_filename is used to redirect the STDOUT to file
+                # when self.aligner is "mafft" and it requires redirect to file
+                cmd, out_filename = self.make_align_cmd(seqfile.name, name)
                 if self.verbose:
                     print("Alignment command is '{}'".format(cmd))
                 try:
-                    subprocess.run(cmd, check=True)
+                    if out_filename:
+                        with open(out_filename, "w") as f:
+                            subprocess.run(cmd, check=True, stdout=f)
+                    else:
+                        subprocess.run(cmd, check=True)
                 except (subprocess.CalledProcessError) as exception:
-                    print("Error running '{}':".format(self.aligner) + str(exception))
+                    print("Error running '{}': ".format(self.aligner) + str(exception))
 
-            # Convert Fasta to Maf
-            # AlignIO.convert(name + '.fasta', 'fasta', name + '.maf', 'maf', alphabet=None)
-            # subprocess.run(['rm','-f',name + '.tmpgit'], check=True)
+            # Create additional Maf format alignment
+            if self.maf:
+                AlignIO.convert(name + '.fasta', 'fasta', name + '.maf', 'maf', alphabet=None)
 
             self.alns[name] = name + '.fasta'
 
     def make_align_cmd(self, infile, name):
         '''
+        time mafft --auto M-aa.fasta > M-aa.aln
+            real	0m2.254s
+            user	0m2.036s
+            sys	0m0.170s
         time muscle -in M-aa.fasta -out M-aa.aln
             real	0m19.963s
             user	0m19.594s
@@ -98,27 +110,27 @@ class Seqs_To_Aligns_And_Hmms:
             real	0m23.045s
             user	0m18.665s
             sys	0m4.255s
-        time mafft --auto M-aa.fasta > M-aa.aln
-            real	0m2.254s
-            user	0m2.036s
-            sys	0m0.170s
         '''
         if self.aligner == 'muscle':
-            return [self.aligner, '-quiet','-in', infile, '-out', name + '.fasta']
+            return [self.aligner, '-quiet','-in', infile, '-out', name + '.fasta'], None
         elif self.aligner == 'mafft':
-            return [self.aligner, '--auto', infile, '>', name + '.fasta']
+            return [self.aligner, '--auto', infile], name + '.fasta'
         elif self.aligner == 'clustalo':
-            return [self.aligner, '-i', infile, '-o', name + '.fasta', '--outfmt=fasta']
+            return [self.aligner, '-i', infile, '-o', name + '.fasta', '--outfmt=fasta'], None
         else:
             sys.exit("No command for aligner {}".format(self.aligner))
 
     def make_hmm(self):
         for name in self.alns:
             if self.verbose:
-                print("hmmbuild input file is '{}'".format(self.alns[name]))
+                print("{0} input file is '{1}'".format(self.hmmbuild, self.alns[name]))
             # Either --amino or --dna
             opt = '--amino' if '-aa' in name else '--dna'
-            subprocess.run([self.hmmbuild, opt, name + '.hmm', self.alns[name]])
+            try:
+                subprocess.run([self.hmmbuild, opt, name + '.hmm', self.alns[name]])
+            except (subprocess.CalledProcessError) as exception:
+                print("Error running {}: ".format(self.hmmbuild) + str(exception))
+
             self.hmms[name] = name + '.hmm'
 
     def write_json(self):
