@@ -67,7 +67,7 @@ class Seqs_To_Aligns_And_Hmms:
                 continue
             if 'invalid' in name:
                 continue
-            # Many aligners will reject a file with a single sequence so just copy
+            # Most aligners will reject a file with a single sequence so just copy
             if len(self.seqs[name]) == 1:
                 cmd = ['cp', name + '.fa', name + '.fasta']
                 subprocess.run(cmd, check=True)

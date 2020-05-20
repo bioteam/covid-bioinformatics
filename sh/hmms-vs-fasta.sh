@@ -36,10 +36,10 @@ do
         exit
     fi
     base=$( echo $hmm | cut -d '.' -f 1 )
-    out="$base$UNDERSCORE$fasta.tblout"
+    out=${base}${UNDERSCORE}${fasta}.tblout
     if [ ! -f $out ]
     then
-        echo HMM: $hmm Fasta:$fasta
+        echo HMM: $hmm Fasta: $fasta
         if [[ $evalue == FALSE ]]
         then
             cmd="hmmsearch --noali --tblout $out $hmm $fasta"
