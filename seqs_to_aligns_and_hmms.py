@@ -58,7 +58,9 @@ class Seqs_To_Aligns_And_Hmms:
     def remove_dups(self, seqs):
         d = dict()
         for seq in seqs:
-            d[str(seq.seq)] = seq
+            # Do not put sequences containing "X" in alignments
+            if 'X' not in str(seq.seq):
+                d[str(seq.seq)] = seq
         return list(d.values())
 
     def make_align(self):
