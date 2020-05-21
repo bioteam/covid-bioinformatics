@@ -16,7 +16,7 @@ parser.add_argument('-verbose', default=False, action='store_true', help="Verbos
 parser.add_argument('-download', default=False, action='store_true', help="Download hit sequences")
 parser.add_argument('-align', default=False, action='store_true', help="Align hits to HMM")
 parser.add_argument('-taxfilter', default=None, help="Exclude clade")
-parser.add_argument('-chunk', default=10, type=int, help="Number of ids to send to Elink")
+parser.add_argument('-chunk', default=10, help="Number of ids to send to Elink")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
@@ -53,7 +53,7 @@ class Parse_Hmmsearch:
                     if self.verbose:
                         print("No match:\t{0}\t{1}".format(matches[1], matches[2]))
                     continue
-                pids = [hit.id for hit in qresult]
+                pids = [ hit.id for hit in qresult]
                 taxarray = self.get_taxid(pids)
                 self.hits[base] = self.get_lineage(taxarray)
 
@@ -106,7 +106,7 @@ class Parse_Hmmsearch:
 
     def write(self):
         for file in self.fasta:
-            seqfile = file + '-hits.fa'
+            seqfile = file + '-hits-no-' + self.taxfilter + '.fa' if self.taxfilter else file + '-hits.fa'
             if self.verbose:
                 print("Writing {}".format(seqfile))
             SeqIO.write(self.fasta[file], seqfile, 'fasta')
@@ -116,14 +116,15 @@ class Parse_Hmmsearch:
         if not self.align:
             return
         for file in self.hits:
-            fastafile = file + '-hits.fa'
+            fastafile = = file + '-hits-no-' + self.taxfilter + '.fa' if self.taxfilter else file + '-hits.fa'
             if os.path.exists(fastafile) and os.stat(fastafile).st_size != 0:
                 gene = re.match(r'(\w+-\w+)_\w+', file)[1]
                 # No guarantee that the HMM is in the current dir so look for it
                 hmm = [f for f in glob.glob('**/' + gene + '.hmm', recursive=True)][0]
+                outfile = file + '-hits-no-' + self.taxfilter + '.sto' if self.taxfilter else file + '-hits.sto'
                 if self.verbose:
-                    print("Creating alignment with hmmalign: {}".format(file + '-hits.sto'))
-                subprocess.run(['hmmalign','--amino', '-o', file + '-hits.sto',
+                    print("Creating alignment with hmmalign: {}".format(outfile))
+                subprocess.run(['hmmalign','--amino', '-o', outfile,
                     hmm, fastafile, ], check=True)
 
 
