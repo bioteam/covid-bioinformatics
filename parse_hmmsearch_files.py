@@ -116,7 +116,7 @@ class Parse_Hmmsearch:
         if not self.align:
             return
         for file in self.hits:
-            fastafile = = file + '-hits-no-' + self.taxfilter + '.fa' if self.taxfilter else file + '-hits.fa'
+            fastafile = file + '-hits-no-' + self.taxfilter + '.fa' if self.taxfilter else file + '-hits.fa'
             if os.path.exists(fastafile) and os.stat(fastafile).st_size != 0:
                 gene = re.match(r'(\w+-\w+)_\w+', file)[1]
                 # No guarantee that the HMM is in the current dir so look for it
@@ -145,6 +145,8 @@ class Parse_Hmmsearch:
     def get_lineage(self, taxarray):
         Entrez.email = self.email
         taxids = [ elem[1] for elem in taxarray ]
+        if self.verbose:
+            print("Fetching from 'taxonomy': {}".format(taxids))
         handle = Entrez.efetch(db="taxonomy", id=','.join(taxids))
         results = Entrez.read(handle)
         handle.close()
@@ -152,6 +154,8 @@ class Parse_Hmmsearch:
         taxdict = {}
         for num, result in enumerate(results):
             taxdict[taxarray[num][0]] = result["Lineage"]
+        if self.verbose:
+            print("Retrieved from 'taxonomy': {}".format(taxdict))
         return taxdict
 
 if __name__ == "__main__":
