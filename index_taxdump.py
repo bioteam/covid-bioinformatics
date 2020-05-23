@@ -3,11 +3,14 @@
 import argparse
 import os
 import sys
+import codecs
 from whoosh import index
 from whoosh.fields import Schema, TEXT, NUMERIC
 from whoosh.qparser import QueryParser
 from whoosh.index import open_dir
 from whoosh.query import *
+from whoosh.filedb.filestore import FileStorage
+
 
 '''
 >head prot.accession2taxid
@@ -58,7 +61,7 @@ class Index_Taxdump:
         ix = index.create_in(self.index, schema)
         writer = ix.writer()
         
-        with open(self.file, 'r', encoding='utf-8') as f:
+        with codecs.open(self.file, 'r', encoding='utf-8') as f:
             # Skip line 1
             first_line = f.readline()
             for line in f:
@@ -69,7 +72,8 @@ class Index_Taxdump:
                     gi=row[3])
 
     def do_query(self):
-        ix = index.open_dir(self.index)
+        storage = FileStorage(self.index)
+        ix = storage.open_index()
         qry = QueryParser('accession', schema=ix.schema).parse(self.query)
 
         with ix.searcher() as s:
