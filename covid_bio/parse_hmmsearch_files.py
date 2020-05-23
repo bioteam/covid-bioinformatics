@@ -64,7 +64,7 @@ class Parse_Hmmsearch:
     def get_taxid(self, pids):
         Entrez.email = self.email
         # Split the list of ids into "batches" of ids for Entrez
-        num_chunks = int(len(pids)/self.chunk) + 1
+        num_chunks = len(pids)/int(self.chunk) + 1
         taxarray = []
         errorarray =[]
         for id_chunk in numpy.array_split(numpy.array(pids), num_chunks):
