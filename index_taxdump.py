@@ -5,7 +5,7 @@ import os
 import sys
 import codecs
 from whoosh import index
-from whoosh.fields import Schema, TEXT, NUMERIC
+from whoosh.fields import Schema, TEXT, NUMERIC, STORED
 from whoosh.qparser import QueryParser
 from whoosh.index import open_dir
 from whoosh.query import *
@@ -50,7 +50,9 @@ class Index_Taxdump:
         self.file = file
 
     def create_schema(self):
-        schema = Schema(accession=TEXT,accession_version=TEXT,taxid=NUMERIC,gi=NUMERIC)
+        # Set 'stored' to True if you want that value returned in search results
+        schema = Schema(accession=TEXT, accession_version=TEXT, 
+            taxid=NUMERIC(stored=True), gi=NUMERIC)
         
         if not os.path.exists(self.index):
             os.mkdir(self.index)
@@ -59,28 +61,27 @@ class Index_Taxdump:
             sys.exit("prot.accession2taxid file required")
 
         ix = index.create_in(self.index, schema)
-        writer = ix.writer()
         
         with codecs.open(self.file, 'r', encoding='utf-8') as f:
-            # Skip line 1
+            # Skip header line 1
             first_line = f.readline()
-            for line in f:
-                row = line.strip().split('\t')
-                writer.add_document(accession=row[0],
-                    accession_version=row[1],
-                    taxid=row[2],
-                    gi=row[3])
+            with ix.writer() as writer:
+                for index,line in enumerate(f):
+                    row = line.strip().split('\t')
+                    writer.add_document(accession=row[0],
+                        accession_version=row[1],
+                        taxid=row[2],
+                        gi=row[3])
 
     def do_query(self):
         storage = FileStorage(self.index)
         ix = storage.open_index()
         qry = QueryParser('accession', schema=ix.schema).parse(self.query)
 
-        with ix.searcher() as s:
-            results = s.search(qry,limit=1)
-            print("{}".format(results[0]))
-
-
+        with ix.searcher() as searcher:
+            results = searcher.search(qry,limit=1)
+            if self.verbose:
+                print("{}".format(results[0]))
 
 if __name__ == "__main__":
     main()
