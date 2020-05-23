@@ -72,6 +72,8 @@ class Index_Taxdump:
                         accession_version=row[1],
                         taxid=row[2],
                         gi=row[3])
+                    if self.verbose and index % 1000 == 0:
+                        print("Line {}".format(index))
 
     def do_query(self):
         storage = FileStorage(self.index)
