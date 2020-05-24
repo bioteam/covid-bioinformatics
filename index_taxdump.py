@@ -66,14 +66,14 @@ class Index_Taxdump:
             # Skip header line 1
             first_line = f.readline()
             with ix.writer() as writer:
-                for index,line in enumerate(f):
+                for linenum,line in enumerate(f):
                     row = line.strip().split('\t')
                     writer.add_document(accession=row[0],
                         accession_version=row[1],
                         taxid=row[2],
                         gi=row[3])
-                    if self.verbose and index % 1000 == 0:
-                        print("Line {}".format(index))
+                    if self.verbose and linenum % 1000 == 0:
+                        print("Line {}".format(linenum))
 
     def do_query(self):
         storage = FileStorage(self.index)
