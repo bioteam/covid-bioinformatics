@@ -1,0 +1,21 @@
+from setuptools import setup
+
+requirements = ['biopython', 'numpy', 'PyYAML']
+
+setup(
+    name='covid_bio',
+    use_scm_version=True,
+    author="Brian Osborne",
+    author_email="briano@bioteam.net",
+    description="Tools for COV sequence analysis",
+    packages=['covid_bio'],
+    scripts=['download_gb_by_taxid.py','feature_to_gene_and_protein.py','seqs_to_aligns_and_hmms.py','parse_hmmsearch_files.py'],
+    python_requires='>=3.7',
+    setup_requires=['setuptools_scm'],
+    install_requires=requirements,
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "Topic :: Scientific/Engineering :: Bio-Informatics",
+        "License :: OSI Approved :: Apache Software License"
+    ]
+)
