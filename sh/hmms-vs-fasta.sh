@@ -1,6 +1,6 @@
 #!/bin/bash
 # Run HMMs against a Fasta file using hmmsearch,
-# create 'table' output files like S-aa_nr.out.
+# create 'table' output files like "S-aa_nr.tblout".
 
 fasta=FALSE
 hmms=FALSE
