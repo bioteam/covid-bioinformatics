@@ -83,7 +83,7 @@ SQ   SEQUENCE   225 AA;  25107 MW;  3BD60B1CA8C7D7F5 CRC64;
 def main():
     extractor = Fast_Uniprot_Parser(args.verbose, args.files)
     extractor.read()
-    # extractor.write()
+    # extractor.write_matrix()
 
 
 class Fast_Uniprot_Parser:
@@ -98,6 +98,7 @@ class Fast_Uniprot_Parser:
         for path in paths:
             with open(path, 'r') as f:
                 for linenum,line in enumerate(f):
+                    # Capture Uniprot id
                     matches = re.match(r'^ID\s+(\S+)', line)
                     if matches:
                         pid = matches[1]
@@ -111,46 +112,37 @@ class Fast_Uniprot_Parser:
                             data['SQ'] = []
                         data['GO'].append(matches[1])
                         continue
-                    # Only collect sequence if there's a GO term
-                    if 'GO' in data.keys():
-                        matches = re.match(r'^     ([\sA-Z]+)', line)
-                        if matches:
+                    # Look for KEGG terms
+                    matches = re.match(r'^DR   KEGG; ([a-z]+:[^;]+)', line)
+                    if matches:
+                        if 'KEGG' not in data.keys():
+                            data['KEGG'] = []
+                            data['SQ'] = []
+                        data['KEGG'].append(matches[1])
+                        continue
+                    # Capture sequence if there's a GO or KEGG term
+                    matches = re.match(r'^     ([\sA-Z]+)', line)
+                    if matches:
+                        if 'GO' in data.keys() or 'KEGG' in data.keys():
                             data['SQ'].append(matches[1].replace(' ','').strip())
                             continue
+                    # End of entry
                     matches = re.match(r'^//', line)
                     if matches:
-                        if 'GO' in data.keys():
+                        if 'GO' in data.keys() or 'KEGG' in data.keys():
                             data['SQ'] = ''.join(data['SQ'])
                             self.data[pid] = data
                     if self.verbose and linenum % 10000 == 0:
                         print("Line {}".format(linenum))
 
-                    
-            print(self.data)
-
-
-    def write(self):
-        for name in self.feats.keys():
-                aaseqfile = name + '-aa.fa'
-                ntseqfile = name + '-nt.fa'
-                aahandle = open(aaseqfile, "w")
-                nthandle = open(ntseqfile, "w")
-                for feat in self.feats[name].keys():
-                    SeqIO.write(self.feats[name][feat]['aa'], aahandle, self.seq_format)
-                    SeqIO.write(self.feats[name][feat]['nt'], nthandle, self.seq_format)
-                aahandle.close()
-                nthandle.close()
-                if self.make_json and 'invalid' not in name:
-                    # No JSON for invalid sequences
-                    aafile = name + '-aa-fasta.json'
-                    ntfile = name + '-nt-fasta.json'
-                    aahandle = open(aafile, "w")
-                    nthandle = open(ntfile, "w")
-                    for feat in self.feats[name].keys():
-                        aahandle.write(self.json[name][feat]['aa'])
-                        nthandle.write(self.json[name][feat]['nt'])
-                    aahandle.close()
-                    nthandle.close()
+    def write_matrix(self):
+        for pid in self.data.keys():
+            nthandle = open(ntfile, "w")
+            for feat in self.feats[name].keys():
+                aahandle.write(self.json[name][feat]['aa'])
+                nthandle.write(self.json[name][feat]['nt'])
+            aahandle.close()
+            nthandle.close()
                     
     
 if __name__ == "__main__":
