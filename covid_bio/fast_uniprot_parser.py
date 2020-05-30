@@ -4,9 +4,11 @@ import argparse
 import sys
 import os
 import re
+import itertools
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
+parser.add_argument('-matrix', default=False, action='store_true', help="Make matrix for ChemProp")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
@@ -81,15 +83,17 @@ SQ   SEQUENCE   225 AA;  25107 MW;  3BD60B1CA8C7D7F5 CRC64;
 
 
 def main():
-    extractor = Fast_Uniprot_Parser(args.verbose, args.files)
+    extractor = Fast_Uniprot_Parser(args.verbose, args.matrix, args.files)
     extractor.read()
-    # extractor.write_matrix()
+    if extractor.matrix:
+        extractor.write_matrix()
 
 
 class Fast_Uniprot_Parser:
 
-    def __init__(self, verbose, files):
+    def __init__(self, verbose, matrix, files):
         self.verbose = verbose
+        self.matrix = matrix
         self.files = files
         self.data = dict()
 
@@ -123,27 +127,43 @@ class Fast_Uniprot_Parser:
                     # Capture sequence if there's a GO or KEGG term
                     matches = re.match(r'^     ([\sA-Z]+)', line)
                     if matches:
-                        if 'GO' in data.keys() or 'KEGG' in data.keys():
+                        if 'SQ' in data.keys():
                             data['SQ'].append(matches[1].replace(' ','').strip())
                             continue
                     # End of entry
                     matches = re.match(r'^//', line)
                     if matches:
-                        if 'GO' in data.keys() or 'KEGG' in data.keys():
+                        if 'SQ' in data.keys():
                             data['SQ'] = ''.join(data['SQ'])
                             self.data[pid] = data
                     if self.verbose and linenum % 10000 == 0:
                         print("Line {}".format(linenum))
 
     def write_matrix(self):
+        goterms, uniquegoterms = self.parse_terms('GO')
+        keggterms, uniquekeggterms = self.parse_terms('KEGG')
         for pid in self.data.keys():
+            ntfile = ''
             nthandle = open(ntfile, "w")
             for feat in self.feats[name].keys():
-                aahandle.write(self.json[name][feat]['aa'])
                 nthandle.write(self.json[name][feat]['nt'])
-            aahandle.close()
             nthandle.close()
                     
-    
+    def parse_terms(self, ontology):
+        '''
+        >>> data
+        {3: {'GO': [5, 9]}, 5: {'KEGG': [7, 4]}}
+        >>> [ ids.get('GO') for ids in [trms for trms in data.values() ]]
+        [[5, 9], None]  
+        '''
+        # Array of arrays of all terms plus None
+        terms = [ gids.get(ontology) for gids in [pids for pids in self.data.values() ]]
+        # Remove None
+        terms = [i for i in terms if i] 
+        # Merge array of arrays
+        terms = list(itertools.chain.from_iterable(terms))
+        uniqueterms = set(terms)
+        return terms, uniqueterms
+
 if __name__ == "__main__":
     main()
