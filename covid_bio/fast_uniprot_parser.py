@@ -86,7 +86,7 @@ def main():
     extractor = Fast_Uniprot_Parser(args.verbose, args.matrix, args.files)
     extractor.read()
     if extractor.matrix:
-        extractor.write_matrix()
+        extractor.make_matrix()
 
 
 class Fast_Uniprot_Parser:
@@ -139,18 +139,28 @@ class Fast_Uniprot_Parser:
                     if self.verbose and linenum % 10000 == 0:
                         print("Line {}".format(linenum))
 
-    def write_matrix(self):
-        goterms, uniquegoterms = self.parse_terms('GO')
-        keggterms, uniquekeggterms = self.parse_terms('KEGG')
-        for pid in self.data.keys():
-            ntfile = ''
-            nthandle = open(ntfile, "w")
-            for feat in self.feats[name].keys():
-                nthandle.write(self.json[name][feat]['nt'])
-            nthandle.close()
-                    
-    def parse_terms(self, ontology):
+    def make_matrix(self):
         '''
+        PID, Sequence, GO:123, GO:456, GO:789, vg:123, vg:456
+        A1, MAK, 0, 1, 0, 0, 0
+        B2, MLY, 0, 0, 1, 0, 0
+        C3, MAF, 1, 0, 0, 0, 0
+        '''
+        matrix = dict()
+        goterms = self.parse_terms('GO')
+        keggterms = self.parse_terms('KEGG')
+        header = ['PID','Sequence',goterms,keggterms]
+
+        for pid in self.data.keys():
+            print()
+
+    def write_matrix(self):
+        ntfile = ''
+        with open(ntfile, "w")as nthandle:
+            nthandle.write(self.json[name][feat]['nt'])
+
+    def parse_terms(self, ontology):
+        ''' Return unique, sorted set of terms
         >>> data
         {3: {'GO': [5, 9]}, 5: {'KEGG': [7, 4]}}
         >>> [ ids.get('GO') for ids in [trms for trms in data.values() ]]
@@ -160,10 +170,11 @@ class Fast_Uniprot_Parser:
         terms = [ gids.get(ontology) for gids in [pids for pids in self.data.values() ]]
         # Remove None
         terms = [i for i in terms if i] 
-        # Merge array of arrays
-        terms = list(itertools.chain.from_iterable(terms))
-        uniqueterms = set(terms)
-        return terms, uniqueterms
+        # Merge array of arrays and sort
+        terms = sorted(set(itertools.chain.from_iterable(terms)))
+        if self.verbose:
+            print("{0} terms: {1}".format(ontology,terms))
+        return terms
 
 if __name__ == "__main__":
     main()
