@@ -9,6 +9,7 @@ import itertools
 parser = argparse.ArgumentParser()
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
 parser.add_argument('-matrix', default=False, action='store_true', help="Make matrix for ChemProp")
+parser.add_argument('-output', default='uniprot_sprot.mat', help="Output matrix file")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
@@ -78,22 +79,21 @@ SQ   SEQUENCE   225 AA;  25107 MW;  3BD60B1CA8C7D7F5 CRC64;
      SSLAALVALK YHIKDIFTIL GAAIIIILAE YVVLPYQRQY NIVDGIGLPL LLLGFFILYQ
      VFSVPNPSTP TGVMVPKPED EWDIEMAPLN HRDRQVPESE LENVK
 //
-
 '''
 
-
 def main():
-    extractor = Fast_Uniprot_Parser(args.verbose, args.matrix, args.files)
+    extractor = Fast_Uniprot_Parser(args.verbose, args.matrix, args.output, args.files)
     extractor.read()
     if extractor.matrix:
         extractor.make_matrix()
-
+        extractor.write_matrix()
 
 class Fast_Uniprot_Parser:
 
-    def __init__(self, verbose, matrix, files):
+    def __init__(self, verbose, matrix, output, files):
         self.verbose = verbose
         self.matrix = matrix
+        self.output = output
         self.files = files
         self.data = dict()
 
@@ -146,18 +146,38 @@ class Fast_Uniprot_Parser:
         B2, MLY, 0, 0, 1, 0, 0
         C3, MAF, 1, 0, 0, 0, 0
         '''
-        matrix = dict()
         goterms = self.parse_terms('GO')
         keggterms = self.parse_terms('KEGG')
-        header = ['PID','Sequence',goterms,keggterms]
+        # Initialize array of arrays
+        matrix = [None] * (len(self.data.keys()) + 1)
+        # Create header line
+        header = []
+        header.extend(['PID', 'Sequence'])
+        header.extend(goterms)
+        header.extend(keggterms)
+        matrix[0] = header
 
-        for pid in self.data.keys():
-            print()
+        for colindex, pid in enumerate(self.data.keys(), start=1):
+            arr = []
+            arr.extend([pid, self.data[pid]['SQ']])
+            for goterm in goterms:
+                if 'GO' in self.data[pid].keys() and goterm in self.data[pid]['GO']:
+                    arr.append('1')
+                else:
+                    arr.append('0')
+            for keggterm in keggterms:
+                if 'KEGG' in self.data[pid].keys() and keggterm in self.data[pid]['KEGG']:
+                    arr.append('1')
+                else:
+                    arr.append('0')
+            if self.verbose:
+                print("Row: {}".format(arr))
+            matrix[colindex] = arr
+        self.matrix = matrix
 
     def write_matrix(self):
-        ntfile = ''
-        with open(ntfile, "w")as nthandle:
-            nthandle.write(self.json[name][feat]['nt'])
+        with open(self.output, "w") as out:
+            out.write()
 
     def parse_terms(self, ontology):
         ''' Return unique, sorted set of terms
