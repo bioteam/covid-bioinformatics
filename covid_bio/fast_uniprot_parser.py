@@ -177,7 +177,11 @@ class Fast_Uniprot_Parser:
 
     def write_matrix(self):
         with open(self.output, "w") as out:
-            out.write()
+            if self.verbose:
+                print("Writing matrix file {}".format(self.output))
+            for line in self.matrix:
+                l = ','.join(line) + "\n"
+                out.write(l)
 
     def parse_terms(self, ontology):
         ''' Return unique, sorted set of terms
