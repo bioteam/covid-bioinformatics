@@ -86,8 +86,8 @@ class Feature_To_Gene_And_Protein:
         self.json = dict()
         # Nucleotide and protein features for writing to fasta
         self.feats = dict()
-        # Features that cannot be identified by name
-        self.unidentified = []
+        # Synonyms that are matched
+        self.matches = dict()
         # Dictionaries
         self.synonyms = self.read_synonyms()
         self.variants = self.read_variants()
@@ -220,11 +220,13 @@ class Feature_To_Gene_And_Protein:
         for name in self.synonyms:
             if product in self.synonyms[name]:
                 if self.verbose:
-                    print("Product '{0}' from {1} found".format(product, acc))
+                    print("Product {0}-{1} found".format(product, acc))
                 return name
         if self.verbose:
-            print("Product '{0}' from {1} not found".format(product, acc))
-        self.unidentified.append(product + '-' + acc)
+            print("Product {0}-{1} not found".format(product, acc))
+        if self.analyze:
+            match = self.synonyms[name][self.synonyms[name].index(product)]
+            self.matches[match] = 1
         return None
 
     def get_host(self):
