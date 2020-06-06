@@ -13,23 +13,19 @@ ORF7a: { 'valid': [122,121,119], 'invalid': [] }
 ORF7b: { 'valid': [44,43,30,31,25], 'invalid': [] }
 ORF8: { 'valid': [121,122], 'invalid': [50,55] }
 ORF9b: { 'valid': [97,98], 'invalid': [70] }
-ORF10: { 'valid': [38], 'invalid': [39,122,121,70] }
+ORF10: { 'valid': [38,39], 'invalid': [122,121,70] }
 NS1: { 'valid': [179,180], 'invalid': [2422] }
 NS2: { 'valid': [638,639], 'invalid': [306] }
 NS3: { 'valid': [1922, 1945], 'invalid': [290] }
 NS3a: { 'valid': [274], 'invalid': [] }
-NS3b: { 'valid': [154], 'invalid': [] }
 NS4: { 'valid': [500], 'invalid': [83] }
 NS5: { 'valid': [306], 'invalid': [198] }
 NS6: { 'valid': [290],'invalid': [63,113] }
 NS7: { 'valid': [83], 'invalid': [139] }
-NS7a: { 'valid': [122,121], 'invalid': [] }
-NS7b: { 'valid': [44,43], 'invalid': [] }
 NS8: { 'valid': [198], 'invalid': [121] }
 NS8a: { 'valid': [39], 'invalid': [] }
 NS8b: { 'valid': [84], 'invalid': [] }
 NS9: { 'valid': [113],'invalid': [932] }
-NS9b: { 'valid': [98], 'invalid': [] }
 NS10: { 'valid': [139], 'invalid': [601,70] }
 NS11: { 'valid': [11,13], 'invalid': [527] }
 NS12: { 'valid': [932,936,934], 'invalid': [346] }

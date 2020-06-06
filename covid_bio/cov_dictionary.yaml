@@ -155,6 +155,14 @@ ORF3b:
   - ORF3b_protein
   - putative ORF3b
   - sars3b
+  - accessory protein 3b
+  - non-structural protein 3b
+  - nonstructural protein 3b
+  - nonstructural protein NS3b
+  - NS3b
+  - NS3b_protein
+  - NS3b protein
+  - NSP3b
 ORF6:
   - hypothetical protein orf6
   - hypothetical protein Orf6
@@ -203,6 +211,14 @@ ORF7b:
   - ORF7b_protein
   - putative ORF7b
   - sars7b
+  - accessory protein 7b
+  - non-structural protein 7b
+  - nonstructural protein 7b
+  - nonstructural protein NS7b
+  - NS7b
+  - NS7b protein
+  - NS7b_protein
+  - NSP7b
 ORF8:
   - hypothetical protein orf8
   - hypothetical protein ORF8
@@ -214,6 +230,14 @@ ORF8:
   - ORF8 protein
   - ORF8_protein
   - putative ORF8
+  - accessory protein 7a
+  - non-structural protein 7a
+  - nonstructural protein 7a
+  - nonstructural protein NS7a
+  - NS7a
+  - NS7a protein
+  - NS7a_protein
+  - NSP7a
 ORF9b:
   - hypothetical protein orf9b
   - hypothetical protein ORF9b
@@ -224,6 +248,15 @@ ORF9b:
   - orf9b protein
   - Orf9b protein
   - putative ORF9b
+  - accessory protein 9b
+  - non-structural protein 9b
+  - nonstructural protein 9b
+  - nonstructural protein NS9b
+  - NS9b
+  - NS9b_protein
+  - NS9b protein
+  - NSP9b
+  - sars9b
 ORF10:
   - hypothetical protein orf10
   - hypothetical protein ORF10
@@ -294,15 +327,6 @@ NS3a:
   - NS3a_protein
   - NS3a protein
   - NSP3a
-NS3b:
-  - accessory protein 3b
-  - non-structural protein 3b
-  - nonstructural protein 3b
-  - nonstructural protein NS3b
-  - NS3b
-  - NS3b_protein
-  - NS3b protein
-  - NSP3b
 NS4:
   - accessory protein 4
   - non-structural protein 4
@@ -382,24 +406,6 @@ NS7:
   - putative NSP7
   - putative nsp7
   - putative Nsp7
-NS7a:
-  - accessory protein 7a
-  - non-structural protein 7a
-  - nonstructural protein 7a
-  - nonstructural protein NS7a
-  - NS7a
-  - NS7a protein
-  - NS7a_protein
-  - NSP7a
-NS7b:
-  - accessory protein 7b
-  - non-structural protein 7b
-  - nonstructural protein 7b
-  - nonstructural protein NS7b
-  - NS7b
-  - NS7b protein
-  - NS7b_protein
-  - NSP7b
 NS8:
   - accessory protein 8
   - non-structural protein 8
@@ -453,16 +459,6 @@ NS9:
   - putative Nsp9
   - putative nsp9 (RdRp)
   - ssRNA-binding protein
-NS9b:
-  - accessory protein 9b
-  - non-structural protein 9b
-  - nonstructural protein 9b
-  - nonstructural protein NS9b
-  - NS9b
-  - NS9b_protein
-  - NS9b protein
-  - NSP9b
-  - sars9b
 NS10:
   - accessory protein 10
   - formerly known as growth-factor-like protein (GFL)
