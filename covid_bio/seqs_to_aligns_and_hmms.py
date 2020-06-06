@@ -47,6 +47,8 @@ class Seqs_To_Aligns_And_Hmms:
             # Get baseneme, for example "S-aa"
             name = os.path.basename(path).split('.')[0]
             try:
+                if self.verbose:
+                    print("Reading Fasta file: {}".format(path))
                 # Each one of these is a multiple fasta file
                 for index, fa in enumerate(SeqIO.parse(path, "fasta")):
                     seqs.append(fa)
