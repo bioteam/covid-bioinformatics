@@ -45,6 +45,8 @@ class Parse_Hmmsearch:
 
     def parse(self):
         for file in self.files:
+            if os.stat(file).st_size == 0:
+                continue
             base = os.path.basename(file).split('.')[0]
             # self.hits[base] = dict()
             matches = re.match(r'(\w+-\w+)_(\w+-\w+)', base)

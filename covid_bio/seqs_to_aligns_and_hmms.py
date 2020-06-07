@@ -44,8 +44,12 @@ class Seqs_To_Aligns_And_Hmms:
     def read(self):
         for path in [f for f in self.files if os.path.isfile(f)]:
             seqs = []
-            # Get baseneme, for example "S-aa"
+            # Get basename without suffix, for example "S-aa"
             name = os.path.basename(path).split('.')[0]
+            if name in self.skip:
+                continue
+            if 'invalid' in name:
+                continue
             try:
                 if self.verbose:
                     print("Reading Fasta file: {}".format(path))
@@ -67,10 +71,6 @@ class Seqs_To_Aligns_And_Hmms:
 
     def make_align(self):
         for name in self.seqs:
-            if name in self.skip:
-                continue
-            if 'invalid' in name:
-                continue
             # Most aligners will reject a file with a single sequence so just copy
             if len(self.seqs[name]) == 1:
                 cmd = ['cp', name + '.fa', name + '.fasta']
