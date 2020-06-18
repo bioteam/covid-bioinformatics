@@ -15,7 +15,7 @@ from Bio import SeqIO
 # 694009 (parent of 2697049): Severe acute respiratory syndrome-related coronavirus
 # https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=694009
 parser = argparse.ArgumentParser()
-parser.add_argument('-t', default=694009, dest='taxid', help="Taxonomy id")
+parser.add_argument('-t', default=11118, dest='taxid', help="Taxonomy id")
 parser.add_argument('-r', default=True, dest='recurse', help="Recursive retrieval of child tax IDs", type=bool)
 parser.add_argument('-f', default='gb', dest='format', help="Input and output format")
 parser.add_argument('-e', default="briano@bioteam.net", dest='email', help="Email")
@@ -25,6 +25,7 @@ parser.add_argument('-split', dest='split', default=True, help="Split into separ
 parser.add_argument('-no-split', dest='split', action='store_false', help="Create one 'taxid' file")
 parser.add_argument('-verbose', action='store_true', help="Verbose")
 parser.add_argument('-retmax', default=10000, type=int, help="Entrez retmax")
+parser.add_argument('-chunk', default=500, type=int, help="eFetch batch size")
 parser.add_argument('-api_key', help="Entrez API key")
 parser.add_argument('-json', action='store_true', help="Create JSON for Gen3")
 parser.add_argument('-no-fetch', action='store_false', dest='fetch', help="Do not download")
@@ -33,7 +34,7 @@ args = parser.parse_args()
 def main():
     entrez = DownloadGbByTaxid(args.email, args.taxid, args.format, args.min, args.max,
                                      args.split, args.recurse, args.verbose, args.retmax,
-                                     args.api_key, args.json, args.fetch)
+                                     args.chunk, args.api_key, args.json, args.fetch)
     entrez.search()
     entrez.efetch()
     entrez.filter()
@@ -42,7 +43,7 @@ def main():
 
 class DownloadGbByTaxid:
 
-    def __init__(self, email, taxid, format, min_len, max_len, split, recurse, verbose, retmax, api_key, json, fetch):
+    def __init__(self, email, taxid, format, min_len, max_len, split, recurse, verbose, retmax, chunk, api_key, json, fetch):
         self.email = email
         self.taxid = taxid
         self.format = format
@@ -52,6 +53,7 @@ class DownloadGbByTaxid:
         self.recurse = recurse
         self.verbose = verbose
         self.retmax = retmax
+        self.chunk = chunk
         self.api_key = api_key
         self.fetch = fetch
         self.json = json
@@ -70,7 +72,7 @@ class DownloadGbByTaxid:
         Entrez.email = self.email
         Entrez.api_key = self.api_key
 
-        if self.recurse == True:
+        if self.recurse:
             try:
                 handle = Entrez.esearch(db="nuccore", 
                                         idtype="acc",
@@ -107,11 +109,12 @@ class DownloadGbByTaxid:
                 self.taxid, len(self.nt_ids)))
 
     def efetch(self):
-        if self.fetch == False:
+        if not self.fetch:
             sys.exit(0)
         Entrez.email = self.email
+        Entrez.api_key = self.api_key
         # Split the list of ids into "batches" of ids for Entrez
-        num_chunks = int(len(self.nt_ids)/self.retmax) + 1
+        num_chunks = int(len(self.nt_ids)/self.chunk) + 1
 
         for id_chunk in numpy.array_split(numpy.array(self.nt_ids), num_chunks):
             try:
