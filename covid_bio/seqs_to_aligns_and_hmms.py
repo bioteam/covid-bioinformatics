@@ -65,8 +65,9 @@ class Seqs_To_Aligns_And_Hmms:
         d = dict()
         for seq in seqs:
             # Do not put sequences containing "X" in alignments
-            if 'X' not in str(seq.seq):
-                d[str(seq.seq)] = seq
+            if 'X' in str(seq.seq):
+                continue
+            d[str(seq.seq)] = seq
         return list(d.values())
 
     def make_align(self):

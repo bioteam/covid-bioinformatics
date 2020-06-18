@@ -24,15 +24,16 @@ parser.add_argument('-max', type=int, help="Maximum length")
 parser.add_argument('-split', dest='split', default=True, help="Split into separate files")
 parser.add_argument('-no-split', dest='split', action='store_false', help="Create one 'taxid' file")
 parser.add_argument('-verbose', action='store_true', help="Verbose")
+parser.add_argument('-retmax', default=10000, type=int, help="Entrez retmax")
+parser.add_argument('-api_key', help="Entrez API key")
 parser.add_argument('-json', action='store_true', help="Create JSON for Gen3")
-parser.add_argument('-cloud', default=False, type=bool, help="Cloud mode")
 parser.add_argument('-no-fetch', action='store_false', dest='fetch', help="Do not download")
 args = parser.parse_args()
 
 def main():
     entrez = DownloadGbByTaxid(args.email, args.taxid, args.format, args.min, args.max,
-                                     args.split, args.recurse, args.verbose, args.cloud,
-                                     args.json, args.fetch)
+                                     args.split, args.recurse, args.verbose, args.retmax,
+                                     args.api_key, args.json, args.fetch)
     entrez.search()
     entrez.efetch()
     entrez.filter()
@@ -41,7 +42,7 @@ def main():
 
 class DownloadGbByTaxid:
 
-    def __init__(self, email, taxid, format, min_len, max_len, split, recurse, verbose, cloud, json, fetch):
+    def __init__(self, email, taxid, format, min_len, max_len, split, recurse, verbose, retmax, api_key, json, fetch):
         self.email = email
         self.taxid = taxid
         self.format = format
@@ -50,26 +51,15 @@ class DownloadGbByTaxid:
         self.split = split
         self.recurse = recurse
         self.verbose = verbose
-        self.nt_ids = []
-        self.records = []
-        self.retmax = 100
-        self.cloud = cloud
+        self.retmax = retmax
+        self.api_key = api_key
         self.fetch = fetch
         self.json = json
-        if self.cloud:
-            with open('config.yaml') as file:
-                config = yaml.load(file, Loader=yaml.FullLoader)
-            scriptname = os.path.basename(__file__)
-            self.email = config[scriptname]['email']
-            self.min_len = config[scriptname]['min_len']
-            self.max_len = config[scriptname]['max_len']
-            self.split = config[scriptname]['split']
-            self.recurse = config[scriptname]['recurse']
-            self.verbose = config[scriptname]['verbose']
-            self.taxid = config[scriptname]['taxid']
-            self.format = config[scriptname]['format']
-            self.retmax = config[scriptname]['retmax']
+        self.nt_ids = []
+        self.records = []
 
+        if not self.api_key and 'NCBI_API_KEY' in os.environ.keys():
+            self.api_key = os.environ['NCBI_API_KEY']
 
     def search(self):
         nummatch = re.match(r'^\d+$', str(self.taxid))
@@ -78,12 +68,13 @@ class DownloadGbByTaxid:
             return
 
         Entrez.email = self.email
+        Entrez.api_key = self.api_key
 
         if self.recurse == True:
             try:
                 handle = Entrez.esearch(db="nuccore", 
                                         idtype="acc",
-                                        retmax=5000, 
+                                        retmax=self.retmax, 
                                         term="txid{}[Organism:exp]".format(self.taxid))
                 records = Entrez.read(handle)
                 handle.close()
