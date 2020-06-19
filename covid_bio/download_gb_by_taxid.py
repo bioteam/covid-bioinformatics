@@ -43,7 +43,8 @@ def main():
 
 class DownloadGbByTaxid:
 
-    def __init__(self, email, taxid, format, min_len, max_len, split, recurse, verbose, retmax, chunk, api_key, json, fetch):
+    def __init__(self, email, taxid, format, min_len, max_len, split, recurse, verbose, retmax,
+                 chunk, api_key, json, fetch):
         self.email = email
         self.taxid = taxid
         self.format = format
@@ -98,7 +99,8 @@ class DownloadGbByTaxid:
                       str(self.taxid) + "'" + str(exception))
 
             if len(links[0]["LinkSetDb"]) == 0:
-                print("No sequences found with id " + self.taxid)
+                if self.verbose:
+                    print("No sequences found with id " + self.taxid)
                 return
 
             for link in links[0]["LinkSetDb"][0]["Link"]:
