@@ -10,42 +10,24 @@ from Bio import SearchIO
 from Bio import SeqIO
 
 '''
+Coronavirus reference genome NC_045512 proteins:
+
+NC_045512.2	266	13483	+	43740578	ORF1ab	GU280_gp01	YP_009725295.1	4405	orf1a polyprotein
+NC_045512.2	21563	25384	+	43740568	S	GU280_gp02	YP_009724390.1	1273	surface glycoprotein
+NC_045512.2	25393	26220	+	43740569	ORF3a	GU280_gp03	YP_009724391.1	275	ORF3a protein
+NC_045512.2	26245	26472	+	43740570	E	GU280_gp04	YP_009724392.1	75	envelope protein
+NC_045512.2	26523	27191	+	43740571	M	GU280_gp05	YP_009724393.1	222	membrane glycoprotein
+NC_045512.2	27202	27387	+	43740572	ORF6	GU280_gp06	YP_009724394.1	61	ORF6 protein
+NC_045512.2	27394	27759	+	43740573	ORF7a	GU280_gp07	YP_009724395.1	121	ORF7a protein
+NC_045512.2	27756	27887	+	43740574	ORF7b	GU280_gp08	YP_009725318.1	43	ORF7b
+NC_045512.2	27894	28259	+	43740577	ORF8	GU280_gp09	YP_009724396.1	121	ORF8 protein
+NC_045512.2	28274	29533	+	43740575	N	GU280_gp10	YP_009724397.2	419	nucleocapsid phosphoprotein
+NC_045512.2	29558	29674	+	43740576	ORF10
+
+
+
 BED Format (https://m.ensembl.org/info/website/upload/bed.html)
-
-Required fields
-The first three fields in each feature line are required:
-
-chrom - name of the chromosome or scaffold. Any valid seq_region_name can be used, with or without the 'chr' prefix.
-chromStart - Start position of the feature in standard chromosomal coordinates (i.e. first base is 0).
-chromEnd - End position of the feature in standard chromosomal coordinates
-
-Optional fields
-Nine additional fields are optional. Note that columns cannot be empty - lower-numbered fields must always be populated if higher-numbered ones are used.
-
-name - Label to be displayed under the feature, if turned on in "Configure this page".
-score - A score between 0 and 1000. See track lines, below, for ways to configure the display style of scored data.
-strand - defined as + (forward) or - (reverse).
-thickStart - coordinate at which to start drawing the feature as a solid rectangle
-thickEnd - coordinate at which to stop drawing the feature as a solid rectangle
-itemRgb - an RGB colour value (e.g. 0,0,255). Only used if there is a track line with the value of itemRgb set to "on" (case-insensitive).
-blockCount - the number of sub-elements (e.g. exons) within the feature
-blockSizes - the size of these sub-elements
-blockStarts - the start coordinate of each sub-element
-
-Track lines
-
-Track definition lines can be used to configure the display further, e.g. by grouping features into separate tracks. 
-Track lines should be placed at the beginning of the list of features they are to affect.
-
-The track line consists of the word 'track' followed by space-separated key=value pairs - see the example below. 
-Valid parameters used are:
-
-name - unique name to identify this track when parsing the file
-description - Label to be displayed under the track in Region in Detail
-priority - integer defining the order in which to display tracks, if multiple tracks are defined.
-color - as RGB, hex or X11 named color.
-useScore - set to 1 to render the track in greyscale based on the values in the score column.
-itemRgb - if set to 'on' (case-insensitive), the individual RGB values defined in tracks will be used.
+BED example:
 
 track name="ItemRGBDemo" description="Item RGB demonstration" itemRgb="On"
 chr7  127471196  127472363  Pos1  0  +  127471196  127472363  255,0,0
@@ -63,7 +45,6 @@ args = parser.parse_args()
 
 def main():
     annotator = Annotate_With_Hmms(args.verbose, args.hmmdir, args.files)
-    annotator.get_hmms()
     annotator.annotate()
     annotator.write()
 
@@ -73,6 +54,11 @@ class Annotate_With_Hmms:
         self.verbose = verbose
         self.hmmdir = hmmdir
         self.files = files
+        # COV2 HMMs
+        self.hmms = ['ORF1a', 'ORF1ab', 'S', 'E', 'M', 'N',
+                     'NS1', 'NS2', 'NS3', 'NS4', 'NS5', 'NS6', 'NS7', 'NS8', 'NS9',
+                     'NS10', 'NS11', 'NS12', 'NS13', 'NS14', 'NS15', 'NS16',
+                     'ORF3a', 'ORF6', 'ORF7a', 'ORF7b', 'ORF8', 'ORF9b', 'ORF10']
         self.bed = dict()
 
 
@@ -80,67 +66,71 @@ class Annotate_With_Hmms:
         for file in self.files:
             name = self.write_fasta(file)
             self.bed[name] = []
-            self.bed[name].append(['track name="' + name + '"',
-                'description="HMM-based annotation of COV sequence ' + name + '"',
-                'itemRgb="on"'])
+            trackline = "track name='{0}' description='HMM-based annotation of COV sequence {1}' itemRgb='on'".format(name,name)
+            self.bed[name].append(trackline)
             for hmm in self.hmms:
                 feat = os.path.basename(hmm).split('-')[0]
-                if self.verbose:
-                    print("Annotating {0} with {1}".format(name,hmm))
-                hit = self.run_hmmsearch(name,hmm)
-                # Create feature line
-                featureline = []
-                featureline.append(str(1))
-                featureline.append(str(hit.hit_start - 1))
-                featureline.append(str(hit.hit_end))
-                featureline.append(feat)
-                featureline.append(str(hit.bitscore))
-                featureline.append('+')
-                # If there is an ATG
+                hit = self.run_hmmsearch(name, hmm)
+                # Create feature line with thicker line for any ATG
                 thickStart = str(hit.hit_start - 1) if 'ORF' in feat or feat in 'EMNS' else ''
-                featureline.append(thickStart)
                 thickEnd = str(hit.hit_start + 2) if 'ORF' in feat or feat in 'EMNS' else ''
-                featureline.append(thickEnd)
-                # Color features
+                # Color structural proteins, ORFs, and NSPs
                 if feat in 'EMNS':
-                    featureline.append('66,245,173')
+                    color = '66,245,173'
                 elif 'ORF' in feat:
-                    featureline.append('66,123,245')
+                    color = '66,123,245'
                 else:
-                    featureline.append('245,66,197')
+                    color = '245,66,197'
+
+                featureline = "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}".format(
+                    name,
+                    hit.hit_start,
+                    hit.hit_end,
+                    feat,
+                    hit.bitscore,
+                    '+',
+                    thickStart,
+                    thickEnd,
+                    color,
+                    '',
+                    '',
+                    '')
+
                 self.bed[name].append(featureline)
 
 
     def get_hmms(self):
         # Get all nucleotide HMMs
-        self.hmms = [f for f in glob.glob(self.hmmdir + '/*nt.hmm', recursive=False)]
+        # self.hmms = [f for f in glob.glob(self.hmmdir + '/*nt.hmm', recursive=False)]
         if self.verbose:
             print("HMMs: {}".format(self.hmms))
 
 
     def write_fasta(self, file):
-        name = os.path.basename(file).split('.')[0]
-        gb = SeqIO.parse(file, 'gb')
+        gb = SeqIO.read(file, 'gb')
         # Create fasta "reference" sequence
-        SeqIO.write(gb, name + '.fa', 'fasta')
+        SeqIO.write(gb, gb.id + '.fa', 'fasta')
         # Index with samtools
-        cmd = ['samtools', 'faidx', name + '.fa']
+        cmd = ['samtools', 'faidx', gb.id + '.fa']
         try:
             subprocess.run(cmd, check=True)
         except (subprocess.CalledProcessError) as exception:
             print("Error: {}".format(exception))
             sys.exit("Error running samtools")
-        return name
+        return gb.id
 
 
-    def run_hmmsearch(self,name,hmm):
+    def run_hmmsearch(self, name, hmm):
         out = tempfile.NamedTemporaryFile('w')
-        cmd = ['hmmsearch', '--noali', '-o', out.name, hmm, name + '.fa']
+        hmmpath = self.hmmdir + '/' + hmm + '-nt.hmm'
+        cmd = ['hmmsearch', '--noali', '-o', out.name, hmmpath, name + '.fa']
+        if self.verbose:
+            print("Command: {0}".format(cmd))
         try:
             subprocess.run(cmd, check=True)
         except (subprocess.CalledProcessError) as exception:
             print("Error: {}".format(exception))
-            sys.exit("Error running hmmsearch")
+            sys.exit("Error running hmmsearch using {}".format(hmm))
         bestscore = 0
         # Get HSP with highest score
         for qresult in SearchIO.parse(out.name, 'hmmer3-text'):
@@ -156,7 +146,7 @@ class Annotate_With_Hmms:
         for seq in self.bed:
             with open(seq + '.bed', 'w') as out:
                 for line in self.bed[seq]:
-                    out.write('\t'.join(line) + '\n')
+                    out.write(line + '\n')
 
 
 if __name__ == "__main__":
