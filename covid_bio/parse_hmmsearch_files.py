@@ -48,8 +48,8 @@ class Parse_Hmmsearch:
             if os.stat(file).st_size == 0:
                 continue
             base = os.path.basename(file).split('.')[0]
-            # self.hits[base] = dict()
             matches = re.match(r'(\w+-\w+)_(\w+-\w+)', base)
+            # In hmmer3-tab format there is just one qresult
             for qresult in SearchIO.parse(file, 'hmmer3-tab'):
                 if not qresult:
                     if self.verbose:
