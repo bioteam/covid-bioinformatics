@@ -8,32 +8,34 @@ import tempfile
 import subprocess
 from Bio import SearchIO
 from Bio import SeqIO
+import tmhmm
 
 '''
-Coronavirus reference genome NC_045512 proteins:
+Annotate COV GenBank files using a collection of HMMs.
 
-NC_045512.2	266	13483	+	43740578	ORF1ab	GU280_gp01	YP_009725295.1	4405	orf1a polyprotein
-NC_045512.2	21563	25384	+	43740568	S	GU280_gp02	YP_009724390.1	1273	surface glycoprotein
-NC_045512.2	25393	26220	+	43740569	ORF3a	GU280_gp03	YP_009724391.1	275	ORF3a protein
-NC_045512.2	26245	26472	+	43740570	E	GU280_gp04	YP_009724392.1	75	envelope protein
-NC_045512.2	26523	27191	+	43740571	M	GU280_gp05	YP_009724393.1	222	membrane glycoprotein
-NC_045512.2	27202	27387	+	43740572	ORF6	GU280_gp06	YP_009724394.1	61	ORF6 protein
-NC_045512.2	27394	27759	+	43740573	ORF7a	GU280_gp07	YP_009724395.1	121	ORF7a protein
-NC_045512.2	27756	27887	+	43740574	ORF7b	GU280_gp08	YP_009725318.1	43	ORF7b
-NC_045512.2	27894	28259	+	43740577	ORF8	GU280_gp09	YP_009724396.1	121	ORF8 protein
-NC_045512.2	28274	29533	+	43740575	N	GU280_gp10	YP_009724397.2	419	nucleocapsid phosphoprotein
-NC_045512.2	29558	29674	+	43740576	ORF10
+Example BED files showing genes:
 
-
+track name='NC_045512.2' description='HMM-based annotation of COV sequence NC_045512.2' itemRgb='on'
+NC_045512.2	265	13483	ORF1a	17560.1	+	264	267	66,123,245			
+NC_045512.2	265	21555	ORF1ab	28346.8	+	264	267	66,123,245			
+NC_045512.2	21562	25384	S	4981.5	+	21561	21564	66,245,173			
+NC_045512.2	26244	26472	E	271.3	+	26243	26246	66,245,173			
+NC_045512.2	26522	27191	M	886.4	+	26521	26524	66,245,173			
+NC_045512.2	28273	29533	N	1656.6	+	28272	28275	66,245,173			
+NC_045512.2	265	805	NS1	715.7	+			245,66,197			
+NC_045512.2	805	2719	NS2	2524.5	+			245,66,197			
+...
+NC_045512.2	20658	21552	NS16	1104.6	+			245,66,197			
+NC_045512.2	25392	26220	ORF3a	1070.6	+	25391	25394	66,123,245			
+NC_045512.2	25813	26281	ORF3b	279.1	+	25812	25815	66,123,245			
+NC_045512.2	27201	27387	ORF6	210.4	+	27200	27203	66,123,245			
+NC_045512.2	27393	27759	ORF7a	463.2	+	27392	27395	66,123,245			
+NC_045512.2	27755	27887	ORF7b	140.6	+	27754	27757	66,123,245			
+NC_045512.2	27893	28259	ORF8	416.6	+	27892	27895	66,123,245			
+NC_045512.2	28283	28577	ORF9b	288.1	+	28282	28285	66,123,245			
+NC_045512.2	29557	29674	ORF10	123.3	+	29556	29559	66,123,245	
 
 BED Format (https://m.ensembl.org/info/website/upload/bed.html)
-BED example:
-
-track name="ItemRGBDemo" description="Item RGB demonstration" itemRgb="On"
-chr7  127471196  127472363  Pos1  0  +  127471196  127472363  255,0,0
-chr7  127472363  127473530  Pos2  0  +  127472363  127473530  255,0,0
-chr7  127475864  127477031  Neg1  0  -  127475864  127477031  0,0,255
-chr7  127477031  127478198  Neg2  0  -  127477031  127478198  0,0,255
 '''
 
 parser = argparse.ArgumentParser()
@@ -46,6 +48,7 @@ args = parser.parse_args()
 def main():
     annotator = Annotate_With_Hmms(args.verbose, args.hmmdir, args.files)
     annotator.find_genes()
+    annotator.find_tms()
     annotator.write()
 
 
@@ -63,11 +66,14 @@ class Annotate_With_Hmms:
 
 
     def find_genes(self):
+        self.bed['genes'] = dict()
         for file in self.files:
             name = self.write_fasta(file)
-            self.bed[name] = []
-            trackline = "track name='{0} genes' description='HMM-based gene detection of COV sequence {1}' itemRgb='on'".format(name,name)
-            self.bed[name].append(trackline)
+            self.bed['genes'][name] = []
+            trackline = "track name='{0} genes' \
+                        description='HMM-based gene detection of COV sequence {1}' \
+                        itemRgb='on'".format(name,name)
+            self.bed['genes'][name].append(trackline)
             for hmm in self.hmms:
                 feat = os.path.basename(hmm).split('-')[0]
                 hit = self.run_hmmsearch(name, hmm)
@@ -96,7 +102,27 @@ class Annotate_With_Hmms:
                     '',
                     '')
 
-                self.bed[name].append(featureline)
+                self.bed['genes'][name].append(featureline)
+
+
+    def find_tms(self):
+        '''
+        Translate predicted gene sequences and predict their TM regions
+        '''
+        self.bed['tms'] = dict()
+        for file in self.files:
+            gb = SeqIO.read(file,'gb')
+            self.bed['tms'][gb.id] = []
+            trackline = "track name='{0} Transmembrame regions' \
+                        description='tmhmm-based TM detection of COV sequence {1}' \
+                        itemRgb='on'".format(name,name)
+            self.bed['tms'][gb.id].append(trackline)
+            for track in self.bed['genes']:
+
+
+
+    def run_tmhmm(self):=
+        annotation, posterior = tmhmm.predict(sequence, 'TMHMM2.0.model')
 
 
     def get_hmms(self):
@@ -116,7 +142,7 @@ class Annotate_With_Hmms:
             subprocess.run(cmd, check=True)
         except (subprocess.CalledProcessError) as exception:
             print("Error: {}".format(exception))
-            sys.exit("Error running samtools")
+            sys.exit("Error running samtools faidx")
         return gb.id
 
 
@@ -143,10 +169,11 @@ class Annotate_With_Hmms:
 
 
     def write(self):
-        for seq in self.bed:
-            with open(seq + '.bed', 'w') as out:
-                for line in self.bed[seq]:
-                    out.write(line + '\n')
+        for tracktype in self.bed:
+            for seq in self.bed[tracktype]:
+                with open(seq + '.bed', 'w') as out:
+                    for line in self.bed[tracktype][seq]:
+                        out.write(line + '\n')
 
 
 if __name__ == "__main__":
