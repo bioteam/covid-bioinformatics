@@ -45,7 +45,7 @@ args = parser.parse_args()
 
 def main():
     annotator = Annotate_With_Hmms(args.verbose, args.hmmdir, args.files)
-    annotator.annotate()
+    annotator.find_genes()
     annotator.write()
 
 
@@ -62,11 +62,11 @@ class Annotate_With_Hmms:
         self.bed = dict()
 
 
-    def annotate(self):
+    def find_genes(self):
         for file in self.files:
             name = self.write_fasta(file)
             self.bed[name] = []
-            trackline = "track name='{0}' description='HMM-based annotation of COV sequence {1}' itemRgb='on'".format(name,name)
+            trackline = "track name='{0} genes' description='HMM-based gene detection of COV sequence {1}' itemRgb='on'".format(name,name)
             self.bed[name].append(trackline)
             for hmm in self.hmms:
                 feat = os.path.basename(hmm).split('-')[0]
