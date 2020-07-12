@@ -49,7 +49,7 @@ class Parse_Hmmsearch:
                 continue
             base = os.path.basename(file).split('.')[0]
             matches = re.match(r'(\w+-\w+)_(\w+-\w+)', base)
-            qresult = SearchIO.read(file, 'hmmer3-tab'):
+            qresult = SearchIO.read(file, 'hmmer3-tab')
             if not qresult:
                 if self.verbose:
                     print("No match:\t{0}\t{1}".format(matches[1], matches[2]))
