@@ -53,16 +53,19 @@ class Annotate_With_Hmms:
         self.rfamfile = rfamfile
         self.files = files
         # COV2 HMMs
-        self.covproteins = ['ORF1a', 'ORF1ab', 'S', 'E', 'M', 'N',
+        self.cov_proteins = ['ORF1a', 'ORF1ab', 'S', 'E', 'M', 'N',
                             'NS1', 'NS2', 'NS3', 'NS4', 'NS5', 'NS6', 'NS7', 'NS8', 'NS9',
                             'NS10', 'NS11', 'NS12', 'NS13', 'NS14', 'NS15', 'NS16',
                             'ORF3a', 'ORF6', 'ORF7a', 'ORF7b', 'ORF8', 'ORF9b', 'ORF10']
         # Text for BED files
         self.beds = dict()
         # Gene positions on given genome
-        self.genes = dict()
-        # Corresponding protein sequences in given genome
-        self.proteins = dict()
+        self.gene_positions = dict()
+        # Protein,gene, and nucleotide TM sequences in given genome
+        self.protein_strs = dict()
+        self.gene_strs = dict()
+        self.tm_positions = dict()
+
 
     def write_fasta(self, file):
         '''
@@ -84,12 +87,12 @@ class Annotate_With_Hmms:
     def find_genes(self, gb):
         self.beds[gb.id] = dict()
         self.beds[gb.id]['genes'] = []
-        self.genes[gb.id] = dict()
+        self.gene_positions[gb.id] = dict()
         trackline = "track name='{0} genes' \
                     description='HMM-based gene detection of COV sequence {1}' \
                     itemRgb='on'".format(gb.id, gb.id)
         self.beds[gb.id]['genes'].append(trackline)
-        for protein in self.covproteins:
+        for protein in self.cov_proteins:
             hit = self.run_hmmsearch(gb.id, protein)
             # Create feature line with thicker line for any ATG
             thickStart = str(hit.hit_start - 1) if 'ORF' in protein or protein in 'EMNS' else ''
@@ -115,7 +118,7 @@ class Annotate_With_Hmms:
                     '','','')
 
             self.beds[gb.id]['genes'].append(featureline)
-            self.genes[gb.id][protein] = (hit.hit_start, hit.hit_end)
+            self.gene_positions[gb.id][protein] = (hit.hit_start, hit.hit_end)
 
 
     def find_rfam(self, gb):
@@ -145,14 +148,15 @@ class Annotate_With_Hmms:
         '''
         Translate predicted gene sequences and account for frameshift if necessary
         '''
-        self.proteins[gb.id] = dict()
+        self.protein_strs[gb.id] = dict()
         # Get gene nucleotide and protein sequences
-        for protein in self.covproteins:
-            ntstr = str(gb.seq)[self.genes[gb.id][protein][0]:self.genes[gb.id][protein][1]]
+        for protein in self.cov_proteins:
+            ntstr = str(gb.seq)[self.gene_positions[gb.id][protein][0]:self.gene_positions[gb.id][protein][1]]
             aastr = self.translate_orf(ntstr, protein, gb)
             if self.verbose:
                 print("{0} translation: {1}".format(protein, aastr))
-            self.proteins[gb.id][protein] = aastr
+            self.protein_strs[gb.id][protein] = aastr
+            self.gene_strs[gb.id][protein] = ntstr
 
 
     def find_tms(self, gb):
@@ -164,27 +168,43 @@ class Annotate_With_Hmms:
                         description='tmhmm-based TM detection of COV sequence {1}' \
                         itemRgb='on'".format(gb.id,gb.id)
         self.beds[gb.id]['tms'].append(trackline)
-        for protein in self.proteins[gb.id]:
-            tms = self.run_tmhmm(self.proteins[gb.id][protein])
+        for protein in self.protein_strs[gb.id]:
+            tms = self.run_tmhmm(self.protein_strs[gb.id][protein], protein, gb)
             if tms == None:
                 continue
-            for tm in tms:
+            for tm in self.tm_positions[gb.id]:
             # Get gene coordinates for a given genome
                 if self.verbose:
                     print("{0} {1} TM: {2}".format(gb.id, protein, tm))
 
-            self.beds[gb.id]['tms'].append(trackline)
+                featureline = "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}".format(
+                    gb.id,
+                    self.get_nt_position(tm[0], protein, gb),
+                    self.get_nt_position(tm[1], protein, gb),
+                    '','','','','','','','','')
+            self.beds[gb.id]['tms'].append(featureline)
 
 
-    def run_tmhmm(self, aastr):
-        annotation,posterior = tmhmm.predict(aastr)
+    def get_nt_position(self, num, protein, gb):
+        return pos
+
+
+    def run_tmhmm(self, aastr, protein, gb):
+        annotation,_ = tmhmm.predict(aastr)
         if 'M' not in annotation:
             return None
-        return
+        self.parse_annotation(annotation, protein, gb)
 
 
-    def parse_annotation(self, output):
-        return
+    def parse_annotation(self, annotation, protein, gb):
+        # 'm' in 'oooommmmmiiiiimmmmiii': [4, 5, 6, 7, 8, 14, 15, 16, 17]   
+        # matchs = [i for i, char in enumerate(annotation) if query == char]
+        p = re.compile("M+")
+        for m in p.finditer(annotation):
+            if gb.id not in self.tm_positions.keys():
+                self.tm_positions[gb.id] = []
+            self.tm_positions[gb.id].append([(m.start(),m.end()))
+
 
     def translate_orf(self, ntstr, protein, gb):
         """
@@ -194,9 +214,7 @@ class Annotate_With_Hmms:
         """
         noframeshift = 'TTAAACGGG'
         frameshift =   'TTAAACCGGG'
-        aaseq = Seq(ntstr, IUPAC.unambiguous_dna).translate(to_stop=False)
-        # Remove trailing '*'
-        aastr = str(aaseq)[:-1]
+        aastr = self.translate(ntstr)
         if '*' in aastr:
             if self.verbose:
                 print("Stop codon found in {0} {1}".format(gb.id, protein))
@@ -204,14 +222,19 @@ class Annotate_With_Hmms:
                 if self.verbose:
                     print("Found 1 'slip sequence'")
                 ntstr = ntstr.replace(noframeshift, frameshift)
-                aaseq = Seq(ntstr, IUPAC.unambiguous_dna).translate(to_stop=False)
-                aastr = str(aaseq)[:-1]
+                aastr = self.translate(ntstr)
             else:
                 sys.exit("More than 1 'slip sequence' found in {0} {1}".format(gb.id, protein))
         if '*' in aastr:
             sys.exit("Stop codon found in {0} {1}: {2}".format(gb.id, protein, aastr))
         return aastr
-        
+
+
+    def translate(self, ntstr):
+        aaseq = Seq(ntstr, IUPAC.unambiguous_dna).translate(to_stop=False)
+        # Remove trailing '*'
+        return str(aaseq)[:-1]
+
 
     def run_hmmsearch(self, name, hmm):
         '''
