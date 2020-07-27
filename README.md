@@ -20,6 +20,9 @@ sequences that do not match expected lengths are not included in sequence files,
 * Python3 and packages, including [Biopython](https://biopython.org/)
 * Sequence aligner ([muscle](https://drive5.com/muscle/), or [clustalo](http://www.clustal.org/omega/), or [mafft](https://mafft.cbrc.jp/alignment/software/))
 * [HMMER 3.3](http://hmmer.org)
+* To make BED files:
+    * [Infernal](http://eddylab.org/infernal/)
+    * [tmhmm.py](https://github.com/dansondergaard/tmhmm.py)
 
 
 # recommended
