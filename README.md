@@ -22,6 +22,11 @@ sequences that do not match expected lengths are not included in sequence files,
 * [HMMER 3.3](http://hmmer.org)
 
 
+# recommended
+* Get an [NCBI API key](https://ncbiinsights.ncbi.nlm.nih.gov/2017/11/02/new-api-keys-for-the-e-utilities/)
+* Pass the key as a command-line argument or configure as an `env` variable (`export NCBI_API_KEY=8cc3fffffff2b4444492e68a8167aaaa08`)
+
+
 # file formats created
 * GenBank sequence: `.gb`
 * Fasta sequence: `.fa`
@@ -30,6 +35,7 @@ sequences that do not match expected lengths are not included in sequence files,
 * MAF alignment: `.maf`
 * HMMER profile HMM: `.hmm`
 * hmmsearch table: `.tblout`
+* BED track file: `.bed`
 
 
 # to do

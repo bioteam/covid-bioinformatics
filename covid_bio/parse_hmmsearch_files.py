@@ -49,15 +49,14 @@ class Parse_Hmmsearch:
                 continue
             base = os.path.basename(file).split('.')[0]
             matches = re.match(r'(\w+-\w+)_(\w+-\w+)', base)
-            # In hmmer3-tab format there is just one qresult
-            for qresult in SearchIO.parse(file, 'hmmer3-tab'):
-                if not qresult:
-                    if self.verbose:
-                        print("No match:\t{0}\t{1}".format(matches[1], matches[2]))
-                    continue
-                pids = [ hit.id for hit in qresult]
-                taxarray = self.get_taxid(pids)
-                self.hits[base] = self.get_lineage(taxarray)
+            qresult = SearchIO.read(file, 'hmmer3-tab')
+            if not qresult:
+                if self.verbose:
+                    print("No match:\t{0}\t{1}".format(matches[1], matches[2]))
+                return
+            pids = [ hit.id for hit in qresult]
+            taxarray = self.get_taxid(pids)
+            self.hits[base] = self.get_lineage(taxarray)
 
 
     def get_taxid(self, pids):
