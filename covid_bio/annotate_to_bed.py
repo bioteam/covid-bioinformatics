@@ -78,7 +78,7 @@ class Annotate_With_Hmms:
             subprocess.run(cmd, check=True)
         except (subprocess.CalledProcessError) as exception:
             print("Error: {}".format(exception))
-            sys.exit("Error running samtools faidx")
+            sys.exit("Error running samtools faidx on {}.fa".format(gb.id))
         return gb
 
     def find_genes(self, gb):
