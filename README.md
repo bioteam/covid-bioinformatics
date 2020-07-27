@@ -33,6 +33,7 @@ sequences that do not match expected lengths are not included in sequence files,
 # file formats created
 * GenBank sequence: `.gb`
 * Fasta sequence: `.fa`
+* Fasta index file: `.fai`
 * Fasta alignment: `.fasta`
 * Stockholm alignment: `.sto`
 * MAF alignment: `.maf`
