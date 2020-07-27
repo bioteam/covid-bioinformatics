@@ -42,7 +42,6 @@ def main():
         annotator.find_tms(gb)
         annotator.write_bed(gb)
 
-
 class Annotate_With_Hmms:
     '''
     Create tracks for genes using HMMs ('genes'), Rfam hits ('rfam'), tmhmm predictions ('tms')
@@ -66,7 +65,6 @@ class Annotate_With_Hmms:
         self.gene_strs = dict()
         self.tm_positions = dict()
 
-
     def write_fasta(self, file):
         '''
         Create genome fasta file using GenBank id
@@ -82,7 +80,6 @@ class Annotate_With_Hmms:
             print("Error: {}".format(exception))
             sys.exit("Error running samtools faidx")
         return gb
-
 
     def find_genes(self, gb):
         self.beds[gb.id] = dict()
@@ -120,7 +117,6 @@ class Annotate_With_Hmms:
             self.beds[gb.id]['genes'].append(featureline)
             self.gene_positions[gb.id][protein] = (hit.hit_start, hit.hit_end)
 
-
     def find_rfam(self, gb):
         if gb.id not in self.beds.keys():
             self.beds[gb.id] = dict()
@@ -143,12 +139,12 @@ class Annotate_With_Hmms:
                     '','','','','','')
             self.beds[gb.id]['rfam'].append(featureline)
 
-
     def find_proteins(self, gb):
         '''
         Translate predicted gene sequences and account for frameshift if necessary
         '''
         self.protein_strs[gb.id] = dict()
+        self.gene_strs[gb.id] = dict()
         # Get gene nucleotide and protein sequences
         for protein in self.cov_proteins:
             ntstr = str(gb.seq)[self.gene_positions[gb.id][protein][0]:self.gene_positions[gb.id][protein][1]]
@@ -158,53 +154,55 @@ class Annotate_With_Hmms:
             self.protein_strs[gb.id][protein] = aastr
             self.gene_strs[gb.id][protein] = ntstr
 
-
     def find_tms(self, gb):
         '''
         Predict TM regions using tmhmm.py
         '''
         self.beds[gb.id]['tms'] = []
-        trackline = "track name='{0} Transmembrame regions' \
+        track_line = "track name='{0} Transmembrame regions' \
                         description='tmhmm-based TM detection of COV sequence {1}' \
                         itemRgb='on'".format(gb.id,gb.id)
-        self.beds[gb.id]['tms'].append(trackline)
+        self.beds[gb.id]['tms'].append(track_line)
         for protein in self.protein_strs[gb.id]:
-            tms = self.run_tmhmm(self.protein_strs[gb.id][protein], protein, gb)
-            if tms == None:
+            # Do not analyze polyprotein
+            if 'ORF1a' in protein:
                 continue
-            for tm in self.tm_positions[gb.id]:
-            # Get gene coordinates for a given genome
-                if self.verbose:
-                    print("{0} {1} TM: {2}".format(gb.id, protein, tm))
-
-                featureline = "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}".format(
-                    gb.id,
-                    self.get_nt_position(tm[0], protein, gb),
-                    self.get_nt_position(tm[1], protein, gb),
-                    '','','','','','','','','')
-            self.beds[gb.id]['tms'].append(featureline)
-
+            self.run_tmhmm(self.protein_strs[gb.id][protein], protein, gb)
+            if protein in self.tm_positions[gb.id].keys():
+                for tm in self.tm_positions[gb.id][protein]:
+                    # Get gene coordinates for a given genome
+                    feature_line = "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}".format(
+                        gb.id,
+                        self.get_nt_position(tm[0], protein, gb),
+                        self.get_nt_position(tm[1], protein, gb),
+                        '','','','','','','','','')
+                    self.beds[gb.id]['tms'].append(feature_line)
 
     def get_nt_position(self, num, protein, gb):
-        return pos
-
+        '''
+        Return nt position in genome given aa position in a specified protein
+        '''
+        return (3 * num) + self.gene_positions[gb.id][protein][0]
 
     def run_tmhmm(self, aastr, protein, gb):
-        annotation,_ = tmhmm.predict(aastr)
-        if 'M' not in annotation:
+        tm_annotation, _ = tmhmm.predict(aastr)
+        if 'M' not in tm_annotation:
             return None
-        self.parse_annotation(annotation, protein, gb)
-
+        self.parse_annotation(tm_annotation, protein, gb)
 
     def parse_annotation(self, annotation, protein, gb):
-        # 'm' in 'oooommmmmiiiiimmmmiii': [4, 5, 6, 7, 8, 14, 15, 16, 17]   
+        # 'm' in 'oooommmmmiiiiimmmmiii': [4, 5, 6, 7, 8, 14, 15, 16, 17]
         # matchs = [i for i, char in enumerate(annotation) if query == char]
         p = re.compile("M+")
+        # Matches are zero-based, so the start() of the 'bc' search() in 'abcdef' = 1
         for m in p.finditer(annotation):
             if gb.id not in self.tm_positions.keys():
-                self.tm_positions[gb.id] = []
-            self.tm_positions[gb.id].append([(m.start(),m.end()))
-
+                self.tm_positions[gb.id] = dict()
+            if protein not in self.tm_positions[gb.id].keys():
+                self.tm_positions[gb.id][protein] = []
+            if self.verbose:
+                print("TM: {0} {1} {2}-{3}".format(gb.id, protein, m.start(), m.end()))
+            self.tm_positions[gb.id][protein].append((m.start(), m.end()))
 
     def translate_orf(self, ntstr, protein, gb):
         """
@@ -229,12 +227,10 @@ class Annotate_With_Hmms:
             sys.exit("Stop codon found in {0} {1}: {2}".format(gb.id, protein, aastr))
         return aastr
 
-
     def translate(self, ntstr):
         aaseq = Seq(ntstr, IUPAC.unambiguous_dna).translate(to_stop=False)
         # Remove trailing '*'
         return str(aaseq)[:-1]
-
 
     def run_hmmsearch(self, name, hmm):
         '''
@@ -260,7 +256,6 @@ class Annotate_With_Hmms:
                         bestscore = hsp.bitscore
         return besthit
 
-
     def run_cmscan(self, name):
         '''
         Run cmscan and return list of all hits
@@ -278,14 +273,12 @@ class Annotate_With_Hmms:
         hits = self.parse_cmscan(out.name)
         return hits
 
-
     def parse_cmscan(self, file):
         '''
         Parse cmscan table output and return list of lists
         '''
         with open(file, 'r') as fin:
             return [line.strip().split() for line in fin if not line.startswith('#')]
-
 
     def write_bed(self, gb):
         for bed in self.beds[gb.id]:
