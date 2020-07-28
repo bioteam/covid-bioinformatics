@@ -9,6 +9,7 @@ from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import IUPAC
+from myconfig import COV_DIR
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-f', default='fasta', dest='format', help="Output format")
@@ -17,6 +18,7 @@ parser.add_argument('-no-split', action='store_false', dest='split', help="Creat
 parser.add_argument('-analyze', default=False, action='store_true', help="Parse files without file creation")
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
 parser.add_argument('-json', default=False, action='store_true', help="Create JSON for Gen3")
+parser.add_argument('-cov_dir', default=COV_DIR, help="Destination directory")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
@@ -137,7 +139,6 @@ class Feature_To_Gene_And_Protein:
                     feats[gene][feat] = self.feats[gene][feat]
 
         self.feats = feats
-
 
     def read(self):
         paths = [f for f in self.files if os.path.isfile(f)]
@@ -352,8 +353,8 @@ class Feature_To_Gene_And_Protein:
             # SeqIO.write(seqs, seqfile, self.seq_format)
         else:
             for name in self.feats.keys():
-                aaseqfile = name + '-aa.fa'
-                ntseqfile = name + '-nt.fa'
+                aaseqfile = os.path.join(COV_DIR, name + '-aa.fa')
+                ntseqfile = os.path.join(COV_DIR, name + '-nt.fa')
                 aahandle = open(aaseqfile, "w")
                 nthandle = open(ntseqfile, "w")
                 for feat in self.feats[name].keys():
@@ -363,8 +364,8 @@ class Feature_To_Gene_And_Protein:
                 nthandle.close()
                 if self.make_json and 'invalid' not in name:
                     # No JSON for invalid sequences
-                    aafile = name + '-aa-fasta.json'
-                    ntfile = name + '-nt-fasta.json'
+                    aafile = os.path.join(COV_DIR, name + '-aa-fasta.json')
+                    ntfile = os.path.join(COV_DIR, name + '-nt-fasta.json')
                     aahandle = open(aafile, "w")
                     nthandle = open(ntfile, "w")
                     for feat in self.feats[name].keys():
@@ -372,7 +373,6 @@ class Feature_To_Gene_And_Protein:
                         nthandle.write(self.json[name][feat]['nt'])
                     aahandle.close()
                     nthandle.close()
-                    
-    
+
 if __name__ == "__main__":
     main()

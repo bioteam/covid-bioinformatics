@@ -10,6 +10,8 @@ import numpy
 from Bio import SearchIO
 from Bio import Entrez
 from Bio import SeqIO
+from myconfig import COV_DIR
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
@@ -42,7 +44,6 @@ class Parse_Hmmsearch:
         self.fasta = dict()
         self.email = 'briano@bioteam.net'
 
-
     def parse(self):
         for file in self.files:
             if os.stat(file).st_size == 0:
@@ -57,7 +58,6 @@ class Parse_Hmmsearch:
             pids = [ hit.id for hit in qresult]
             taxarray = self.get_taxid(pids)
             self.hits[base] = self.get_lineage(taxarray)
-
 
     def get_taxid(self, pids):
         Entrez.email = self.email
@@ -83,7 +83,6 @@ class Parse_Hmmsearch:
                 errorarray = errorarray + list(id_chunk)                
         return taxarray
 
-
     def download_hits(self):
         if not self.download:
             return
@@ -104,15 +103,6 @@ class Parse_Hmmsearch:
                     str(pids) + "':" + str(exception))
         self.write()
 
-
-    def write(self):
-        for file in self.fasta:
-            seqfile = file + '-hits-no-' + self.taxfilter + '.fa' if self.taxfilter else file + '-hits.fa'
-            if self.verbose:
-                print("Writing {}".format(seqfile))
-            SeqIO.write(self.fasta[file], seqfile, 'fasta')
-
-
     def align_hits_to_hmm(self):
         if not self.align:
             return
@@ -128,7 +118,6 @@ class Parse_Hmmsearch:
                 subprocess.run(['hmmalign','--amino', '-o', outfile,
                     hmm, fastafile, ], check=True)
 
-
     def filter(self):
         if self.taxfilter:
             for file in self.hits:
@@ -141,7 +130,6 @@ class Parse_Hmmsearch:
             for file in self.hits:
                 for hit in self.hits[file]:
                     print("Lineage is: {}".format(self.hits[file][hit]))
-
 
     def get_lineage(self, taxarray):
         Entrez.email = self.email
@@ -158,6 +146,14 @@ class Parse_Hmmsearch:
         if self.verbose:
             print("Retrieved from 'taxonomy': {}".format(taxdict))
         return taxdict
+
+    def write(self):
+        for file in self.fasta:
+            seqfile = file + '-hits-no-' + self.taxfilter + '.fa' if self.taxfilter else file + '-hits.fa'
+            seqfile = os.path.join(COV_DIR, seqfile)
+            if self.verbose:
+                print("Writing {}".format(seqfile))
+            SeqIO.write(self.fasta[file], seqfile, 'fasta')
 
 if __name__ == "__main__":
     main()

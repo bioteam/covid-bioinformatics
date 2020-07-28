@@ -11,6 +11,7 @@ from Bio import SearchIO
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.Alphabet import IUPAC
+from myconfig import COV_DIR
 import tmhmm
 
 '''
@@ -26,7 +27,7 @@ BED Format (https://m.ensembl.org/info/website/upload/bed.html)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-verbose', action='store_true', help="Verbose")
-parser.add_argument('-hmmdir', default=os.path.dirname(os.path.abspath(__file__)), help="HMM directory")
+parser.add_argument('-cov_dir', default=COV_DIR, help="Destination directory")
 parser.add_argument('-rfamfile', default='cov_allvirus.cm', help="Rfam covariance model file")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()

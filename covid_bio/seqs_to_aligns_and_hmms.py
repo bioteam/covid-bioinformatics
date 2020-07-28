@@ -8,7 +8,7 @@ import tempfile
 import subprocess
 from Bio import AlignIO
 from Bio import SeqIO
-
+from myconfig import COV_DIR
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
@@ -17,6 +17,7 @@ parser.add_argument('-hmmbuilder', default='hmmbuild', help="HMM build applicati
 parser.add_argument('-skip', default='ORF1a-aa,ORF1a-nt,ORF1ab-aa,ORF1ab-nt', help="Do not align")
 parser.add_argument('-json', action='store_true', help="Create JSON for Gen3")
 parser.add_argument('-maf', action='store_true', help="Create additional MAF format alignments")
+parser.add_argument('-cov_dir', default=COV_DIR, help="Destination directory")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
@@ -54,7 +55,7 @@ class Seqs_To_Aligns_And_Hmms:
                 if self.verbose:
                     print("Reading Fasta file: {}".format(path))
                 # Each one of these is a multiple fasta file
-                for index, fa in enumerate(SeqIO.parse(path, "fasta")):
+                for fa in enumerate(SeqIO.parse(path, "fasta")):
                     seqs.append(fa)
                 self.seqs[name] = self.remove_dups(seqs)
             except (RuntimeError) as exception:
@@ -144,12 +145,12 @@ class Seqs_To_Aligns_And_Hmms:
         from make_json import make_hmm_json
         for name in self.hmms:
             json = make_hmm_json(self.hmms[name])
-            with open(name + '-hmm.json', 'w') as out:
+            with open(os.path.join(COV_DIR, name + '-hmm.json'), 'w') as out:
                 out.write(json)
         from make_json import make_alignment_json
         for name in self.alns:
             json = make_alignment_json(self.alns[name], self.aligner)
-            with open(name + '-aln.json', 'w') as out:
+            with open(os.path.join(COV_DIR, name + '-aln.json'), 'w') as out:
                 out.write(json)
 
 if __name__ == "__main__":

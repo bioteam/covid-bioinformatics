@@ -5,9 +5,9 @@ import sys
 import os
 import re
 import numpy
-import yaml
 from Bio import Entrez
 from Bio import SeqIO
+from myconfig import COV_DIR
 
 # NCBI Taxonomy ids:
 # 333387: single record for testing
@@ -15,12 +15,12 @@ from Bio import SeqIO
 # 694009 (parent of 2697049): Severe acute respiratory syndrome-related coronavirus
 # https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=694009
 parser = argparse.ArgumentParser()
-parser.add_argument('-t', default=11118, dest='taxid', help="Taxonomy id")
+parser.add_argument('-t, -taxid', default=11118, dest='taxid', help="Taxonomy id")
 parser.add_argument('-r', default=True, dest='recurse', help="Recursive retrieval of child tax IDs", type=bool)
 parser.add_argument('-f', default='gb', dest='format', help="Input and output format")
-parser.add_argument('-e', default="briano@bioteam.net", dest='email', help="Email")
-parser.add_argument('-min', default=25000, type=int, help="Minimum length")
-parser.add_argument('-max', type=int, help="Maximum length")
+parser.add_argument('-e', default="self@organization.net", dest='email', help="Email")
+parser.add_argument('-min_len', default=25000, type=int, help="Minimum length")
+parser.add_argument('-max_len', type=int, help="Maximum length")
 parser.add_argument('-split', dest='split', default=True, help="Split into separate files")
 parser.add_argument('-no-split', dest='split', action='store_false', help="Create one 'taxid' file")
 parser.add_argument('-verbose', action='store_true', help="Verbose")
@@ -29,12 +29,13 @@ parser.add_argument('-chunk', default=500, type=int, help="eFetch batch size")
 parser.add_argument('-api_key', help="Entrez API key")
 parser.add_argument('-json', action='store_true', help="Create JSON for Gen3")
 parser.add_argument('-no-fetch', action='store_false', dest='fetch', help="Do not download")
+parser.add_argument('-cov_dir', default=COV_DIR, help="Destination directory")
 args = parser.parse_args()
 
 def main():
     entrez = DownloadGbByTaxid(args.email, args.taxid, args.format, args.min, args.max,
-                                     args.split, args.recurse, args.verbose, args.retmax,
-                                     args.chunk, args.api_key, args.json, args.fetch)
+                                args.split, args.recurse, args.verbose, args.retmax,
+                                args.chunk, args.api_key, args.json, args.fetch)
     entrez.search()
     entrez.efetch()
     entrez.filter()
@@ -145,11 +146,10 @@ class DownloadGbByTaxid:
                     filtered.append(record)
             self.records = filtered
 
-
     def write(self):
         if self.split:
             for record in self.records:
-                seqfile = record.name + '.' + self.format
+                seqfile = os.path.join(COV_DIR, record.name + '.' + self.format)
                 if self.verbose:
                     print("Writing {}".format(seqfile))
                 SeqIO.write(record, seqfile, self.format)
@@ -159,7 +159,7 @@ class DownloadGbByTaxid:
                     with open(record.name + '.json', 'w') as out:
                         out.write(genome_json)
         else:
-            seqfile = 'taxid-' + str(self.taxid) + '.' + self.format
+            seqfile = os.path.join(COV_DIR, 'taxid-' + str(self.taxid) + '.' + self.format)
             if self.verbose:
                 print("Writing {}".format(seqfile))
             SeqIO.write(self.records, seqfile, self.format)
