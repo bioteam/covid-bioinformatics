@@ -21,6 +21,9 @@ parser.add_argument('-cov_dir', default=COV_DIR, help="Destination directory")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
+'''
+
+'''
 
 def main():
     builder = Seqs_To_Aligns_And_Hmms(args.verbose, args.aligner, args.hmmbuilder, args.skip, 
@@ -56,7 +59,7 @@ class Seqs_To_Aligns_And_Hmms:
                 if self.verbose:
                     print("Reading Fasta file: {}".format(path))
                 # Each one of these is a multiple fasta file
-                for fa in enumerate(SeqIO.parse(path, "fasta")):
+                for fa in SeqIO.parse(path, "fasta"):
                     seqs.append(fa)
                 self.seqs[name] = self.remove_dups(seqs)
             except (RuntimeError) as exception:
@@ -120,11 +123,11 @@ class Seqs_To_Aligns_And_Hmms:
         '''
         out = os.path.join(self.cov_dir, name + '.fasta')
         if self.aligner == 'muscle':
-            return [self.aligner, '-quiet','-in', infile, '-out', out], out
+            return [self.aligner, '-quiet','-in', infile, '-out', out], None
         elif self.aligner == 'mafft':
-            return [self.aligner, '--auto', infile, out], out
+            return [self.aligner, '--auto', infile], out
         elif self.aligner == 'clustalo':
-            return [self.aligner, '-i', infile, '-o', out, '--outfmt=fasta'], out
+            return [self.aligner, '-i', infile, '-o', out, '--outfmt=fasta'], None
         else:
             sys.exit("No command for aligner {}".format(self.aligner))
 
@@ -135,7 +138,7 @@ class Seqs_To_Aligns_And_Hmms:
             # Either --amino or --dna
             opt = '--amino' if '-aa' in name else '--dna'
             try:
-                subprocess.run([self.hmmbuild, opt, os.path.join(self.cov_dir, name + '.hmm'), self.alns[name]])
+                subprocess.run([self.hmmbuild, opt, os.path.join(self.cov_dir, name + '.hmm'), os.path.join(self.cov_dir, self.alns[name])])
             except (subprocess.CalledProcessError) as exception:
                 print("Error running {}: ".format(self.hmmbuild) + str(exception))
 
