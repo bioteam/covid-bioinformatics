@@ -10,7 +10,7 @@ import numpy
 from Bio import SearchIO
 from Bio import Entrez
 from Bio import SeqIO
-from myconfig import COV_DIR
+from vars import COV_DIR
 
 
 parser = argparse.ArgumentParser()

@@ -1,4 +1,5 @@
 import json
+import hashlib
 
 def make_genome_json(name):
     # Genomes

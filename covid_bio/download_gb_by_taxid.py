@@ -7,7 +7,7 @@ import re
 import numpy
 from Bio import Entrez
 from Bio import SeqIO
-from myconfig import COV_DIR
+from vars import COV_DIR
 
 # NCBI Taxonomy ids:
 # 333387: single record for testing

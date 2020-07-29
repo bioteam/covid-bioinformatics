@@ -9,7 +9,7 @@ from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import IUPAC
-from myconfig import COV_DIR
+from vars import COV_DIR
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-f', default='fasta', dest='format', help="Output format")

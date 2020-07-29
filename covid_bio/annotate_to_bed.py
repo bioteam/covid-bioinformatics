@@ -11,7 +11,7 @@ from Bio import SearchIO
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.Alphabet import IUPAC
-from myconfig import COV_DIR
+from vars import COV_DIR
 
 '''
 Annotate COV GenBank files using a collection of HMMs. Example BED files showing genes:
@@ -26,8 +26,8 @@ BED Format (https://m.ensembl.org/info/website/upload/bed.html)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-verbose', action='store_true', help="Verbose")
-parser.add_argument('-cov_dir', default=COV_DIR, help="Destination directory")
 parser.add_argument('-rfam_file', default='cov_allvirus.cm', help="Rfam covariance model file")
+parser.add_argument('-cov_dir', default=COV_DIR, help="Destination directory")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 

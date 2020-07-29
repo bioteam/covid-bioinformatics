@@ -8,7 +8,7 @@ import tempfile
 import subprocess
 from Bio import AlignIO
 from Bio import SeqIO
-from myconfig import COV_DIR
+from vars import COV_DIR
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
