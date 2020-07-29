@@ -4,7 +4,6 @@ import argparse
 import sys
 import os
 import re
-import glob
 import subprocess
 import numpy
 from Bio import SearchIO
@@ -110,11 +109,12 @@ class Parse_Hmmsearch:
             return
         for file in self.hits:
             fastafile = file + '-hits-no-' + self.taxfilter + '.fa' if self.taxfilter else file + '-hits.fa'
+            fastafile = os.path.join(self.cov_dir, fastafile)
             if os.path.exists(fastafile) and os.stat(fastafile).st_size != 0:
                 gene = re.match(r'(\w+-\w+)_\w+', file)[1]
-                # No guarantee that the HMM is in the current dir so look for it
-                hmm = [f for f in glob.glob('**/' + gene + '.hmm', recursive=True)][0]
+                hmm = os.path.join(self.cov_dir, gene + '.hmm')
                 outfile = file + '-hits-no-' + self.taxfilter + '.sto' if self.taxfilter else file + '-hits.sto'
+                outfile = os.path.join(self.cov_dir, outfile)
                 if self.verbose:
                     print("Creating alignment with hmmalign: {}".format(outfile))
                 subprocess.run(['hmmalign','--amino', '-o', outfile,
