@@ -3,16 +3,15 @@
 import argparse
 import sys
 import os
-import glob
 import tempfile
 import subprocess
 import re
+import tmhmm
 from Bio import SearchIO
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.Alphabet import IUPAC
 from myconfig import COV_DIR
-import tmhmm
 
 '''
 Annotate COV GenBank files using a collection of HMMs. Example BED files showing genes:
@@ -28,13 +27,13 @@ BED Format (https://m.ensembl.org/info/website/upload/bed.html)
 parser = argparse.ArgumentParser()
 parser.add_argument('-verbose', action='store_true', help="Verbose")
 parser.add_argument('-cov_dir', default=COV_DIR, help="Destination directory")
-parser.add_argument('-rfamfile', default='cov_allvirus.cm', help="Rfam covariance model file")
+parser.add_argument('-rfam_file', default='cov_allvirus.cm', help="Rfam covariance model file")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
 
 def main():
-    annotator = Annotate_With_Hmms(args.verbose, args.hmmdir, args.rfamfile, args.files)
+    annotator = Annotate_With_Hmms(args.verbose, args.rfam_file, args.cov_dir, args.files)
     for file in annotator.files:
         gb = annotator.write_fasta(file)
         annotator.find_genes(gb)
@@ -47,10 +46,10 @@ class Annotate_With_Hmms:
     '''
     Create tracks for genes using HMMs ('genes'), Rfam hits ('rfam'), tmhmm predictions ('tms')
     '''
-    def __init__(self, verbose, hmmdir, rfamfile, files):
+    def __init__(self, verbose, rfam_file, cov_dir, files):
         self.verbose = verbose
-        self.hmmdir = hmmdir
-        self.rfamfile = rfamfile
+        self.rfam_file = rfam_file
+        self.cov_dir = cov_dir
         self.files = files
         # COV2 HMMs
         self.cov_proteins = ['ORF1a', 'ORF1ab', 'S', 'E', 'M', 'N',
@@ -72,9 +71,9 @@ class Annotate_With_Hmms:
         '''
         gb = SeqIO.read(file, 'gb')
         # Create fasta "reference" sequence
-        SeqIO.write(gb, gb.id + '.fa', 'fasta')
+        SeqIO.write(gb, os.path.join(self.cov_dir, gb.id + '.fa'), 'fasta')
         # Index with samtools
-        cmd = ['samtools', 'faidx', gb.id + '.fa']
+        cmd = ['samtools', 'faidx', os.path.join(self.cov_dir, gb.id + '.fa')]
         try:
             subprocess.run(cmd, check=True)
         except (subprocess.CalledProcessError) as exception:
@@ -238,7 +237,7 @@ class Annotate_With_Hmms:
         Rum hmmsearch and return the highest scoring hit
         '''
         out = tempfile.NamedTemporaryFile('w')
-        hmmpath = self.hmmdir + '/' + hmm + '-nt.hmm'
+        hmmpath = os.path.join(self.cov_dir, hmm + '-nt.hmm')
         cmd = ['hmmsearch', '--noali', '-o', out.name, hmmpath, name + '.fa']
         if self.verbose:
             print("Command: {0}".format(cmd))
@@ -262,7 +261,7 @@ class Annotate_With_Hmms:
         Run cmscan and return list of all hits
         '''
         out = tempfile.NamedTemporaryFile('w')
-        rfampath = os.path.join(self.hmmdir, self.rfamfile)
+        rfampath = os.path.join(self.cov_dir, self.rfam_file)
         cmd = ['cmscan', '--tblout', out.name, rfampath, name + '.fa']
         if self.verbose:
             print("Command: {0}".format(cmd))
@@ -283,7 +282,7 @@ class Annotate_With_Hmms:
 
     def write_bed(self, gb):
         for bed in self.beds[gb.id]:
-            with open(gb.id + '-' + bed + '.bed', 'w') as out:
+            with open(os.path.join(self.cov_dir, gb.id + '-' + bed + '.bed'), 'w') as out:
                 for line in self.beds[gb.id][bed]:
                     out.write(line + '\n')
 

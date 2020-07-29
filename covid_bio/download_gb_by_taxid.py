@@ -33,9 +33,9 @@ parser.add_argument('-cov_dir', default=COV_DIR, help="Destination directory")
 args = parser.parse_args()
 
 def main():
-    entrez = DownloadGbByTaxid(args.email, args.taxid, args.format, args.min, args.max,
+    entrez = DownloadGbByTaxid(args.email, args.taxid, args.format, args.min_len, args.max_len,
                                 args.split, args.recurse, args.verbose, args.retmax,
-                                args.chunk, args.api_key, args.json, args.fetch)
+                                args.chunk, args.api_key, args.json, args.fetch, args.cov_dir)
     entrez.search()
     entrez.efetch()
     entrez.filter()
@@ -45,7 +45,7 @@ def main():
 class DownloadGbByTaxid:
 
     def __init__(self, email, taxid, format, min_len, max_len, split, recurse, verbose, retmax,
-                 chunk, api_key, json, fetch):
+                 chunk, api_key, json, fetch, cov_dir):
         self.email = email
         self.taxid = taxid
         self.format = format
@@ -59,6 +59,7 @@ class DownloadGbByTaxid:
         self.api_key = api_key
         self.fetch = fetch
         self.json = json
+        self.cov_dir = cov_dir
         self.nt_ids = []
         self.records = []
 
@@ -149,7 +150,7 @@ class DownloadGbByTaxid:
     def write(self):
         if self.split:
             for record in self.records:
-                seqfile = os.path.join(COV_DIR, record.name + '.' + self.format)
+                seqfile = os.path.join(self.cov_dir, record.name + '.' + self.format)
                 if self.verbose:
                     print("Writing {}".format(seqfile))
                 SeqIO.write(record, seqfile, self.format)
@@ -159,7 +160,7 @@ class DownloadGbByTaxid:
                     with open(record.name + '.json', 'w') as out:
                         out.write(genome_json)
         else:
-            seqfile = os.path.join(COV_DIR, 'taxid-' + str(self.taxid) + '.' + self.format)
+            seqfile = os.path.join(self.cov_dir, 'taxid-' + str(self.taxid) + '.' + self.format)
             if self.verbose:
                 print("Writing {}".format(seqfile))
             SeqIO.write(self.records, seqfile, self.format)

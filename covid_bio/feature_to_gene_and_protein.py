@@ -61,7 +61,7 @@ qualifiers:
 
 def main():
     extractor = Feature_To_Gene_And_Protein(args.format, args.split, args.analyze, 
-        args.verbose, args.json, args.files)
+        args.verbose, args.json, args.cov_dir, args.files)
     extractor.read()
     extractor.standardize()
     extractor.create_objects()
@@ -72,13 +72,14 @@ def main():
 class Feature_To_Gene_And_Protein:
     from make_json import make_sequence_json
 
-    def __init__(self, seq_format, split, analyze, verbose, json, files):
+    def __init__(self, seq_format, split, analyze, verbose, json, cov_dir, files):
         self.seq_format = seq_format
         self.split = split
         # Do not write to any files
         self.analyze = analyze
         self.verbose = verbose
         self.make_json = json
+        self.cov_dir = cov_dir
         self.files = files
         # Initial collection of all features keyed by accession
         self.accs = dict()
@@ -353,8 +354,8 @@ class Feature_To_Gene_And_Protein:
             # SeqIO.write(seqs, seqfile, self.seq_format)
         else:
             for name in self.feats.keys():
-                aaseqfile = os.path.join(COV_DIR, name + '-aa.fa')
-                ntseqfile = os.path.join(COV_DIR, name + '-nt.fa')
+                aaseqfile = os.path.join(self.cov_dir, name + '-aa.fa')
+                ntseqfile = os.path.join(self.cov_dir, name + '-nt.fa')
                 aahandle = open(aaseqfile, "w")
                 nthandle = open(ntseqfile, "w")
                 for feat in self.feats[name].keys():
@@ -364,8 +365,8 @@ class Feature_To_Gene_And_Protein:
                 nthandle.close()
                 if self.make_json and 'invalid' not in name:
                     # No JSON for invalid sequences
-                    aafile = os.path.join(COV_DIR, name + '-aa-fasta.json')
-                    ntfile = os.path.join(COV_DIR, name + '-nt-fasta.json')
+                    aafile = os.path.join(self.cov_dir, name + '-aa-fasta.json')
+                    ntfile = os.path.join(self.cov_dir, name + '-nt-fasta.json')
                     aahandle = open(aafile, "w")
                     nthandle = open(ntfile, "w")
                     for feat in self.feats[name].keys():

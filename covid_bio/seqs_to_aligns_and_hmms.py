@@ -24,7 +24,7 @@ args = parser.parse_args()
 
 def main():
     builder = Seqs_To_Aligns_And_Hmms(args.verbose, args.aligner, args.hmmbuilder, args.skip, 
-        args.json, args.maf, args.files)
+        args.json, args.maf, args.cov_dir, args.files)
     builder.read()
     builder.make_align()
     builder.make_hmm()
@@ -32,13 +32,14 @@ def main():
 
 
 class Seqs_To_Aligns_And_Hmms:
-    def __init__(self, verbose, aligner, hmmbuild, skip, json, maf, files):
+    def __init__(self, verbose, aligner, hmmbuild, skip, json, maf, cov_dir, files):
         self.verbose = verbose
         self.aligner = aligner
         self.hmmbuild = hmmbuild
         self.skip = skip
         self.make_json = json
         self.maf = maf
+        self.cov_dir = cov_dir
         self.files = files
         self.seqs, self.alns, self.hmms = dict(), dict(), dict()
 
@@ -117,12 +118,13 @@ class Seqs_To_Aligns_And_Hmms:
             user	0m18.665s
             sys	0m4.255s
         '''
+        out = os.path.join(self.cov_dir, name + '.fasta')
         if self.aligner == 'muscle':
-            return [self.aligner, '-quiet','-in', infile, '-out', name + '.fasta'], None
+            return [self.aligner, '-quiet','-in', infile, '-out', out], out
         elif self.aligner == 'mafft':
-            return [self.aligner, '--auto', infile], name + '.fasta'
+            return [self.aligner, '--auto', infile, out], out
         elif self.aligner == 'clustalo':
-            return [self.aligner, '-i', infile, '-o', name + '.fasta', '--outfmt=fasta'], None
+            return [self.aligner, '-i', infile, '-o', out, '--outfmt=fasta'], out
         else:
             sys.exit("No command for aligner {}".format(self.aligner))
 
@@ -133,7 +135,7 @@ class Seqs_To_Aligns_And_Hmms:
             # Either --amino or --dna
             opt = '--amino' if '-aa' in name else '--dna'
             try:
-                subprocess.run([self.hmmbuild, opt, name + '.hmm', self.alns[name]])
+                subprocess.run([self.hmmbuild, opt, os.path.join(self.cov_dir, name + '.hmm'), self.alns[name]])
             except (subprocess.CalledProcessError) as exception:
                 print("Error running {}: ".format(self.hmmbuild) + str(exception))
 
@@ -145,12 +147,12 @@ class Seqs_To_Aligns_And_Hmms:
         from make_json import make_hmm_json
         for name in self.hmms:
             json = make_hmm_json(self.hmms[name])
-            with open(os.path.join(COV_DIR, name + '-hmm.json'), 'w') as out:
+            with open(os.path.join(self.cov_dir, name + '-hmm.json'), 'w') as out:
                 out.write(json)
         from make_json import make_alignment_json
         for name in self.alns:
             json = make_alignment_json(self.alns[name], self.aligner)
-            with open(os.path.join(COV_DIR, name + '-aln.json'), 'w') as out:
+            with open(os.path.join(self.cov_dir, name + '-aln.json'), 'w') as out:
                 out.write(json)
 
 if __name__ == "__main__":

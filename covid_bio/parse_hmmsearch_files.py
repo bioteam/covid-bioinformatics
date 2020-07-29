@@ -19,12 +19,13 @@ parser.add_argument('-download', default=False, action='store_true', help="Downl
 parser.add_argument('-align', default=False, action='store_true', help="Align hits to HMM")
 parser.add_argument('-taxfilter', default=None, help="Exclude clade")
 parser.add_argument('-chunk', default=10, help="Number of ids to send to Elink")
+parser.add_argument('-cov_dir', default=COV_DIR, help="Destination directory")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
 
 def main():
-    query = Parse_Hmmsearch(args.verbose, args.download, args.align, args.taxfilter, args.chunk, args.files)
+    query = Parse_Hmmsearch(args.verbose, args.download, args.align, args.taxfilter, args.chunk, args.cov_dir, args.files)
     query.parse()
     query.filter()
     query.download_hits()
@@ -32,12 +33,13 @@ def main():
 
 class Parse_Hmmsearch:
 
-    def __init__(self, verbose, download, align, taxfilter, chunk, files):
+    def __init__(self, verbose, download, align, taxfilter, chunk, cov_dir, files):
         self.verbose = verbose
         self.download = download
         self.align = align
         self.taxfilter = taxfilter
         self.chunk = chunk
+        self.cov_dir = cov_dir
         self.files = files
         # The primary keys for hits{} and fasta{} are file names, the secondary keys are the hits
         self.hits = dict()
@@ -150,7 +152,7 @@ class Parse_Hmmsearch:
     def write(self):
         for file in self.fasta:
             seqfile = file + '-hits-no-' + self.taxfilter + '.fa' if self.taxfilter else file + '-hits.fa'
-            seqfile = os.path.join(COV_DIR, seqfile)
+            seqfile = os.path.join(self.cov_dir, seqfile)
             if self.verbose:
                 print("Writing {}".format(seqfile))
             SeqIO.write(self.fasta[file], seqfile, 'fasta')
