@@ -7,7 +7,7 @@ import re
 import numpy
 from Bio import Entrez
 from Bio import SeqIO
-from vars import COV_DIR
+from vars import COV_DIR, EMAIL
 
 # NCBI Taxonomy ids:
 # 333387: single record for testing
@@ -18,10 +18,10 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-t, -taxid', default=11118, dest='taxid', help="Taxonomy id")
 parser.add_argument('-r', default=True, dest='recurse', help="Recursive retrieval of child tax IDs", type=bool)
 parser.add_argument('-f', default='gb', dest='format', help="Input and output format")
-parser.add_argument('-e', default="self@organization.net", dest='email', help="Email")
+parser.add_argument('-e', default=EMAIL, dest='email', help="Email for Entrez")
 parser.add_argument('-min_len', default=25000, type=int, help="Minimum length")
 parser.add_argument('-max_len', type=int, help="Maximum length")
-parser.add_argument('-split', dest='split', default=True, help="Split into separate files")
+parser.add_argument('-split', default=True, help="Split into separate files")
 parser.add_argument('-no-split', dest='split', action='store_false', help="Create one 'taxid' file")
 parser.add_argument('-verbose', action='store_true', help="Verbose")
 parser.add_argument('-retmax', default=10000, type=int, help="Entrez retmax")

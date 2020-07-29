@@ -9,7 +9,7 @@ import numpy
 from Bio import SearchIO
 from Bio import Entrez
 from Bio import SeqIO
-from vars import COV_DIR
+from vars import COV_DIR, EMAIL
 
 
 parser = argparse.ArgumentParser()
@@ -19,12 +19,14 @@ parser.add_argument('-align', default=False, action='store_true', help="Align hi
 parser.add_argument('-taxfilter', default=None, help="Exclude clade")
 parser.add_argument('-chunk', default=10, help="Number of ids to send to Elink")
 parser.add_argument('-cov_dir', default=COV_DIR, help="Destination directory")
+parser.add_argument('-email', default=EMAIL, help="Email for Entrez")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
 
 def main():
-    query = Parse_Hmmsearch(args.verbose, args.download, args.align, args.taxfilter, args.chunk, args.cov_dir, args.files)
+    query = Parse_Hmmsearch(args.verbose, args.download, args.align, args.taxfilter, 
+        args.chunk, args.cov_dir, args.email, args.files)
     query.parse()
     query.filter()
     query.download_hits()
@@ -32,18 +34,18 @@ def main():
 
 class Parse_Hmmsearch:
 
-    def __init__(self, verbose, download, align, taxfilter, chunk, cov_dir, files):
+    def __init__(self, verbose, download, align, taxfilter, chunk, cov_dir, email, files):
         self.verbose = verbose
         self.download = download
         self.align = align
         self.taxfilter = taxfilter
         self.chunk = chunk
         self.cov_dir = cov_dir
+        self.email = email
         self.files = files
         # The primary keys for hits{} and fasta{} are file names, the secondary keys are the hits
         self.hits = dict()
         self.fasta = dict()
-        self.email = 'briano@bioteam.net'
 
     def parse(self):
         for file in self.files:
