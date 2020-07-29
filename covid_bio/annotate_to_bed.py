@@ -237,8 +237,9 @@ class Annotate_With_Hmms:
         Rum hmmsearch and return the highest scoring hit
         '''
         out = tempfile.NamedTemporaryFile('w')
-        hmmpath = os.path.join(self.cov_dir, hmm + '-nt.hmm')
-        cmd = ['hmmsearch', '--noali', '-o', out.name, hmmpath, name + '.fa']
+        cmd = ['hmmsearch', '--noali', '-o', out.name, 
+                os.path.join(self.cov_dir, hmm + '-nt.hmm'), 
+                os.path.join(self.cov_dir, name + '.fa')]
         if self.verbose:
             print("Command: {0}".format(cmd))
         try:
@@ -261,8 +262,9 @@ class Annotate_With_Hmms:
         Run cmscan and return list of all hits
         '''
         out = tempfile.NamedTemporaryFile('w')
-        rfampath = os.path.join(self.cov_dir, self.rfam_file)
-        cmd = ['cmscan', '--tblout', out.name, rfampath, name + '.fa']
+        cmd = ['cmscan', '--tblout', out.name,
+                os.path.join(self.cov_dir, self.rfam_file), 
+                os.path.join(self.cov_dir, name + '.fa')]
         if self.verbose:
             print("Command: {0}".format(cmd))
         try:
