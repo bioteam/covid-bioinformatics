@@ -121,11 +121,11 @@ class Feature_To_Gene_And_Protein:
         for gene in self.feats:
             for feat in self.feats[gene].keys():
                 feat_len = len(self.feats[gene][feat]['aa'])
-                # If a given feature does vary by length
-                if feat_len not in self.variants[gene]['valid']:
+                # If a given feature length is not in the right range
+                if feat_len < self.variants[gene][0] or feat_len > self.variants[gene][1]:
                     if self.verbose:
-                        print("'{0}' is invalid: {1} ne {2}".format(feat,
-                                    feat_len, self.variants[gene]['valid']))
+                        print("'{0}' is invalid: {1} not in {2}".format(feat,
+                                    feat_len, str(self.variants[gene])))
                     invalid = gene + '-invalid'
                     if invalid not in feats.keys():
                         feats[invalid] = dict()
