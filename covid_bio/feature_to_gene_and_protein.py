@@ -126,7 +126,7 @@ class Feature_To_Gene_And_Protein:
                     if self.verbose:
                         print("'{0}' is invalid: {1} not in {2}".format(feat,
                                     feat_len, str(self.variants[gene])))
-                    invalid = gene + '-invalid'
+                    invalid = gene + '-INVALID'
                     if invalid not in feats.keys():
                         feats[invalid] = dict()
                     if feat not in feats[invalid].keys():
@@ -222,10 +222,10 @@ class Feature_To_Gene_And_Protein:
         for name in self.synonyms:
             if product in self.synonyms[name]:
                 if self.verbose:
-                    print("Product {0}-{1} found".format(product, acc))
+                    print("Product {0} found ({1})".format(product, acc))
                 return name
         if self.verbose:
-            print("Product {0}-{1} not found".format(product, acc))
+            print("Product {0} not found ({1})".format(product, acc))
         if self.analyze:
             match = self.synonyms[name][self.synonyms[name].index(product)]
             self.matches[match] = 1

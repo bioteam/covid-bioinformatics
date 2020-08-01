@@ -62,7 +62,7 @@ class Seqs_To_Aligns_And_Hmms:
                 for fa in SeqIO.parse(path, "fasta"):
                     seqs.append(fa)
                 self.seqs[name] = self.remove_dups(seqs)
-            except (RuntimeError) as exception:
+            except (RuntimeError) as exception: 
                 print("Error parsing sequences in '" +
                       str(path) + "':" + str(exception))
 
@@ -79,7 +79,8 @@ class Seqs_To_Aligns_And_Hmms:
         for name in self.seqs:
             # Most aligners will reject a file with a single sequence so just copy
             if len(self.seqs[name]) == 1:
-                cmd = ['cp', name + '.fa', name + '.fasta']
+                cmd = ['cp', os.path.join(self.cov_dir, name + '.fa'), 
+                    os.path.join(self.cov_dir, name + '.fasta')]
                 subprocess.run(cmd, check=True)
             else:
                 seqfile = tempfile.NamedTemporaryFile('w', delete=False)
@@ -102,7 +103,10 @@ class Seqs_To_Aligns_And_Hmms:
 
             # Create additional Maf format alignment
             if self.maf:
-                AlignIO.convert(name + '.fasta', 'fasta', name + '.maf', 'maf', alphabet=None)
+                AlignIO.convert(os.path.join(self.cov_dir, name + '.fasta'),
+                                'fasta',
+                                os.path.join(self.cov_dir, name + '.maf'),
+                                'maf', alphabet=None)
 
             self.alns[name] = name + '.fasta'
 
