@@ -28,10 +28,11 @@ args = parser.parse_args()
 def main():
     builder = Seqs_To_Aligns_And_Hmms(args.verbose, args.aligner, args.hmmbuilder, args.skip, 
         args.json, args.maf, args.cov_dir, args.files)
-    builder.read()
-    builder.make_align()
-    builder.make_hmm()
-    builder.write_json()
+    for path in [f for f in builder.files if os.path.isfile(f)]:
+        seqs, name = builder.read(path)
+        builder.make_align(seqs, name)
+        builder.make_hmm(name)
+        builder.write_json(name)
 
 
 class Seqs_To_Aligns_And_Hmms:
@@ -44,27 +45,26 @@ class Seqs_To_Aligns_And_Hmms:
         self.maf = maf
         self.cov_dir = cov_dir
         self.files = files
-        self.seqs, self.alns, self.hmms = dict(), dict(), dict()
 
-    def read(self):
-        for path in [f for f in self.files if os.path.isfile(f)]:
-            seqs = []
-            # Get basename without suffix, for example "S-aa"
-            name = os.path.basename(path).split('.')[0]
-            if name in self.skip:
-                continue
-            if 'invalid' in name:
-                continue
-            try:
-                if self.verbose:
-                    print("Reading Fasta file: {}".format(path))
-                # Each one of these is a multiple fasta file
-                for fa in SeqIO.parse(path, "fasta"):
-                    seqs.append(fa)
-                self.seqs[name] = self.remove_dups(seqs)
-            except (RuntimeError) as exception: 
-                print("Error parsing sequences in '" +
-                      str(path) + "':" + str(exception))
+    def read(self, path):
+        seqs = []
+        # Get basename without suffix, for example "S-aa"
+        name = os.path.basename(path).split('.')[0]
+        if name in self.skip:
+            return
+        if 'invalid' in name:
+            return
+        try:
+            if self.verbose:
+                print("Reading Fasta file: {}".format(path))
+            # Each one of these is a multiple fasta file
+            for fa in SeqIO.parse(path, "fasta"):
+                seqs.append(fa)
+            seqs = self.remove_dups(seqs)
+        except (RuntimeError) as exception: 
+            print("Error parsing sequences in '" +
+                str(path) + "':" + str(exception))
+        return seqs, name
 
     def remove_dups(self, seqs):
         d = dict()
@@ -75,40 +75,37 @@ class Seqs_To_Aligns_And_Hmms:
             d[str(seq.seq)] = seq
         return list(d.values())
 
-    def make_align(self):
-        for name in self.seqs:
-            # Most aligners will reject a file with a single sequence so just copy
-            if len(self.seqs[name]) == 1:
-                cmd = ['cp', os.path.join(self.cov_dir, name + '.fa'), 
+    def make_align(self, seqs, name):
+        # Most aligners will reject a file with a single sequence so just copy
+        if len(seqs) == 1:
+            cmd = ['cp', os.path.join(self.cov_dir, name + '.fa'), 
                     os.path.join(self.cov_dir, name + '.fasta')]
-                subprocess.run(cmd, check=True)
-            else:
-                seqfile = tempfile.NamedTemporaryFile('w', delete=False)
-                SeqIO.write(self.seqs[name], seqfile.name, 'fasta')
-                if self.verbose:
-                    print("Alignment input sequence file: {}".format(seqfile.name))
-                # out_filename is used to redirect the STDOUT to file
-                # when self.aligner is "mafft" and it requires redirect to file
-                cmd, out_filename = self.make_align_cmd(seqfile.name, name)
-                if self.verbose:
-                    print("Alignment command is '{}'".format(cmd))
-                try:
-                    if out_filename:
-                        with open(out_filename, "w") as f:
-                            subprocess.run(cmd, check=True, stdout=f)
-                    else:
-                        subprocess.run(cmd, check=True)
-                except (subprocess.CalledProcessError) as exception:
-                    print("Error running '{}': ".format(self.aligner) + str(exception))
+            subprocess.run(cmd, check=True)
+        else:
+            seqfile = tempfile.NamedTemporaryFile('w', delete=False)
+            SeqIO.write(seqs, seqfile.name, 'fasta')
+            if self.verbose:
+                print("Alignment input sequence file: {}".format(seqfile.name))
+            # out_filename is used to redirect the STDOUT to file
+            # when self.aligner is "mafft" and it requires redirect to file
+            cmd, out_filename = self.make_align_cmd(seqfile.name, name)
+            if self.verbose:
+                print("Alignment command is '{}'".format(cmd))
+            try:
+                if out_filename:
+                    with open(out_filename, "w") as f:
+                        subprocess.run(cmd, check=True, stdout=f)
+                else:
+                    subprocess.run(cmd, check=True)
+            except (subprocess.CalledProcessError) as exception:
+                print("Error running '{}': ".format(self.aligner) + str(exception))
 
-            # Create additional Maf format alignment
-            if self.maf:
-                AlignIO.convert(os.path.join(self.cov_dir, name + '.fasta'),
-                                'fasta',
-                                os.path.join(self.cov_dir, name + '.maf'),
-                                'maf', alphabet=None)
-
-            self.alns[name] = name + '.fasta'
+        # Create additional Maf format alignment
+        if self.maf:
+            AlignIO.convert(os.path.join(self.cov_dir, name + '.fasta'),
+                            'fasta',
+                            os.path.join(self.cov_dir, name + '.maf'),
+                            'maf', alphabet=None)
 
     def make_align_cmd(self, infile, name):
         '''
@@ -135,32 +132,30 @@ class Seqs_To_Aligns_And_Hmms:
         else:
             sys.exit("No command for aligner {}".format(self.aligner))
 
-    def make_hmm(self):
-        for name in self.alns:
-            if self.verbose:
-                print("{0} input file is '{1}'".format(self.hmmbuild, self.alns[name]))
-            # Either --amino or --dna
-            opt = '--amino' if '-aa' in name else '--dna'
-            try:
-                subprocess.run([self.hmmbuild, opt, os.path.join(self.cov_dir, name + '.hmm'), os.path.join(self.cov_dir, self.alns[name])])
-            except (subprocess.CalledProcessError) as exception:
-                print("Error running {}: ".format(self.hmmbuild) + str(exception))
+    def make_hmm(self, name):
+        if self.verbose:
+            print("{0} input file is '{1}'".format(self.hmmbuild, name))
+        # Either --amino or --dna
+        opt = '--amino' if '-aa' in name else '--dna'
+        try:
+            subprocess.run([self.hmmbuild, 
+                            opt, 
+                            os.path.join(self.cov_dir, name + '.hmm'), 
+                            os.path.join(self.cov_dir, name + '.fasta')])
+        except (subprocess.CalledProcessError) as exception:
+            print("Error running {}: ".format(self.hmmbuild) + str(exception))
 
-            self.hmms[name] = name + '.hmm'
-
-    def write_json(self):
+    def write_json(self, name):
         if not self.make_json:
             return
         from make_json import make_hmm_json
-        for name in self.hmms:
-            json = make_hmm_json(self.hmms[name])
-            with open(os.path.join(self.cov_dir, name + '-hmm.json'), 'w') as out:
-                out.write(json)
+        json = make_hmm_json(name)
+        with open(os.path.join(self.cov_dir, name + '-hmm.json'), 'w') as out:
+            out.write(json)
         from make_json import make_alignment_json
-        for name in self.alns:
-            json = make_alignment_json(self.alns[name], self.aligner)
-            with open(os.path.join(self.cov_dir, name + '-aln.json'), 'w') as out:
-                out.write(json)
+        json = make_alignment_json(name, self.aligner)
+        with open(os.path.join(self.cov_dir, name + '-aln.json'), 'w') as out:
+            out.write(json)
 
 if __name__ == "__main__":
     main()
