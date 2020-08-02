@@ -136,7 +136,7 @@ class Seqs_To_Aligns_And_Hmms:
         if self.aligner == 'muscle':
             return [self.aligner, '-quiet','-in', infile, '-out', align_name], None
         elif self.aligner == 'mafft':
-            return [self.aligner, '--auto', infile], align_name
+            return [self.aligner, '--quiet', '--auto', infile], align_name
         elif self.aligner == 'clustalo':
             return [self.aligner, '-i', infile, '-o', align_name, '--outfmt=fasta'], None
         else:

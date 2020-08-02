@@ -20,11 +20,15 @@ S:
   - spike protein S
   - surface glycoprotein
   - surface_glycoprotein
+  - protein S
 E:
   - E
+  - protein E
   - E protein
   - E_protein
   - E2
+  - E2 glycoprotein precursor
+  - E2 glycoprotein
   - small membrane protein
   - envelope protein E
   - envelope_protein
@@ -36,6 +40,8 @@ E:
   - putative E2 glycoprotein precursor
 M:
   - M
+  - protein M
+  - matrix protein
   - M protein
   - M_protein
   - membrance glycoprotein
@@ -50,6 +56,7 @@ M:
   - small membrane protein
 N:
   - N
+  - protein N
   - N phosphoprotein
   - N protein
   - N_protein
@@ -141,6 +148,7 @@ ORF3a:
   - ORF3 protein
   - ORF3_protein
   - putative ORF3
+  - hypothetical protein sars3a
 ORF3b:
   - 3b
   - 3b protein
@@ -163,10 +171,12 @@ ORF3b:
   - NS3b_protein
   - NS3b protein
   - NSP3b
+  - hypothetical protein sars3b
 ORF6:
   - hypothetical protein orf6
   - hypothetical protein Orf6
   - hypothetical protein ORF6
+  - hypothetical protein sars6
   - ORF6
   - Orf6
   - orf6
@@ -191,6 +201,7 @@ ORF7a:
   - hypothetical protein orf7a
   - hypothetical protein ORF7a
   - hypothetical protein Orf7a
+  - hypothetical protein sars7a
   - ORF7a
   - Orf7a
   - orf7a
@@ -203,6 +214,7 @@ ORF7b:
   - hypothetical protein orf7b
   - hypothetical protein ORF7b
   - hypothetical protein Orf7b
+  - hypothetical protein sars7b
   - ORF7b
   - Orf7b
   - orf7b
@@ -242,6 +254,7 @@ ORF9b:
   - hypothetical protein orf9b
   - hypothetical protein ORF9b
   - hypothetical protein Orf9b
+  - hypothetical protein sars9b
   - ORF9b
   - Orf9b
   - orf9b
