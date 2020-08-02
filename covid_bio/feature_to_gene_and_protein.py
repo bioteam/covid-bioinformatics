@@ -121,12 +121,12 @@ class Feature_To_Gene_And_Protein:
         for gene in self.feats:
             for feat in self.feats[gene].keys():
                 feat_len = len(self.feats[gene][feat]['aa'])
-                # If a given feature length is not in the right range
+                # If a given feature length is not in the right length range
                 if feat_len < self.variants[gene][0] or feat_len > self.variants[gene][1]:
                     if self.verbose:
                         print("'{0}' is invalid: {1} not in {2}".format(feat,
                                     feat_len, str(self.variants[gene])))
-                    invalid = gene + '-INVALID'
+                    invalid = gene + '-invalid'
                     if invalid not in feats.keys():
                         feats[invalid] = dict()
                     if feat not in feats[invalid].keys():
@@ -134,6 +134,19 @@ class Feature_To_Gene_And_Protein:
                     # Copy feature
                     feats[invalid][feat]['aa'] = self.feats[gene][feat]['aa']
                     feats[invalid][feat]['nt'] = self.feats[gene][feat]['nt']
+                # Check that ORF1a and ORF1ab begin with M
+                elif gene == 'ORF1a' or gene == 'ORF1ab':
+                    if str(self.feats[gene][feat]['aa'].seq)[0] is not 'M':
+                        if self.verbose:
+                            print("'{0}' is invalid: no M".format(feat))
+                        invalid = gene + '-invalid'
+                        if invalid not in feats.keys():
+                            feats[invalid] = dict()
+                        if feat not in feats[invalid].keys():
+                            feats[invalid][feat] = dict()
+                        # Copy feature
+                        feats[invalid][feat]['aa'] = self.feats[gene][feat]['aa']
+                        feats[invalid][feat]['nt'] = self.feats[gene][feat]['nt']
                 else:
                     if gene not in feats.keys():
                         feats[gene] = dict()

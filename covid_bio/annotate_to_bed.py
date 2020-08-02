@@ -218,7 +218,7 @@ class Annotate_With_Hmms:
                 print("Stop codon found in {0} {1}".format(gb.id, protein))
             if len(re.findall(noframeshift, ntstr)) == 1:
                 if self.verbose:
-                    print("Found 1 'slip sequence'")
+                    print("Found 1 'slip sequence' in {0} {1}".format(gb.id, protein))
                 ntstr = ntstr.replace(noframeshift, frameshift)
                 aastr = self.translate(ntstr)
             else:
