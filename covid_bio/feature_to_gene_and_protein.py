@@ -135,8 +135,7 @@ class Feature_To_Gene_And_Protein:
                     feats[invalid][feat]['aa'] = self.feats[gene][feat]['aa']
                     feats[invalid][feat]['nt'] = self.feats[gene][feat]['nt']
                 # Check that ORF1a and ORF1ab begin with M
-                elif gene == 'ORF1a' or gene == 'ORF1ab':
-                    if str(self.feats[gene][feat]['aa'].seq)[0] != 'M':
+                elif gene == 'ORF1a' or gene == 'ORF1ab' and str(self.feats[gene][feat]['aa'].seq)[0] != 'M':
                         if self.verbose:
                             print("'{0}' is invalid: no M".format(feat))
                         invalid = gene + '-invalid'
