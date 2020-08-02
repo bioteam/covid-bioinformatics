@@ -14,7 +14,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
 parser.add_argument('-aligner', default='mafft', help="Alignment application")
 parser.add_argument('-hmmbuilder', default='hmmbuild', help="HMM build application")
-parser.add_argument('-skip', default='ORF1a-aa,ORF1a-nt,ORF1ab-aa,ORF1ab-nt', help="Do not align")
+parser.add_argument('-skip', help="Do not align")
 parser.add_argument('-json', action='store_true', help="Create JSON for Gen3")
 parser.add_argument('-maf', action='store_true', help="Create additional MAF format alignments")
 parser.add_argument('-cov_dir', default=COV_DIR, help="Destination directory")
@@ -40,6 +40,7 @@ def main():
             continue
         seqs = builder.read(f)
         builder.make_align(seqs, name)
+        builder.make_maf(name)
         builder.make_hmm(name)
         builder.write_json(name)
 
@@ -80,10 +81,15 @@ class Seqs_To_Aligns_And_Hmms:
         return list(d.values())
 
     def make_align(self, seqs, name):
+        align_name = os.path.join(self.cov_dir, name + '.fasta')
+        if os.path.exists(align_name) and os.stat(align_name).st_size > 0:
+            return
+
         # Most aligners will reject a file with a single sequence so just copy
         if len(seqs) == 1:
-            cmd = ['cp', os.path.join(self.cov_dir, name + '.fa'), 
-                    os.path.join(self.cov_dir, name + '.fasta')]
+            cmd = ['cp', 
+                    os.path.join(self.cov_dir, name + '.fa'), 
+                    align_name]
             subprocess.run(cmd, check=True)
         else:
             seqfile = tempfile.NamedTemporaryFile('w', delete=False)
@@ -92,7 +98,7 @@ class Seqs_To_Aligns_And_Hmms:
                 print("Alignment input sequence file: {}".format(seqfile.name))
             # out_filename is used to redirect the STDOUT to file
             # when self.aligner is "mafft" and it requires redirect to file
-            cmd, out_filename = self.make_align_cmd(seqfile.name, name)
+            cmd, out_filename = self.make_align_cmd(seqfile.name, align_name)
             if self.verbose:
                 print("Alignment command is '{}'".format(cmd))
             try:
@@ -104,14 +110,15 @@ class Seqs_To_Aligns_And_Hmms:
             except (subprocess.CalledProcessError) as exception:
                 print("Error running '{}': ".format(self.aligner) + str(exception))
 
-        # Create additional Maf format alignment
+    def make_maf(self, name):
+        # Create additional Maf format alignment if needed
         if self.maf:
             AlignIO.convert(os.path.join(self.cov_dir, name + '.fasta'),
                             'fasta',
                             os.path.join(self.cov_dir, name + '.maf'),
                             'maf', alphabet=None)
 
-    def make_align_cmd(self, infile, name):
+    def make_align_cmd(self, infile, align_name):
         '''
         time mafft --auto M-aa.fasta > M-aa.aln
             real	0m2.254s
@@ -126,17 +133,20 @@ class Seqs_To_Aligns_And_Hmms:
             user	0m18.665s
             sys	0m4.255s
         '''
-        out = os.path.join(self.cov_dir, name + '.fasta')
         if self.aligner == 'muscle':
-            return [self.aligner, '-quiet','-in', infile, '-out', out], None
+            return [self.aligner, '-quiet','-in', infile, '-out', align_name], None
         elif self.aligner == 'mafft':
-            return [self.aligner, '--auto', infile], out
+            return [self.aligner, '--auto', infile], align_name
         elif self.aligner == 'clustalo':
-            return [self.aligner, '-i', infile, '-o', out, '--outfmt=fasta'], None
+            return [self.aligner, '-i', infile, '-o', align_name, '--outfmt=fasta'], None
         else:
             sys.exit("No command for aligner {}".format(self.aligner))
 
     def make_hmm(self, name):
+        hmm_name = os.path.join(self.cov_dir, name + '.hmm')
+        if os.path.exists(hmm_name) and os.stat(hmm_name).st_size > 0:
+            return
+
         if self.verbose:
             print("{0} input file is '{1}'".format(self.hmmbuild, name))
         # Either --amino or --dna
@@ -144,8 +154,9 @@ class Seqs_To_Aligns_And_Hmms:
         try:
             subprocess.run([self.hmmbuild, 
                             opt, 
-                            os.path.join(self.cov_dir, name + '.hmm'), 
-                            os.path.join(self.cov_dir, name + '.fasta')])
+                            hmm_name, 
+                            os.path.join(self.cov_dir, name + '.fasta')],
+                            check=True)
         except (subprocess.CalledProcessError) as exception:
             print("Error running {}: ".format(self.hmmbuild) + str(exception))
 
