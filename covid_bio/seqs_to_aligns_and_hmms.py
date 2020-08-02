@@ -28,8 +28,17 @@ args = parser.parse_args()
 def main():
     builder = Seqs_To_Aligns_And_Hmms(args.verbose, args.aligner, args.hmmbuilder, args.skip, 
         args.json, args.maf, args.cov_dir, args.files)
-    for path in [f for f in builder.files if os.path.isfile(f)]:
-        seqs, name = builder.read(path)
+    for f in builder.files:
+        if not os.path.isfile(f):
+            if builder.verbose:
+                print('{0} is not a file'.format(f))
+            continue
+        name = os.path.basename(f).split('.')[0]
+        if name in builder.skip or 'invalid' in name:
+            if builder.verbose:
+                print('Skipping {0}'.format(f))
+            continue
+        seqs = builder.read(f)
         builder.make_align(seqs, name)
         builder.make_hmm(name)
         builder.write_json(name)
@@ -49,11 +58,6 @@ class Seqs_To_Aligns_And_Hmms:
     def read(self, path):
         seqs = []
         # Get basename without suffix, for example "S-aa"
-        name = os.path.basename(path).split('.')[0]
-        if name in self.skip:
-            return
-        if 'invalid' in name:
-            return
         try:
             if self.verbose:
                 print("Reading Fasta file: {}".format(path))
@@ -64,7 +68,7 @@ class Seqs_To_Aligns_And_Hmms:
         except (RuntimeError) as exception: 
             print("Error parsing sequences in '" +
                 str(path) + "':" + str(exception))
-        return seqs, name
+        return seqs
 
     def remove_dups(self, seqs):
         d = dict()
