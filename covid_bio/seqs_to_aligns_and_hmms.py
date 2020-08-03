@@ -77,6 +77,8 @@ class Seqs_To_Aligns_And_Hmms:
             # Do not put sequences containing "X" in alignments
             if 'X' in str(seq.seq):
                 continue
+            if 'n' in str(seq.seq):
+                continue
             d[str(seq.seq)] = seq
         return list(d.values())
 

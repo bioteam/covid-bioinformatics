@@ -134,8 +134,8 @@ class Feature_To_Gene_And_Protein:
                     # Copy feature
                     feats[invalid][feat]['aa'] = self.feats[gene][feat]['aa']
                     feats[invalid][feat]['nt'] = self.feats[gene][feat]['nt']
-                # Check that ORF1a and ORF1ab begin with M
-                elif gene in ['ORF1a','ORF1ab'] and str(self.feats[gene][feat]['aa'].seq)[0] != 'M':
+                # Check that ORF1a, ORF1ab, NS1 begin with M
+                elif gene in ['ORF1a','ORF1ab','NS1'] and str(self.feats[gene][feat]['aa'].seq)[0] != 'M':
                         if self.verbose:
                             print("'{0}' is invalid: no M".format(feat))
                         invalid = gene + '-invalid'
@@ -234,10 +234,10 @@ class Feature_To_Gene_And_Protein:
         for name in self.synonyms:
             if product in self.synonyms[name]:
                 if self.verbose:
-                    print("Product '{0}' found ({1}, {2})".format(product, acc, name))
+                    print("Gene {0} found: {1}, '{2}'".format(name, acc, product, acc))
                 return name
         if self.verbose:
-            print("Product '{0}' not found ({1})".format(product, acc))
+            print("No gene for product {0}, '{1}'".format(acc, product))
         if self.analyze:
             match = self.synonyms[name][self.synonyms[name].index(product)]
             self.matches[match] = 1
