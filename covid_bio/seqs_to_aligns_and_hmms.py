@@ -58,23 +58,27 @@ class Seqs_To_Aligns_And_Hmms:
 
     def read(self, path):
         seqs = []
-        # Get basename without suffix, for example "S-aa"
         try:
             if self.verbose:
                 print("Reading Fasta file: {}".format(path))
             # Each one of these is a multiple fasta file
             for fa in SeqIO.parse(path, "fasta"):
                 seqs.append(fa)
-            seqs = self.remove_dups(seqs)
+            seqs = self.remove_dups(seqs, os.path.basename(path))
         except (RuntimeError) as exception: 
             print("Error parsing sequences in '" +
                 str(path) + "':" + str(exception))
         return seqs
 
-    def remove_dups(self, records):
+    def remove_dups(self, records, filename):
         d = dict()
         # Do not put sequences containing "X" or "N" in alignments
-        invalid = re.compile(r'[xXnN]')
+        if '-aa' in filename:
+            invalid = re.compile(r'[xX]')
+        elif '-nt' in filename:
+            invalid = re.compile(r'[xXnN]')
+        else:
+            sys.exit("Cannot determine sequence type in {}".format(filename))
         for record in records:
             seq_string = str(record.seq)
             if re.search(invalid, seq_string):
