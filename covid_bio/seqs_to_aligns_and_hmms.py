@@ -71,15 +71,15 @@ class Seqs_To_Aligns_And_Hmms:
                 str(path) + "':" + str(exception))
         return seqs
 
-    def remove_dups(self, seqs):
+    def remove_dups(self, records):
         d = dict()
-        for seq in seqs:
-            # Do not put sequences containing "X" in alignments
-            if 'X' in str(seq.seq):
+        # Do not put sequences containing "X" or "N" in alignments
+        invalid = re.compile(r'[xXnN]')
+        for record in records:
+            seq_string = str(record.seq)
+            if re.search(invalid, seq_string):
                 continue
-            if 'n' in str(seq.seq):
-                continue
-            d[str(seq.seq)] = seq
+            d[seq_string] = record
         return list(d.values())
 
     def make_align(self, seqs, name):
