@@ -165,13 +165,6 @@ ORF3b:
   - putative ORF3b
   - sars3b
   - accessory protein 3b
-  - non-structural protein 3b
-  - nonstructural protein 3b
-  - nonstructural protein NS3b
-  - NS3b
-  - NS3b_protein
-  - NS3b protein
-  - NSP3b
   - hypothetical protein sars3b
 ORF6:
   - hypothetical protein orf6
@@ -225,13 +218,6 @@ ORF7b:
   - putative ORF7b
   - sars7b
   - accessory protein 7b
-  - non-structural protein 7b
-  - nonstructural protein 7b
-  - nonstructural protein NS7b
-  - NS7b
-  - NS7b protein
-  - NS7b_protein
-  - NSP7b
 ORF8:
   - hypothetical protein orf8
   - hypothetical protein ORF8
@@ -244,13 +230,6 @@ ORF8:
   - ORF8_protein
   - putative ORF8
   - accessory protein 7a
-  - non-structural protein 7a
-  - nonstructural protein 7a
-  - nonstructural protein NS7a
-  - NS7a
-  - NS7a protein
-  - NS7a_protein
-  - NSP7a
 ORF9b:
   - hypothetical protein orf9b
   - hypothetical protein ORF9b
@@ -263,13 +242,6 @@ ORF9b:
   - Orf9b protein
   - putative ORF9b
   - accessory protein 9b
-  - non-structural protein 9b
-  - nonstructural protein 9b
-  - nonstructural protein NS9b
-  - NS9b
-  - NS9b_protein
-  - NS9b protein
-  - NSP9b
   - sars9b
 ORF10:
   - hypothetical protein orf10

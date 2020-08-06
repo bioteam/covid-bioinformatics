@@ -17,7 +17,7 @@ parser.add_argument('-hmmbuilder', default='hmmbuild', help="HMM build applicati
 parser.add_argument('-skip', default='', help="Do not align")
 parser.add_argument('-json', action='store_true', help="Create JSON for Gen3")
 parser.add_argument('-maf', action='store_true', help="Create additional MAF format alignments")
-parser.add_argument('-cov_dir', default=COV_DIR', help="Destination directory")
+parser.add_argument('-cov_dir', default=COV_DIR, help="Destination directory")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
