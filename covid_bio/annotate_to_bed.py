@@ -51,11 +51,11 @@ class Annotate_With_Hmms:
         self.rfam_file = rfam_file
         self.cov_dir = cov_dir
         self.files = files
-        # COV2 HMMs
+        # COV2 HMMs - note that ORF9b is removed
         self.cov_proteins = ['ORF1a', 'ORF1ab', 'S', 'E', 'M', 'N',
                             'NS1', 'NS2', 'NS3', 'NS4', 'NS5', 'NS6', 'NS7', 'NS8', 'NS9',
                             'NS10', 'NS11', 'NS12', 'NS13', 'NS14', 'NS15', 'NS16',
-                            'ORF3a', 'ORF6', 'ORF7a', 'ORF7b', 'ORF8', 'ORF9b', 'ORF10']
+                            'ORF3a', 'ORF6', 'ORF7a', 'ORF7b', 'ORF8', 'ORF10']
         # Text for BED files
         self.beds = dict()
         # Gene positions on given genome
