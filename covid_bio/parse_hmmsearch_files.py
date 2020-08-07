@@ -52,12 +52,13 @@ class Parse_Hmmsearch:
             if os.stat(file).st_size == 0:
                 continue
             base = os.path.basename(file).split('.')[0]
-            matches = re.match(r'(\w+-\w+)_(\w+-\w+)', base)
-            qresult = SearchIO.read(file, 'hmmer3-tab')
-            if not qresult:
+            matches = re.match(r'(\w+-\w+)_([^.]+)', base)
+            try:
+                qresult = SearchIO.read(file, 'hmmer3-tab')
+            except:
                 if self.verbose:
                     print("No match:\t{0}\t{1}".format(matches[1], matches[2]))
-                return
+                continue
             pids = [ hit.id for hit in qresult]
             taxarray = self.get_taxid(pids)
             self.hits[base] = self.get_lineage(taxarray)
