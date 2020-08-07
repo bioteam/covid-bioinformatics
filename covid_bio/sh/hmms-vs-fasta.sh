@@ -49,5 +49,7 @@ do
 	    echo Command is $cmd
         $cmd
         echo Output is $out
+    else
+	echo File $out exists
     fi
 done
