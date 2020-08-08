@@ -16,7 +16,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
 parser.add_argument('-download', default=False, action='store_true', help="Download hit sequences")
 parser.add_argument('-align', default=False, action='store_true', help="Align hits to HMM")
-parser.add_argument('-taxfilter', default=None, help="Exclude clade")
+parser.add_argument('-taxfilter', default=None, help="Exclude clade using NCBI clade name")
+parser.add_argument('-lexfilter', default=None, help="Exclude clade using search string")
 parser.add_argument('-chunk', default=10, help="Number of ids to send to Elink")
 parser.add_argument('-cov_dir', default=COV_DIR, help="Destination directory")
 parser.add_argument('-email', default=EMAIL, help="Email for Entrez")
@@ -30,7 +31,7 @@ args = parser.parse_args()
 
 def main():
     query = Parse_Hmmsearch(args.verbose, args.download, args.align, args.taxfilter, 
-        args.chunk, args.cov_dir, args.email, args.api_key, args.files)
+        args.lexfilter, args.chunk, args.cov_dir, args.email, args.api_key, args.files)
     for f in query.files:
         pids, fname = query.parse(f)
         if pids == None:
@@ -43,11 +44,12 @@ def main():
 
 class Parse_Hmmsearch:
 
-    def __init__(self, verbose, download, align, taxfilter, chunk, cov_dir, email, api_key, files):
+    def __init__(self, verbose, download, align, taxfilter, lexfilter, chunk, cov_dir, email, api_key, files):
         self.verbose = verbose
         self.download = download
         self.align = align
         self.taxfilter = taxfilter
+        self.lexfilter = lexfilter
         self.chunk = chunk
         self.cov_dir = cov_dir
         self.email = email
@@ -57,6 +59,10 @@ class Parse_Hmmsearch:
             self.api_key = os.environ['NCBI_API_KEY']
 
     def parse(self, file):
+        '''
+        Parse hmmsearch output and filter by arbitrary search string 
+        if one is specified.
+        '''
         if os.stat(file).st_size == 0:
             return
         fname = os.path.basename(file).split('.')[0]
@@ -67,7 +73,11 @@ class Parse_Hmmsearch:
             if self.verbose:
                 print("No match:\t{0}\t{1}".format(matches[1], matches[2]))
             return
-        return [ hit.id for hit in qresult], fname
+        if self.lexfilter:
+            patt = re.compile(self.lexfilter, re.IGNORECASE)
+            return [ hit.id for hit in qresult if not re.search(patt, hit.description)], fname
+        else:
+            return [ hit.id for hit in qresult], fname
 
     def get_taxid(self, pids):
         '''
