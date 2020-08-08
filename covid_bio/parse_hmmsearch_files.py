@@ -34,7 +34,7 @@ def main():
         args.lexfilter, args.chunk, args.cov_dir, args.email, args.api_key, args.files)
     for f in query.files:
         pids, fname = query.parse(f)
-        if pids == None:
+        if pids == None or pids == []:
             continue
         taxarray = query.get_taxid(pids)
         lineages = query.get_lineage(taxarray)
@@ -61,7 +61,7 @@ class Parse_Hmmsearch:
     def parse(self, file):
         '''
         Parse hmmsearch output and filter by arbitrary search string 
-        if one is specified.
+        if one is specified by -lexfilter.
         '''
         if os.stat(file).st_size == 0:
             return
