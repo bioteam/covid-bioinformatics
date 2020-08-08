@@ -62,7 +62,6 @@ class DownloadGbByTaxid:
         self.cov_dir = cov_dir
         self.nt_ids = []
         self.records = []
-
         if not self.api_key and 'NCBI_API_KEY' in os.environ.keys():
             self.api_key = os.environ['NCBI_API_KEY']
 
@@ -71,10 +70,8 @@ class DownloadGbByTaxid:
         if not nummatch and self.verbose:
             print("String '" + self.taxid + "' is not an NCBI taxon id")
             return
-
         Entrez.email = self.email
         Entrez.api_key = self.api_key
-
         if self.recurse:
             try:
                 handle = Entrez.esearch(db="nuccore", 

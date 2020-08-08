@@ -234,7 +234,7 @@ class Feature_To_Gene_And_Protein:
         for name in self.synonyms:
             if product in self.synonyms[name]:
                 if self.verbose:
-                    print("Gene {0} found: {1}, '{2}'".format(name, acc, product, acc))
+                    print("Gene {0} found: {1}, '{2}'".format(name, acc, product))
                 return name
         if self.verbose:
             print("No gene for product {0}, '{1}'".format(acc, product))
