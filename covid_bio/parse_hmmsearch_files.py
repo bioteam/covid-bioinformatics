@@ -23,14 +23,22 @@ parser.add_argument('-email', default=EMAIL, help="Email for Entrez")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
+'''
+
+'''
 
 def main():
     query = Parse_Hmmsearch(args.verbose, args.download, args.align, args.taxfilter, 
         args.chunk, args.cov_dir, args.email, args.files)
-    query.parse()
-    query.filter()
-    query.download_hits()
-    query.align_hits_to_hmm()
+    for f in query.files:
+        pids, fname = query.parse(f)
+        if pids == None:
+            continue
+        taxarray = query.get_taxid(pids)
+        lineages = query.get_lineage(taxarray)
+        filtered_pids = query.filter(lineages)
+        query.download_hits(filtered_pids, fname)
+        query.align_hits_to_hmm(fname)
 
 class Parse_Hmmsearch:
 
@@ -43,27 +51,26 @@ class Parse_Hmmsearch:
         self.cov_dir = cov_dir
         self.email = email
         self.files = files
-        # The primary keys for hits{} and fasta{} are file names, the secondary keys are the hits
-        self.hits = dict()
-        self.fasta = dict()
 
-    def parse(self):
-        for file in self.files:
-            if os.stat(file).st_size == 0:
-                continue
-            base = os.path.basename(file).split('.')[0]
-            matches = re.match(r'(\w+-\w+)_([^.]+)', base)
-            try:
-                qresult = SearchIO.read(file, 'hmmer3-tab')
-            except:
-                if self.verbose:
-                    print("No match:\t{0}\t{1}".format(matches[1], matches[2]))
-                continue
-            pids = [ hit.id for hit in qresult]
-            taxarray = self.get_taxid(pids)
-            self.hits[base] = self.get_lineage(taxarray)
+    def parse(self, file):
+        if os.stat(file).st_size == 0:
+            return
+        fname = os.path.basename(file).split('.')[0]
+        matches = re.match(r'(\w+-\w+)_([^.]+)', fname)
+        try:
+            qresult = SearchIO.read(file, 'hmmer3-tab')
+        except:
+            if self.verbose:
+                print("No match:\t{0}\t{1}".format(matches[1], matches[2]))
+            return
+        return [ hit.id for hit in qresult], fname
 
     def get_taxid(self, pids):
+        '''
+        Returns an array of tuples where tup[0] is a protein id 
+        and tup[1] is the Taxonomy id, for example:
+        [('P0DTC2.1', '2697049'), ('P59594.1', '694009')]
+        '''
         Entrez.email = self.email
         # Split the list of ids into "batches" of ids for Entrez
         num_chunks = len(pids)/int(self.chunk) + 1
@@ -79,7 +86,7 @@ class Parse_Hmmsearch:
                 handle.close()
                 # Protein id, Taxonomy id
                 for num, result in enumerate(results):
-                    taxarray.append([id_chunk[num], result["LinkSetDb"][0]["Link"][0]["Id"]])
+                    taxarray.append((id_chunk[num], result["LinkSetDb"][0]["Link"][0]["Id"]))
             except:
                 if self.verbose:
                     print("Problem getting taxids for: {}".format(id_chunk))
@@ -87,56 +94,57 @@ class Parse_Hmmsearch:
                 errorarray = errorarray + list(id_chunk)                
         return taxarray
 
-    def download_hits(self):
+    def download_hits(self, pids, fname):
         if not self.download:
             return
-        for file in self.hits:
-            pids = ','.join(self.hits[file].keys())
-            try:
-                if self.verbose:
-                    print("Downloading records: {}".format(pids))
-                handle = Entrez.efetch(
+        pids = ','.join(pids)
+        try:
+            if self.verbose:
+                print("Downloading records: {}".format(pids))
+            handle = Entrez.efetch(
                     db="protein",
                     rettype='fasta',
                     retmode="text",
                     id=pids )
-                self.fasta[file] = list(SeqIO.parse(handle, 'fasta'))
-                handle.close()
-            except (RuntimeError) as exception:
-                print("Error retrieving sequences using id '" +
-                    str(pids) + "':" + str(exception))
-        self.write()
+            records = list(SeqIO.parse(handle, 'fasta'))
+            handle.close()
+        except (RuntimeError) as exception:
+            print("Error retrieving sequences using id '" +
+                str(pids) + "':" + str(exception))
+        self.write(records, fname)
 
-    def align_hits_to_hmm(self):
+    def align_hits_to_hmm(self, fname):
         if not self.align:
             return
-        for file in self.hits:
-            fastafile = file + '-hits-no-' + self.taxfilter + '.fa' if self.taxfilter else file + '-hits.fa'
-            fastafile = os.path.join(self.cov_dir, fastafile)
-            if os.path.exists(fastafile) and os.stat(fastafile).st_size != 0:
-                gene = re.match(r'(\w+-\w+)_\w+', file)[1]
-                hmm = os.path.join(self.cov_dir, gene + '.hmm')
-                outfile = file + '-hits-no-' + self.taxfilter + '.sto' if self.taxfilter else file + '-hits.sto'
-                outfile = os.path.join(self.cov_dir, outfile)
-                if self.verbose:
-                    print("Creating alignment with hmmalign: {}".format(outfile))
-                subprocess.run(['hmmalign','--amino', '-o', outfile,
-                    hmm, fastafile, ], check=True)
+        fastafile = fname + '-hits-no-' + self.taxfilter + '.fa' if self.taxfilter else fname + '-hits.fa'
+        fastafile = os.path.join(self.cov_dir, fastafile)
+        if os.path.exists(fastafile) and os.stat(fastafile).st_size != 0:
+            gene = re.match(r'(\w+-\w+)_\w+', fname)[1]
+            hmm = os.path.join(self.cov_dir, gene + '.hmm')
+            outfile = fname + '-hits-no-' + self.taxfilter + '.sto' if self.taxfilter else fname + '-hits.sto'
+            outfile = os.path.join(self.cov_dir, outfile)
+            if self.verbose:
+                print("Creating alignment with hmmalign: {}".format(outfile))
+            subprocess.run(['hmmalign','--amino', '-o', outfile,
+                            hmm, fastafile, ], check=True)
 
-    def filter(self):
+    def filter(self, lineages):
         if self.taxfilter:
-            for file in self.hits:
-                filtered = dict()
-                for hit in self.hits[file]:
-                    if self.taxfilter not in self.hits[file][hit]:
-                        filtered[hit] = self.hits[file][hit]
-                self.hits[file] = filtered
-        if self.verbose:
-            for file in self.hits:
-                for hit in self.hits[file]:
-                    print("Lineage is: {}".format(self.hits[file][hit]))
+            filtered = [ pid for pid in lineages.keys() if self.taxfilter not in lineages[pid] ]
+            if self.verbose:
+                print("Filtered lineages: {}".format(filtered))
+            return filtered
+        else:
+            return lineages
 
     def get_lineage(self, taxarray):
+        '''
+        Returns a dict where the key is a Protein id and the value is a lineage,
+        for example:
+        {'P0DTC2.1': 'Viruses; Riboviria; Orthornavirae; Pisuviricota; Pisoniviricetes; \
+        Nidovirales; Cornidovirineae; Coronaviridae; Orthocoronavirinae; Betacoronavirus; \
+        Sarbecovirus; Severe acute respiratory syndrome-related coronavirus'}
+        '''
         Entrez.email = self.email
         taxids = [ elem[1] for elem in taxarray ]
         if self.verbose:
@@ -152,13 +160,12 @@ class Parse_Hmmsearch:
             print("Retrieved from 'taxonomy': {}".format(taxdict))
         return taxdict
 
-    def write(self):
-        for file in self.fasta:
-            seqfile = file + '-hits-no-' + self.taxfilter + '.fa' if self.taxfilter else file + '-hits.fa'
-            seqfile = os.path.join(self.cov_dir, seqfile)
-            if self.verbose:
-                print("Writing {}".format(seqfile))
-            SeqIO.write(self.fasta[file], seqfile, 'fasta')
+    def write(self, records, fname):
+        seqfile = fname + '-hits-no-' + self.taxfilter + '.fa' if self.taxfilter else fname + '-hits.fa'
+        seqfile = os.path.join(self.cov_dir, seqfile)
+        if self.verbose:
+            print("Writing {}".format(seqfile))
+        SeqIO.write(records, seqfile, 'fasta')
 
 if __name__ == "__main__":
     main()
