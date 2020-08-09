@@ -34,7 +34,7 @@ def main():
         args.lexfilter, args.chunk, args.cov_dir, args.email, args.api_key, args.files)
     for f in query.files:
         pids, fname = query.parse(f)
-        if pids == []:
+        if pids == None or pids == []:
             continue
         taxarray = query.get_taxid(pids)
         lineages = query.get_lineage(taxarray)
@@ -63,16 +63,16 @@ class Parse_Hmmsearch:
         Parse hmmsearch output and filter by arbitrary search string 
         if one is specified by -lexfilter.
         '''
-        if os.stat(file).st_size == 0:
-            return []
         fname = os.path.basename(file).split('.')[0]
+        if os.stat(file).st_size == 0:
+            return None, fname
         matches = re.match(r'(\w+-\w+)_([^.]+)', fname)
         try:
             qresult = SearchIO.read(file, 'hmmer3-tab')
         except:
             if self.verbose:
                 print("No match:\t{0}\t{1}".format(matches[1], matches[2]))
-            return
+            return None, fname
         if self.lexfilter:
             patt = re.compile(self.lexfilter, re.IGNORECASE)
             return [ hit.id for hit in qresult if not re.search(patt, hit.description)], fname
