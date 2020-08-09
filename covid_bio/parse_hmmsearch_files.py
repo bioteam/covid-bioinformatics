@@ -34,7 +34,7 @@ def main():
         args.lexfilter, args.chunk, args.cov_dir, args.email, args.api_key, args.files)
     for f in query.files:
         pids, fname = query.parse(f)
-        if pids == None or pids == []:
+        if pids == []:
             continue
         taxarray = query.get_taxid(pids)
         lineages = query.get_lineage(taxarray)
@@ -64,7 +64,7 @@ class Parse_Hmmsearch:
         if one is specified by -lexfilter.
         '''
         if os.stat(file).st_size == 0:
-            return
+            return []
         fname = os.path.basename(file).split('.')[0]
         matches = re.match(r'(\w+-\w+)_([^.]+)', fname)
         try:
