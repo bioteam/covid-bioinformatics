@@ -32,7 +32,7 @@ do
     if [ ! -f $out ]
     then
         cmd="hmmscan -o $out $db $seq"
-	    echo Command is '$cmd'
+	    echo Command is $cmd
         $cmd
     fi
 done
