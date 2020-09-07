@@ -259,6 +259,7 @@ ORF10:
   - putative ORF10
 NS1:
   - leader protein
+  - nsp1 protein
   - non-structural protein NS1
   - nonstructural protein NS1
   - NS1
@@ -283,6 +284,7 @@ NS2:
   - NS2 protein
   - NSP2
   - nsp2
+  - nsp2 protein
   - Nsp2
   - nsp2-pp1a/pp1ab
   - putative NSP2
@@ -298,6 +300,7 @@ NS3:
   - NS3_protein
   - NSP3
   - nsp3
+  - nsp3 protein
   - Nsp3
   - nsp3-pp1a/pp1ab
   - putative NSP3
@@ -312,6 +315,7 @@ NS4:
   - NS4
   - NSP4
   - nsp4
+  - nsp4 protein
   - putative nsp4
   - Nsp4
   - NS4_protein
@@ -339,6 +343,7 @@ NS5:
   - NS5 protein
   - NSP5
   - nsp5
+  - nsp5 protein
   - Nsp5
   - putative nsp5 3CL-PRO
   - putative NSP5
@@ -362,6 +367,7 @@ NS6:
   - NS6 protein
   - NSP6
   - nsp6
+  - nsp6 protein
   - Nsp6
   - nsp6-pp1a/pp1ab
   - nsp6-pp1a/pp1ab (TM3)
@@ -378,6 +384,7 @@ NS7:
   - NS7 protein
   - NSP7
   - nsp7
+  - nsp7 protein
   - Nsp7
   - nsp7-pp1a/pp1ab
   - putative NSP7
@@ -392,6 +399,7 @@ NS8:
   - NS8_protein
   - NSP8
   - nsp8
+  - nsp8 protein
   - Nsp8
   - NSP8 protein
   - nsp8-pp1a/pp1ab
@@ -409,6 +417,7 @@ NS9:
   - NS9_protein
   - NSP9
   - nsp9
+  - nsp9 protein
   - Nsp9
   - nsp9-pp1a/pp1ab
   - putative NSP9
@@ -429,6 +438,7 @@ NS10:
   - NS10 protein
   - NSP10
   - nsp10
+  - nsp10 protein
   - Nsp10
   - nsp10-pp1a/pp1ab
   - putative NSP10
@@ -445,6 +455,7 @@ NS11:
   - NS11 protein
   - NSP11
   - nsp11
+  - nsp11 protein
   - Nsp11
   - putative NSP11
   - putative nsp11
@@ -460,6 +471,7 @@ NS12:
   - NS12 protein
   - NSP12
   - nsp12
+  - nsp12 protein
   - Nsp12
   - nsp12-pp1ab
   - nsp12-pp1ab (RdRp)
@@ -480,6 +492,7 @@ NS13:
   - NS13 protein
   - NSP13
   - nsp13
+  - nsp13 protein
   - Nsp13
   - nsp13-pp1ab
   - nsp13-pp1ab (ZD, NTPase/HEL; RNA 5'-triphosphatase)
@@ -500,6 +513,7 @@ NS14:
   - NS14 protein
   - NSP14
   - nsp14
+  - nsp14 protein
   - Nsp14
   - nsp14-pp1ab
   - nsp14-pp1ab (nuclease ExoN homolog)
@@ -517,6 +531,7 @@ NS15:
   - NS15 protein
   - NSP15
   - nsp15
+  - nsp15 protein
   - Nsp15
   - nsp15-pp1ab
   - putative NSP15
@@ -537,6 +552,7 @@ NS16:
   - NS16 protein
   - NSP16
   - nsp16
+  - nsp16 protein
   - Nsp16
   - nsp16-pp1ab
   - putative NSP16
