@@ -247,7 +247,7 @@ class Feature_To_Gene_And_Protein:
         return None
 
     def get_host(self):
-        for acc in self.accs.keys():
+        for acc in list(self.accs):
             if 'host' in self.accs[acc]['source'].qualifiers.keys():
                 self.accs[acc]['host'] = self.accs[acc]['source'].qualifiers['host'][0]
             elif 'isolation_source' in self.accs[acc]['source'].qualifiers.keys():
@@ -256,7 +256,7 @@ class Feature_To_Gene_And_Protein:
                 self.accs[acc]['host'] = 'unknown'
             # Filter by host if specified
             if self.host_filter:
-                if self.host_filter == self.accs[acc]['host']:
+                if self.host_filter not in self.accs[acc]['host']:
                     self.accs.pop(acc)
 
     def get_date(self):
