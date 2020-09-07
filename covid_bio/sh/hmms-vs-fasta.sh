@@ -4,7 +4,7 @@
 
 fasta=FALSE
 hmms=FALSE
-evalue=FALSE
+evalue=FAwLSE
 UNDERSCORE='_'
 
 while getopts ":h:f:e:" opt

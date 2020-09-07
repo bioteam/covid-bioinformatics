@@ -19,6 +19,7 @@ parser.add_argument('-analyze', default=False, action='store_true', help="Parse 
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
 parser.add_argument('-json', default=False, action='store_true', help="Create JSON for Gen3")
 parser.add_argument('-cov_dir', default=COV_DIR, help="Destination directory")
+parser.add_argument('-host_filter', help="Host name to filter")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
@@ -37,6 +38,7 @@ Number of features: 23
 /sequence_version=2
 /keywords=['']
 /source=Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2)
+/host=Homo sapiens
 /organism=Severe acute respiratory syndrome coronavirus 2
 /taxonomy=['Viruses', 'Riboviria', 'Nidovirales', 'Cornidovirineae', 'Coronaviridae', 'Orthocoronavirinae', 
     'Betacoronavirus', 'Sarbecovirus']
@@ -61,7 +63,7 @@ qualifiers:
 
 def main():
     extractor = Feature_To_Gene_And_Protein(args.format, args.split, args.analyze, 
-        args.verbose, args.json, args.cov_dir, args.files)
+        args.verbose, args.json, args.cov_dir, args.host_filter, args.files)
     extractor.read()
     extractor.standardize()
     extractor.create_objects()
@@ -72,7 +74,7 @@ def main():
 class Feature_To_Gene_And_Protein:
     from make_json import make_sequence_json
 
-    def __init__(self, seq_format, split, analyze, verbose, json, cov_dir, files):
+    def __init__(self, seq_format, split, analyze, verbose, json, cov_dir, host_filter, files):
         self.seq_format = seq_format
         self.split = split
         # Do not write to any files
@@ -80,6 +82,7 @@ class Feature_To_Gene_And_Protein:
         self.verbose = verbose
         self.make_json = json
         self.cov_dir = cov_dir
+        self.host_filter = host_filter
         self.files = files
         # Initial collection of all features keyed by accession
         self.accs = dict()
@@ -251,6 +254,10 @@ class Feature_To_Gene_And_Protein:
                 self.accs[acc]['host'] = self.accs[acc]['source'].qualifiers['isolation_source'][0]
             else:
                 self.accs[acc]['host'] = 'unknown'
+            # Filter by host if specified
+            if self.host_filter:
+                if self.host_filter == self.accs[acc]['host']:
+                    self.accs.pop(acc)
 
     def get_date(self):
         for acc in self.accs.keys():

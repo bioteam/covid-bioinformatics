@@ -91,6 +91,10 @@ class Annotate_With_Hmms:
         self.beds[gb.id]['genes'].append(trackline)
         for protein in self.cov_proteins:
             hit = self.run_hmmsearch(gb.id, protein)
+            if hit == None:
+                continue
+            if self.verbose:
+                print("Protein: {0}\tScore: {1}".format(protein, hit.bitscore))
             # Create feature line with thicker line for any ATG
             thickStart = str(hit.hit_start - 1) if 'ORF' in protein or protein in 'EMNS' else ''
             thickEnd = str(hit.hit_start + 2) if 'ORF' in protein or protein in 'EMNS' else ''
@@ -147,6 +151,12 @@ class Annotate_With_Hmms:
         self.gene_strs[gb.id] = dict()
         # Get gene nucleotide and protein sequences
         for protein in self.cov_proteins:
+            # Only want ORF1ab
+            if protein == 'ORF1a':
+                continue
+            # Not all nt HMMs may match
+            if protein not in self.gene_positions[gb.id].keys():
+                continue
             ntstr = str(gb.seq)[self.gene_positions[gb.id][protein][0]:self.gene_positions[gb.id][protein][1]]
             aastr = self.translate_orf(ntstr, protein, gb)
             if self.verbose:
@@ -248,6 +258,7 @@ class Annotate_With_Hmms:
             print("Error: {}".format(exception))
             sys.exit("Error running hmmsearch using {}".format(hmm))
         bestscore = 0
+        besthit = None
         # Get HSP with highest score
         for qresult in SearchIO.parse(out.name, 'hmmer3-text'):
             for hit in qresult:
