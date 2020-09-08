@@ -247,6 +247,7 @@ class Feature_To_Gene_And_Protein:
         return None
 
     def get_host(self):
+        # Iterate over list since we may be deleting keys
         for acc in list(self.accs):
             if 'host' in self.accs[acc]['source'].qualifiers.keys():
                 self.accs[acc]['host'] = self.accs[acc]['source'].qualifiers['host'][0]
