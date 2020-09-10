@@ -35,6 +35,8 @@ do
         echo HMM "$hmm" not found
         exit
     fi
+
+    
     base=$( echo $hmm | cut -d '.' -f 1 )
     out=${base}${UNDERSCORE}${fasta}.tblout
     if [ ! -f $out ]
@@ -50,6 +52,6 @@ do
         $cmd
         echo Output is $out
     else
-	echo File $out exists
+	    echo File $out exists
     fi
 done
