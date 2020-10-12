@@ -5,7 +5,7 @@ sequence collections, alignments, and Hidden Markov Models (HMMs). The HMMs can 
 sequences and create BED files for genome visualization.
 
 
-# typical usage
+# example usage
 * `./download_gb_by_taxid.py`
 * `./feature_to_gene_and_protein.py *.gb`
 * `./seqs_to_aligns_and_hmms.py *.fa`
@@ -29,7 +29,7 @@ sequences that do not match expected lengths are not included in sequence files,
 
 # recommended for best performance
 * Get an [NCBI API key](https://ncbiinsights.ncbi.nlm.nih.gov/2017/11/02/new-api-keys-for-the-e-utilities/)
-* Pass the key as a command-line argument or configure as an `env` variable (`export NCBI_API_KEY=8cc3fffffff2b4444492e68a8167aaaa08`)
+* Pass the key as a command-line argument or configure as an `env` variable (e.g. `export NCBI_API_KEY=8cc3fffffff2b4444492e68a8167aaaa08`)
 
 
 # file formats created
