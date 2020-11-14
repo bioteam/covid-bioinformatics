@@ -10,7 +10,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
 parser.add_argument('-matrix', default=False, action='store_true', help="Make matrix for ChemProp")
 parser.add_argument('-output', default='uniprot_sprot.mat', help="Output matrix file")
-parser.add_argument('-delimiter', default=',', help="Field delimiter)
+parser.add_argument('-delimiter', default=',', help="Field delimiter")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
@@ -102,6 +102,7 @@ class Fast_Uniprot_Parser:
         self.verbose = verbose
         self.matrix = matrix
         self.output = output
+        self.delimiter = delimiter
         self.files = files
         self.data = dict()
 
