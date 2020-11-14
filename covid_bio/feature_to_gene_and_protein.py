@@ -10,8 +10,8 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import IUPAC
 from vars import COV_DIR
-from utils import read_synonyms
-from utils import read_variants
+from utilities import read_synonyms()
+from utilities import read_variants()
 
 
 parser = argparse.ArgumentParser()
@@ -75,7 +75,7 @@ def main():
 
 
 class Feature_To_Gene_And_Protein:
-    from utils import make_sequence_json
+    from utilities import make_sequence_json
 
     def __init__(self, seq_format, split, analyze, verbose, json, cov_dir, host_filter, files):
         self.seq_format = seq_format
@@ -300,7 +300,7 @@ class Feature_To_Gene_And_Protein:
                 self.feats[name][feat.id]['aa'] = aa
 
                 if self.make_json:
-                    from utils import make_sequence_json
+                    from utilities import make_sequence_json
                     self.json[name][feat.id] = dict()
                     self.json[name][feat.id]['aa'] = make_sequence_json(aa, 'aa')
                     self.json[name][feat.id]['nt'] = make_sequence_json(nt, 'nt')
@@ -326,7 +326,7 @@ class Feature_To_Gene_And_Protein:
                 self.feats[name][feat.id]['aa'] = aa
 
                 if self.make_json:
-                    from utils import make_sequence_json
+                    from utilities import make_sequence_json
                     self.json[name][feat.id] = dict()
                     self.json[name][feat.id]['aa'] = make_sequence_json(aa, 'aa')
                     self.json[name][feat.id]['nt'] = make_sequence_json(nt, 'nt')

@@ -9,7 +9,7 @@ import yaml
 from Bio import Entrez
 from Bio import SeqIO
 from vars import COV_DIR, EMAIL
-from utils import read_strains
+from utilities import read_strains
 
 # NCBI Taxonomy ids:
 # 333387: single record for testing
@@ -157,7 +157,7 @@ class DownloadGbByTaxid:
                     print("Writing {}".format(seqfile))
                 SeqIO.write(record, seqfile, self.format)
                 if self.json:
-                    from utils import make_genome_json
+                    from utilities import make_genome_json
                     genome_json = make_genome_json(record.name)
                     with open(record.name + '.json', 'w') as out:
                         out.write(genome_json)
