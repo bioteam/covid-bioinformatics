@@ -10,8 +10,8 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import IUPAC
 from vars import COV_DIR
-from utilities import read_synonyms()
-from utilities import read_variants()
+from utilities import read_synonyms
+from utilities import read_variants
 
 
 parser = argparse.ArgumentParser()
