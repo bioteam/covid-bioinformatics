@@ -99,7 +99,7 @@ class Feature_To_Gene_And_Protein:
         self.variants = self.read_variants()
 
     def read_synonyms(self):
-        y = os.path.dirname(os.path.abspath(__file__)) + '/cov_dictionary.yaml'
+        y = os.path.dirname(os.path.abspath(__file__)) + '/cov_features.yaml'
         with open(y) as file:
             synonyms = yaml.load(file, Loader=yaml.FullLoader)
         return synonyms

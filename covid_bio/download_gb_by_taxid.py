@@ -5,6 +5,7 @@ import sys
 import os
 import re
 import numpy
+import yaml
 from Bio import Entrez
 from Bio import SeqIO
 from vars import COV_DIR, EMAIL
@@ -15,7 +16,7 @@ from vars import COV_DIR, EMAIL
 # 694009 (parent of 2697049): Severe acute respiratory syndrome-related coronavirus
 # https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=694009
 parser = argparse.ArgumentParser()
-parser.add_argument('-t, -taxid', default=11118, dest='taxid', help="Taxonomy id")
+parser.add_argument('-t, -strain', default='COV2', dest='strain', help="Taxonomy id")
 parser.add_argument('-r', default=True, dest='recurse', help="Recursive retrieval of child tax IDs", type=bool)
 parser.add_argument('-f', default='gb', dest='format', help="Input and output format")
 parser.add_argument('-e', default=EMAIL, dest='email', help="Email for Entrez")
@@ -33,7 +34,7 @@ parser.add_argument('-cov_dir', default=COV_DIR, help="Destination directory")
 args = parser.parse_args()
 
 def main():
-    entrez = DownloadGbByTaxid(args.email, args.taxid, args.format, args.min_len, args.max_len,
+    entrez = DownloadGbByTaxid(args.email, args.strain, args.format, args.min_len, args.max_len,
                                 args.split, args.recurse, args.verbose, args.retmax,
                                 args.chunk, args.api_key, args.json, args.fetch, args.cov_dir)
     entrez.search()
@@ -44,10 +45,10 @@ def main():
 
 class DownloadGbByTaxid:
 
-    def __init__(self, email, taxid, format, min_len, max_len, split, recurse, verbose, retmax,
+    def __init__(self, email, strain, format, min_len, max_len, split, recurse, verbose, retmax,
                  chunk, api_key, json, fetch, cov_dir):
         self.email = email
-        self.taxid = taxid
+        self.strain = strain
         self.format = format
         self.min_len = min_len
         self.max_len = max_len
@@ -64,6 +65,13 @@ class DownloadGbByTaxid:
         self.records = []
         if not self.api_key and 'NCBI_API_KEY' in os.environ.keys():
             self.api_key = os.environ['NCBI_API_KEY']
+        self.read_strains()
+
+    def read_strains(self):
+        y = os.path.dirname(os.path.abspath(__file__)) + '/cov_strains.yaml'
+        with open(y) as file:
+            synonyms = yaml.load(file, Loader=yaml.FullLoader)
+        self.taxid = synonyms['taxid']
 
     def search(self):
         nummatch = re.match(r'^\d+$', str(self.taxid))

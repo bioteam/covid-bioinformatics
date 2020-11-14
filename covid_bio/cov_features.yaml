@@ -1,0 +1,622 @@
+---
+SKIP:
+  - hypothetical protein
+  - putative protein
+  - unknown
+  - structural protein
+S:
+  - peplomer protein
+  - putative S protein
+  - putative spike glycoprotein
+  - putative spike glycoprotein S
+  - S
+  - S protein
+  - S_protein
+  - spike
+  - spike glycoprotein
+  - spike glycoprotein precursor
+  - spike glycoprotein S
+  - spike protein
+  - spike protein S
+  - surface glycoprotein
+  - surface_glycoprotein
+  - Protein S
+  - protein S
+E:
+  - E
+  - E protein
+  - E_protein
+  - E2
+  - small membrane protein
+  - envelope protein E
+  - envelope_protein
+  - envelope protein
+  - putative small envelope protein
+  - putative envelope protein E
+  - small envelope E protein
+  - small envelope protein
+  - putative E2 glycoprotein precursor
+  - Protein E
+  - protein E
+M:
+  - M
+  - M protein
+  - M_protein
+  - membrance glycoprotein
+  - membrane glycoprotein
+  - membrane glycoprotein M
+  - membrane protein
+  - membrane protein M
+  - membrane_glycoprotein
+  - putative M protein
+  - putative membrane protein M
+  - putative protein M
+  - small membrane protein
+  - Protein M
+  - protein M
+N:
+  - N
+  - N phosphoprotein
+  - N protein
+  - N_protein
+  - NP
+  - nucleocapsid
+  - nucleocapsid phosphoprotein
+  - nucleocapsid protein
+  - nucleocapsid protein N
+  - nucleocapsid_phosphoprotein
+  - nucleoprotein
+  - putative N protein
+  - putative nucleocapsid protein
+  - putative nucleocapsid protein N
+  - Protein M
+  - protein M
+ORF1a:
+  - hypothetical protein orf1a
+  - hypothetical protein ORF1a
+  - non-structural polyprotein 1a
+  - non-structural polyprotein pp1a
+  - nonstructural polyprotein 1a
+  - nonstructural polyprotein pp1a
+  - ORF1a
+  - Orf1a
+  - orf1a
+  - Orf1a polyprotein
+  - ORF1a polyprotein
+  - orf1a polyprotein
+  - orf1a polyprotein (pp1a)
+  - orf1a protein
+  - ORF1a protein
+  - ORF1a_polyprotein
+  - ORF1a_protein
+  - polymerase 1a
+  - polyprotein 1a
+  - polyprotein orf1a
+  - Pp1a
+  - putative ORF1a
+  - putative orf1a polyprotein
+  - putative polyprotein orf1a
+  - replicase polyprotein 1a
+ORF1ab:
+  - hypothetical protein orf1ab
+  - hypothetical protein ORF1ab
+  - hypothetical protein ORF1ab_polyprotein
+  - non-structural polyprotein 1ab
+  - non-structural polyprotein pp1ab
+  - nonstructural polyprotein 1ab
+  - nonstructural polyprotein pp1ab
+  - ORF1ab
+  - orf1ab
+  - ORF1ab polyprotein
+  - ORF1ab polyprotein
+  - orf1ab polyprotein
+  - orf1ab polyprotein (pp1ab)
+  - ORF1ab protein
+  - ORF1ab_polyprotein
+  - ORF1ab_protein
+  - polyprotein 1ab
+  - polyprotein orf1ab
+  - Pp1ab
+  - putative orf1ab polyprotein
+  - putative ORF1ab polyprotein
+  - putative polyprotein orf1ab
+  - replicase 1AB
+  - replicase 1ab
+  - replicase 1AB polyprotein
+  - replicase p1AB
+  - replicase polyprotein 1ab
+ORF3a:
+  - ORF3a
+  - 3a
+  - 3a protein
+  - hypothetical protein orf3a
+  - hypothetical protein ORF3a
+  - hypothetical protein Orf3a
+  - Orf3a
+  - orf3a
+  - orf3a protein
+  - ORF3a protein
+  - ORF3a_protein
+  - putative ORF3a
+  - sars3a
+  - hypothetical protein orf3
+  - hypothetical protein Orf3
+  - hypothetical protein ORF3
+  - ORF3
+  - Orf3
+  - orf3
+  - orf3 protein
+  - ORF3 protein
+  - ORF3_protein
+  - putative ORF3
+ORF3b:
+  - 3b
+  - 3b protein
+  - hypothetical protein orf3b
+  - hypothetical protein Orf3b
+  - hypothetical protein ORF3b
+  - ORF3b
+  - Orf3b
+  - orf3b
+  - orf3b protein
+  - ORF3b protein
+  - ORF3b_protein
+  - putative ORF3b
+  - sars3b
+ORF6:
+  - hypothetical protein orf6
+  - hypothetical protein Orf6
+  - hypothetical protein ORF6
+  - ORF6
+  - Orf6
+  - orf6
+  - orf6 protein
+  - ORF6 protein
+  - ORF6_protein
+  - putative ORF6
+  - sars6
+ORF7:
+  - hypothetical protein orf7
+  - hypothetical protein Orf7
+  - hypothetical protein ORF7
+  - ORF7
+  - Orf7
+  - orf7
+  - orf7 protein
+  - ORF7 protein
+  - ORF7_protein
+  - putative ORF7
+  - sars7
+ORF7a:
+  - hypothetical protein orf7a
+  - hypothetical protein ORF7a
+  - hypothetical protein Orf7a
+  - ORF7a
+  - Orf7a
+  - orf7a
+  - orf7a protein
+  - ORF7a protein
+  - ORF7a_protein
+  - putative ORF7a
+  - sars7a
+ORF7b:
+  - hypothetical protein orf7b
+  - hypothetical protein ORF7b
+  - hypothetical protein Orf7b
+  - ORF7b
+  - Orf7b
+  - orf7b
+  - orf7b protein
+  - ORF7b protein
+  - ORF7b_protein
+  - putative ORF7b
+  - sars7b
+ORF8:
+  - hypothetical protein orf8
+  - hypothetical protein ORF8
+  - hypothetical protein Orf8
+  - ORF8
+  - Orf8
+  - orf8
+  - orf8 protein
+  - ORF8 protein
+  - ORF8_protein
+  - putative ORF8
+ORF9b:
+  - hypothetical protein orf9b
+  - hypothetical protein ORF9b
+  - hypothetical protein Orf9b
+  - ORF9b
+  - Orf9b
+  - orf9b
+  - orf9b protein
+  - Orf9b protein
+  - putative ORF9b
+ORF10:
+  - hypothetical protein orf10
+  - hypothetical protein ORF10
+  - hypothetical protein Orf10
+  - ORF10
+  - Orf10
+  - orf10
+  - ORF10 proteiin
+  - orf10 protein
+  - ORF10 protein
+  - ORF10_protein
+  - ORF10'
+  - putative Orf10
+  - putative ORF10
+NS1:
+  - leader protein
+  - non-structural protein NS1
+  - nonstructural protein NS1
+  - NS1
+  - NS1 protein
+  - NS1_protein
+  - NSP1
+  - nsp1
+  - Nsp1
+  - nsp1-pp1a/pp1ab
+  - p28
+  - putative leader protein
+  - putative NSP1
+  - putative nsp1
+  - putative Nsp1
+  - nsp1 protein
+NS2:
+  - accessory protein 2
+  - counterpart of MHV p65
+  - non-structural protein 2
+  - nonstructural protein NS2
+  - NS2
+  - NS2_protein
+  - NS2 protein
+  - NSP2
+  - nsp2
+  - Nsp2
+  - nsp2-pp1a/pp1ab
+  - putative NSP2
+  - putative nsp2
+  - putative Nsp2
+  - nsp2 protein
+NS3:
+  - accessory protein 3
+  - non-structural protein 3
+  - nonstructural protein 3
+  - nonstructural protein NS3
+  - NS3
+  - NS3 protein
+  - NS3_protein
+  - NSP3
+  - nsp3
+  - Nsp3
+  - nsp3-pp1a/pp1ab
+  - putative NSP3
+  - putative nsp3
+  - putative Nsp3
+  - putative nsp3 (HD2)
+  - nsp3 protein
+NS3a:
+  - accessory protein 3a
+  - non-structural protein 3a
+  - nonstructural protein 3a
+  - nonstructural protein NS3a
+  - NS3a
+  - NS3a_protein
+  - NS3a protein
+  - NSP3a
+  - nsp3a protein
+NS3b:
+  - accessory protein 3b
+  - non-structural protein 3b
+  - nonstructural protein 3b
+  - nonstructural protein NS3b
+  - NS3b
+  - NS3b_protein
+  - NS3b protein
+  - NSP3b
+  - nsp3b protein
+NS4:
+  - accessory protein 4
+  - non-structural protein 4
+  - nonstructural protein 4
+  - nonstructural protein NS4
+  - NS4
+  - NSP4
+  - nsp4
+  - putative nsp4
+  - Nsp4
+  - NS4_protein
+  - NSP4 protein
+  - nsp4-pp1a/pp1ab
+  - putative NSP4
+  - putative Nsp4
+  - nsp4 protein
+NS5:
+  - 3C-like proteinase
+  - 3CL-PRO
+  - 3CLPRO
+  - 3CLpro
+  - 3cLpro
+  - 3C-like protease
+  - coronavirus 3C-like protease
+  - accessory protein 5
+  - main proteinase
+  - main proteinase (Mpro)
+  - Mpro
+  - non-structural protein 5
+  - nonstructural protein 5
+  - nonstructural protein NS5
+  - NS5
+  - NS5_protein
+  - NS5 protein
+  - NSP5
+  - nsp5
+  - Nsp5
+  - putative nsp5 3CL-PRO
+  - putative NSP5
+  - putative nsp5
+  - putative Nsp5
+  - SARS 3C-like protease
+  - SARS coronavirus 3CL protease
+  - SARS coronavirus main peptidase
+  - SARS coronavirus main protease
+  - SARS-CoV 3CLpro enzyme
+  - SARS-CoV main protease
+  - SARS-CoV Mpro
+  - severe acute respiratory syndrome coronavirus main protease
+  - nsp5 protein
+NS6:
+  - accessory protein 6
+  - non-structural protein 6
+  - nonstructural protein 6
+  - nonstructural protein NS6
+  - NS6
+  - NS6_protein
+  - NS6 protein
+  - NSP6
+  - nsp6
+  - Nsp6
+  - nsp6-pp1a/pp1ab
+  - nsp6-pp1a/pp1ab (TM3)
+  - putative NSP6
+  - putative nsp6
+  - putative Nsp6
+  - nsp6 protein
+NS7:
+  - accessory protein 7
+  - non-structural protein 7
+  - nonstructural protein 7
+  - nonstructural protein NS7
+  - NS7
+  - NS7_protein
+  - NS7 protein
+  - NSP7
+  - nsp7
+  - Nsp7
+  - nsp7-pp1a/pp1ab
+  - putative NSP7
+  - putative nsp7
+  - putative Nsp7
+  - nsp7 protein
+NS7a:
+  - accessory protein 7a
+  - non-structural protein 7a
+  - nonstructural protein 7a
+  - nonstructural protein NS7a
+  - NS7a
+  - NS7a protein
+  - NS7a_protein
+  - NSP7a
+  - nsp7a protein
+NS7b:
+  - accessory protein 7b
+  - non-structural protein 7b
+  - nonstructural protein 7b
+  - nonstructural protein NS7b
+  - NS7b
+  - NS7b protein
+  - NS7b_protein
+  - NSP7b
+  - nsp7b protein
+NS8:
+  - accessory protein 8
+  - non-structural protein 8
+  - nonstructural protein 8
+  - nonstructural protein NS8
+  - NS8
+  - NS8_protein
+  - NSP8
+  - nsp8
+  - Nsp8
+  - NSP8 protein
+  - nsp8-pp1a/pp1ab
+  - putative NSP8
+  - putative nsp8
+  - putative Nsp8
+  - sars8
+  - nsp8 protein
+NS8a:
+  - accessory protein 8a
+  - non-structural protein 8a
+  - nonstructural protein 8a
+  - nonstructural protein NS8a
+  - NS8a
+  - NS8a protein
+  - NS8a_protein
+  - NSP8a
+  - sars8a
+  - nsp8a protein
+NS8b:
+  - accessory protein 8b
+  - non-structural protein 8b
+  - nonstructural protein 8b
+  - nonstructural protein NS8b
+  - NS8b
+  - NS8b protein
+  - NS8b_protein
+  - NSP8b
+  - sars8b
+  - nsp8b protein
+NS9:
+  - accessory protein 9
+  - non-structural protein 9
+  - nonstructural protein 9
+  - nonstructural protein NS9
+  - NS9
+  - NS9 protein
+  - NS9_protein
+  - NSP9
+  - nsp9
+  - Nsp9
+  - nsp9-pp1a/pp1ab
+  - putative NSP9
+  - putative nsp9
+  - putative Nsp9
+  - putative nsp9 (RdRp)
+  - ssRNA-binding protein
+  - nsp9 protein
+NS9b:
+  - accessory protein 9b
+  - non-structural protein 9b
+  - nonstructural protein 9b
+  - nonstructural protein NS9b
+  - NS9b
+  - NS9b_protein
+  - NS9b protein
+  - NSP9b
+  - sars9b
+  - nsp9b protein
+NS10:
+  - accessory protein 10
+  - formerly known as growth-factor-like protein (GFL)
+  - GFL
+  - growth-factor-like protein
+  - non-structural protein 10
+  - nonstructural protein 10
+  - nonstructural protein NS10
+  - NS10
+  - NS10_protein
+  - NS10 protein
+  - NSP10
+  - nsp10
+  - Nsp10
+  - nsp10-pp1a/pp1ab
+  - putative NSP10
+  - putative nsp10
+  - putative Nsp10
+  - putative nsp10 (MB, NTPase/HEL)
+  - nsp10 protein
+NS11:
+  - accessory protein 11
+  - non-structural protein 11
+  - nonstructural protein 11
+  - nonstructural protein NS11
+  - NS11
+  - NS11_protein
+  - NS11 protein
+  - NSP11
+  - nsp11
+  - Nsp11
+  - putative NSP11
+  - putative nsp11
+  - putative Nsp11
+  - nsp11 protein
+NS12:
+  - accessory protein 12
+  - non-structural protein 12
+  - nonstructural protein 12
+  - nonstructural protein NS12
+  - NS12
+  - NS12_protein
+  - NS12 protein
+  - NSP12
+  - nsp12
+  - Nsp12
+  - nsp12-pp1ab
+  - nsp12-pp1ab (RdRp)
+  - putative NSP12
+  - putative nsp12
+  - putative Nsp12
+  - putative RNA polymerase
+  - RdRp
+  - RNA-dependent RNA polymerase
+  - nsp12 protein
+NS13:
+  - accessory protein 13
+  - helicase
+  - non-structural protein 13
+  - nonstructural protein 13
+  - nonstructural protein NS13
+  - NS13
+  - NS13_protein
+  - NS13 protein
+  - NSP13
+  - nsp13
+  - Nsp13
+  - nsp13-pp1ab
+  - nsp13-pp1ab (ZD, NTPase/HEL; RNA 5'-triphosphatase)
+  - NTPase/helicase
+  - putative helicase
+  - putative NSP13
+  - putative nsp13
+  - putative Nsp13
+  - RNA 5'-triphosphatase
+  - nsp13 protein
+NS14:
+  - 3'-to-5' exonuclease
+  - accessory protein 14
+  - non-structural protein 14
+  - nonstructural protein 14
+  - nonstructural protein NS14
+  - NS14
+  - NS14_protein
+  - NS14 protein
+  - NSP14
+  - nsp14
+  - Nsp14
+  - nsp14-pp1ab
+  - nsp14-pp1ab (nuclease ExoN homolog)
+  - putative NSP14
+  - putative nsp14
+  - putative Nsp14
+  - nsp14 protein
+NS15:
+  - accessory protein 15
+  - endoRNAse
+  - non-structural protein 15
+  - nonstructural protein 15
+  - nonstructural protein NS15
+  - NS15
+  - NS15_protein
+  - NS15 protein
+  - NSP15
+  - nsp15
+  - Nsp15
+  - nsp15-pp1ab
+  - putative NSP15
+  - putative nsp15
+  - putative Nsp15
+  - uridylate-specific endoribonuclease
+  - uridylate-specific endoribonuclease NendoU
+  - nsp15 protein
+NS16:
+  - 2'-o-MT
+  - 2'-O-ribose methyltransferase
+  - 2'-O-ribose methyltransferase (2'-o-MT)
+  - accessory protein 16
+  - non-structural protein 16
+  - nonstructural protein 16
+  - nonstructural protein NS16
+  - NS16
+  - NS16_protein
+  - NS16 protein
+  - NSP16
+  - nsp16
+  - Nsp16
+  - nsp16-pp1ab
+  - putative NSP16
+  - putative nsp16
+  - putative Nsp16
+  - nsp16 protein
+
