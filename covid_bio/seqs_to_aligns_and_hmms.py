@@ -169,11 +169,11 @@ class Seqs_To_Aligns_And_Hmms:
     def write_json(self, name):
         if not self.make_json:
             return
-        from make_json import make_hmm_json
+        from utils import make_hmm_json
         json = make_hmm_json(name)
         with open(os.path.join(self.cov_dir, name + '-hmm.json'), 'w') as out:
             out.write(json)
-        from make_json import make_alignment_json
+        from utils import make_alignment_json
         json = make_alignment_json(name, self.aligner)
         with open(os.path.join(self.cov_dir, name + '-aln.json'), 'w') as out:
             out.write(json)

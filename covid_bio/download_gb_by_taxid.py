@@ -9,6 +9,7 @@ import yaml
 from Bio import Entrez
 from Bio import SeqIO
 from vars import COV_DIR, EMAIL
+from utils import read_strains
 
 # NCBI Taxonomy ids:
 # 333387: single record for testing
@@ -65,13 +66,9 @@ class DownloadGbByTaxid:
         self.records = []
         if not self.api_key and 'NCBI_API_KEY' in os.environ.keys():
             self.api_key = os.environ['NCBI_API_KEY']
-        self.read_strains()
-
-    def read_strains(self):
-        y = os.path.dirname(os.path.abspath(__file__)) + '/cov_strains.yaml'
-        with open(y) as file:
-            synonyms = yaml.load(file, Loader=yaml.FullLoader)
-        self.taxid = synonyms['taxid']
+        strains = read_strains()
+        self.taxid = strains[self.strain]['taxid']
+        
 
     def search(self):
         nummatch = re.match(r'^\d+$', str(self.taxid))
@@ -160,7 +157,7 @@ class DownloadGbByTaxid:
                     print("Writing {}".format(seqfile))
                 SeqIO.write(record, seqfile, self.format)
                 if self.json:
-                    from make_json import make_genome_json
+                    from utils import make_genome_json
                     genome_json = make_genome_json(record.name)
                     with open(record.name + '.json', 'w') as out:
                         out.write(genome_json)

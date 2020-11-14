@@ -1,5 +1,8 @@
 import json
 import hashlib
+import yaml
+import os
+
 
 def make_genome_json(name):
     # Genomes
@@ -59,3 +62,25 @@ def checksum(self, filename):
     with open(filename, "rb") as f:
         bytes = f.read()
     return hashlib.md5(bytes).hexdigest()
+
+
+def read_strains():
+    y = os.path.dirname(os.path.abspath(__file__)) + '/cov_strains.yaml'
+    with open(y) as file:
+        strains = yaml.load(file, Loader=yaml.FullLoader)
+    return strains
+
+
+def read_synonyms(self):
+    y = os.path.dirname(os.path.abspath(__file__)) + '/cov_features.yaml'
+    with open(y) as file:
+        synonyms = yaml.load(file, Loader=yaml.FullLoader)
+    return synonyms
+
+
+def read_variants(self):
+    y = os.path.dirname(os.path.abspath(__file__)) + \
+        '/cov_length_variants.yaml'
+    with open(y) as file:
+        variants = yaml.load(file, Loader=yaml.FullLoader)
+    return variants
