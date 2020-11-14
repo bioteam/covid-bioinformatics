@@ -29,6 +29,10 @@ OC   Viruses; Iridoviridae; Betairidovirinae; Chloriridovirus.
 OX   NCBI_TaxID=345201;
 OH   NCBI_TaxID=7163; Aedes vexans (Inland floodwater mosquito) (Culex vexans).
 OH   NCBI_TaxID=42431; Culex territans.
+OH   NCBI_TaxID=332058; Culiseta annulata.
+OH   NCBI_TaxID=310513; Ochlerotatus sollicitans (eastern saltmarsh mosquito).
+OH   NCBI_TaxID=329105; Ochlerotatus taeniorhynchus (Black salt marsh mosquito) (Aedes taeniorhynchus).
+OH   NCBI_TaxID=7183; Psorophora ferox.
 RN   [1]
 RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA].
 RX   PubMed=16912294; DOI=10.1128/jvi.00464-06;
@@ -53,6 +57,21 @@ FT   CHAIN           1..225
 FT                   /note="Transmembrane protein 022L"
 FT                   /id="PRO_0000377944"
 FT   TRANSMEM        2..22
+FT                   /note="Helical"
+FT                   /evidence="ECO:0000255"
+FT   TRANSMEM        53..73
+FT                   /note="Helical"
+FT                   /evidence="ECO:0000255"
+FT   TRANSMEM        80..100
+FT                   /note="Helical"
+FT                   /evidence="ECO:0000255"
+FT   TRANSMEM        111..131
+FT                   /note="Helical"
+FT                   /evidence="ECO:0000255"
+FT   TRANSMEM        136..156
+FT                   /note="Helical"
+FT                   /evidence="ECO:0000255"
+FT   TRANSMEM        162..182
 FT                   /note="Helical"
 FT                   /evidence="ECO:0000255"
 SQ   SEQUENCE   225 AA;  25107 MW;  3BD60B1CA8C7D7F5 CRC64;
