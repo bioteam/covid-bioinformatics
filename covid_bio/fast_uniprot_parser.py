@@ -10,6 +10,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
 parser.add_argument('-matrix', default=False, action='store_true', help="Make matrix for ChemProp")
 parser.add_argument('-output', default='uniprot_sprot.mat', help="Output matrix file")
+parser.add_argument('-delimiter', default=',', help="Field delimiter)
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
@@ -79,10 +80,17 @@ SQ   SEQUENCE   225 AA;  25107 MW;  3BD60B1CA8C7D7F5 CRC64;
      SSLAALVALK YHIKDIFTIL GAAIIIILAE YVVLPYQRQY NIVDGIGLPL LLLGFFILYQ
      VFSVPNPSTP TGVMVPKPED EWDIEMAPLN HRDRQVPESE LENVK
 //
+
+Example mini-matrix:
+
+PID,Sequence,GO:123,GO:456,GO:789,vg:123,vg:456
+A1,MAK,0,1,0,0,0
+B2,MLY,0,0,1,0,0
+C3,MAF,1,0,0,0,0
 '''
 
 def main():
-    extractor = Fast_Uniprot_Parser(args.verbose, args.matrix, args.output, args.files)
+    extractor = Fast_Uniprot_Parser(args.verbose, args.matrix, args.output, args.delimiter, args.files)
     extractor.read()
     if extractor.matrix:
         extractor.make_matrix()
@@ -90,7 +98,7 @@ def main():
 
 class Fast_Uniprot_Parser:
 
-    def __init__(self, verbose, matrix, output, files):
+    def __init__(self, verbose, matrix, output, delimiter, files):
         self.verbose = verbose
         self.matrix = matrix
         self.output = output
@@ -141,10 +149,7 @@ class Fast_Uniprot_Parser:
 
     def make_matrix(self):
         '''
-        PID, Sequence, GO:123, GO:456, GO:789, vg:123, vg:456
-        A1, MAK, 0, 1, 0, 0, 0
-        B2, MLY, 0, 0, 1, 0, 0
-        C3, MAF, 1, 0, 0, 0, 0
+        Create delimited matrix
         '''
         goterms = self.parse_terms('GO')
         keggterms = self.parse_terms('KEGG')
@@ -175,14 +180,6 @@ class Fast_Uniprot_Parser:
             matrix[colindex] = arr
         self.matrix = matrix
 
-    def write_matrix(self):
-        with open(self.output, "w") as out:
-            if self.verbose:
-                print("Writing matrix file {}".format(self.output))
-            for line in self.matrix:
-                l = ','.join(line) + "\n"
-                out.write(l)
-
     def parse_terms(self, ontology):
         ''' Return unique, sorted set of terms
         >>> data
@@ -199,6 +196,14 @@ class Fast_Uniprot_Parser:
         if self.verbose:
             print("{0} terms: {1}".format(ontology,terms))
         return terms
+
+    def write_matrix(self):
+        with open(self.output, "w") as out:
+            if self.verbose:
+                print("Writing matrix file {}".format(self.output))
+            for line in self.matrix:
+                l = self.delimiter.join(line) + "\n"
+                out.write(l)
 
 if __name__ == "__main__":
     main()
