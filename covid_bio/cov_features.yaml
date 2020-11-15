@@ -246,7 +246,7 @@ ORF10:
   - ORF10'
   - putative Orf10
   - putative ORF10
-NS1:
+NSP1:
   - leader protein
   - non-structural protein NS1
   - nonstructural protein NS1
@@ -263,7 +263,7 @@ NS1:
   - putative nsp1
   - putative Nsp1
   - nsp1 protein
-NS2:
+NSP2:
   - accessory protein 2
   - counterpart of MHV p65
   - non-structural protein 2
@@ -279,7 +279,7 @@ NS2:
   - putative nsp2
   - putative Nsp2
   - nsp2 protein
-NS3:
+NSP3:
   - accessory protein 3
   - non-structural protein 3
   - nonstructural protein 3
@@ -316,7 +316,7 @@ NS3b:
   - NS3b protein
   - NSP3b
   - nsp3b protein
-NS4:
+NSP4:
   - accessory protein 4
   - non-structural protein 4
   - nonstructural protein 4
@@ -332,7 +332,7 @@ NS4:
   - putative NSP4
   - putative Nsp4
   - nsp4 protein
-NS5:
+NSP5:
   - 3C-like proteinase
   - 3CL-PRO
   - 3CLPRO
@@ -366,7 +366,7 @@ NS5:
   - SARS-CoV Mpro
   - severe acute respiratory syndrome coronavirus main protease
   - nsp5 protein
-NS6:
+NSP6:
   - accessory protein 6
   - non-structural protein 6
   - nonstructural protein 6
@@ -383,7 +383,7 @@ NS6:
   - putative nsp6
   - putative Nsp6
   - nsp6 protein
-NS7:
+NSP7:
   - accessory protein 7
   - non-structural protein 7
   - nonstructural protein 7
@@ -419,7 +419,7 @@ NS7b:
   - NS7b_protein
   - NSP7b
   - nsp7b protein
-NS8:
+NSP8:
   - accessory protein 8
   - non-structural protein 8
   - nonstructural protein 8
@@ -458,7 +458,7 @@ NS8b:
   - NSP8b
   - sars8b
   - nsp8b protein
-NS9:
+NSP9:
   - accessory protein 9
   - non-structural protein 9
   - nonstructural protein 9
@@ -487,7 +487,7 @@ NS9b:
   - NSP9b
   - sars9b
   - nsp9b protein
-NS10:
+NSP10:
   - accessory protein 10
   - formerly known as growth-factor-like protein (GFL)
   - GFL
@@ -507,7 +507,7 @@ NS10:
   - putative Nsp10
   - putative nsp10 (MB, NTPase/HEL)
   - nsp10 protein
-NS11:
+NSP11:
   - accessory protein 11
   - non-structural protein 11
   - nonstructural protein 11
@@ -522,7 +522,7 @@ NS11:
   - putative nsp11
   - putative Nsp11
   - nsp11 protein
-NS12:
+NSP12:
   - accessory protein 12
   - non-structural protein 12
   - nonstructural protein 12
@@ -542,7 +542,7 @@ NS12:
   - RdRp
   - RNA-dependent RNA polymerase
   - nsp12 protein
-NS13:
+NSP13:
   - accessory protein 13
   - helicase
   - non-structural protein 13
@@ -563,7 +563,12 @@ NS13:
   - putative Nsp13
   - RNA 5'-triphosphatase
   - nsp13 protein
-NS14:
+  - nsp13_ZBD
+  - nsp13_TB
+  - nsp_HEL1core
+  - zinc-binding domain (ZD)
+  - NTPase/helicase domain (HEL)
+NSP14:
   - 3'-to-5' exonuclease
   - accessory protein 14
   - non-structural protein 14
@@ -581,7 +586,7 @@ NS14:
   - putative nsp14
   - putative Nsp14
   - nsp14 protein
-NS15:
+NSP15:
   - accessory protein 15
   - endoRNAse
   - non-structural protein 15
@@ -600,7 +605,7 @@ NS15:
   - uridylate-specific endoribonuclease
   - uridylate-specific endoribonuclease NendoU
   - nsp15 protein
-NS16:
+NSP16:
   - 2'-o-MT
   - 2'-O-ribose methyltransferase
   - 2'-O-ribose methyltransferase (2'-o-MT)

@@ -1,4 +1,39 @@
 ---
+COV2:
+  taxid: 2697049
+  years:
+    - 2019
+    - 2020
+  host: Homo sapiens
+  genes:
+    - ORF1ab
+    - ORF1a
+    - NSP1
+    - NSP2
+    - NSP3
+    - NSP4
+    - NSP5
+    - NSP6
+    - NSP7
+    - NSP8
+    - NSP9
+    - NSP10
+    - NSP11
+    - NSP12
+    - NSP13
+    - NSP14
+    - NSP15
+    - NSP16
+    - S
+    - ORF3a
+    - E
+    - M
+    - ORF6
+    - ORF7a
+    - ORF7b
+    - ORF8
+    - N
+    - ORF10
 SARS:
   taxid: 694009
   years:
@@ -6,8 +41,20 @@ SARS:
     - 2003
   host: Homo sapiens
   genes:
-    -
-    - 
+    - ORF1ab
+    - ORF1a
+    - S
+    - ORF3a
+    - ORF3b
+    - E
+    - M
+    - ORF6
+    - ORF7a
+    - ORF7b
+    - ORF8a
+    - ORF8b
+    - ORF9b
+    - N
 MERS:
   taxid: 1335626
   minlen: 25000
@@ -18,14 +65,14 @@ MERS:
     - 2015
   host: Homo sapiens
   genes:
-    -
-    - 
-COV2:
-  taxid: 11118
-  years:
-    - 2019
-    - 2020
-  host: Homo sapiens
-  genes:
-    -
-    - 
+    - ORF1ab
+    - ORF1a
+    - S
+    - ORF3
+    - ORF4a
+    - ORF4b
+    - E
+    - M
+    - ORF5
+    - ORF8b
+    - N

@@ -17,7 +17,7 @@ from utilities import read_strains
 # 694009 (parent of 2697049): Severe acute respiratory syndrome-related coronavirus
 # https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=694009
 parser = argparse.ArgumentParser()
-parser.add_argument('-t, -strain', default='COV2', dest='strain', help="Taxonomy id")
+parser.add_argument('-strain', default='COV2', dest='strain', help="Strain name")
 parser.add_argument('-r', default=True, dest='recurse', help="Recursive retrieval of child tax IDs", type=bool)
 parser.add_argument('-f', default='gb', dest='format', help="Input and output format")
 parser.add_argument('-e', default=EMAIL, dest='email', help="Email for Entrez")
@@ -32,12 +32,14 @@ parser.add_argument('-api_key', help="Entrez API key")
 parser.add_argument('-json', action='store_true', help="Create JSON for Gen3")
 parser.add_argument('-no-fetch', action='store_false', dest='fetch', help="Do not download")
 parser.add_argument('-cov_dir', default=COV_DIR, help="Destination directory")
+parser.add_argument('-date_filter', action='store_true', help="Filter by years in cov_strains.yaml")
 args = parser.parse_args()
 
 def main():
     entrez = DownloadGbByTaxid(args.email, args.strain, args.format, args.min_len, args.max_len,
                                 args.split, args.recurse, args.verbose, args.retmax,
-                                args.chunk, args.api_key, args.json, args.fetch, args.cov_dir)
+                                args.chunk, args.api_key, args.json, args.fetch, args.cov_dir,
+                                args.date_filter)
     entrez.search()
     entrez.efetch()
     entrez.filter()
@@ -47,7 +49,7 @@ def main():
 class DownloadGbByTaxid:
 
     def __init__(self, email, strain, format, min_len, max_len, split, recurse, verbose, retmax,
-                 chunk, api_key, json, fetch, cov_dir):
+                 chunk, api_key, json, fetch, cov_dir, date_filter):
         self.email = email
         self.strain = strain
         self.format = format
@@ -62,13 +64,16 @@ class DownloadGbByTaxid:
         self.fetch = fetch
         self.json = json
         self.cov_dir = cov_dir
+        self.date_filter = date_filter
         self.nt_ids = []
         self.records = []
         if not self.api_key and 'NCBI_API_KEY' in os.environ.keys():
             self.api_key = os.environ['NCBI_API_KEY']
+        # Get information about the specific strain (e.g. MERS, COV2)
         strains = read_strains()
         self.taxid = strains[self.strain]['taxid']
-        
+        if self.date_filter:
+            self.date_filter = strains[self.strain]['years']
 
     def search(self):
         nummatch = re.match(r'^\d+$', str(self.taxid))
@@ -140,14 +145,19 @@ class DownloadGbByTaxid:
                   str(self.taxid) + "':" + str(exception))
 
     def filter(self):
-        if self.min_len:
-            filtered = []
-            for record in self.records:
-                if self.verbose:
-                    print("Filtering {}".format(record.id))
-                if len(record) >= self.min_len:
-                    filtered.append(record)
-            self.records = filtered
+        filtered = []
+        for record in self.records:
+            # Minimum length requirement
+            if self.min_len:
+                if len(record) < self.min_len:
+                    continue
+            # Filter by year, from cov_strains.yaml
+            if self.date_filter:
+                pub_year = int(record.annotations['date'].split('-')[2])
+                if pub_year not in self.date_filter:
+                    continue
+            filtered.append(record)
+        self.records = filtered
 
     def write(self):
         if self.split:

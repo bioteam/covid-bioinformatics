@@ -12,6 +12,7 @@ from Bio.Alphabet import IUPAC
 from vars import COV_DIR
 from utilities import read_synonyms
 from utilities import read_variants
+from utilities import read_strains
 
 
 parser = argparse.ArgumentParser()
@@ -23,6 +24,7 @@ parser.add_argument('-verbose', default=False, action='store_true', help="Verbos
 parser.add_argument('-json', default=False, action='store_true', help="Create JSON for Gen3")
 parser.add_argument('-cov_dir', default=COV_DIR, help="Destination directory")
 parser.add_argument('-host_filter', help="Host name to filter")
+parser.add_argument('-s, -strain', default='COV2', dest='strain', help="Strain name")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
@@ -66,7 +68,7 @@ qualifiers:
 
 def main():
     extractor = Feature_To_Gene_And_Protein(args.format, args.split, args.analyze, 
-        args.verbose, args.json, args.cov_dir, args.host_filter, args.files)
+        args.verbose, args.json, args.cov_dir, args.host_filter, args.strain, args.files)
     extractor.read()
     extractor.standardize()
     extractor.create_objects()
@@ -77,7 +79,7 @@ def main():
 class Feature_To_Gene_And_Protein:
     from utilities import make_sequence_json
 
-    def __init__(self, seq_format, split, analyze, verbose, json, cov_dir, host_filter, files):
+    def __init__(self, seq_format, split, analyze, verbose, json, cov_dir, host_filter, strain, files):
         self.seq_format = seq_format
         self.split = split
         # Do not write to any files
@@ -86,6 +88,7 @@ class Feature_To_Gene_And_Protein:
         self.make_json = json
         self.cov_dir = cov_dir
         self.host_filter = host_filter
+        self.strain = strain
         self.files = files
         # Initial collection of all features keyed by accession
         self.accs = dict()
@@ -100,7 +103,8 @@ class Feature_To_Gene_And_Protein:
         # Dictionaries
         self.synonyms = read_synonyms()
         self.variants = read_variants()
-
+        strains = read_strains()
+        self.genes = strains[self.strain]['genes']
 
     def remove_invalid(self):
         '''
@@ -187,8 +191,8 @@ class Feature_To_Gene_And_Protein:
 
     def standardize_cds(self):
         '''
-        If we get a standard name for a feature from the dictionary we
-        rename it and sort it according to the standard name.
+        If we get a standard name for a feature from the synonyms list 
+        we rename it and sort it according to the standard name.
         '''
         for acc in self.accs:
             for cds in self.accs[acc]['cds']:
@@ -202,6 +206,11 @@ class Feature_To_Gene_And_Protein:
                 if cds.qualifiers["product"][0] in self.synonyms['SKIP']:
                     continue
                 id = self.get_standard_name(cds.qualifiers["product"][0], acc)
+                # Skip if the gene is not found in the specific strain
+                if id not in self.genes:
+                    if self.verbose:
+                        print("Gene {0} not found in strain {1}".format(id, self.strain))
+                    continue
                 if id:
                     if id not in self.sorted_cds.keys():
                         self.sorted_cds[id] = []
@@ -219,6 +228,11 @@ class Feature_To_Gene_And_Protein:
                 if pep.qualifiers["product"][0] in self.synonyms['SKIP']:
                     continue
                 id = self.get_standard_name(pep.qualifiers["product"][0], acc)
+                # Skip if the gene is not found in the specific strain
+                if id not in self.genes:
+                    if self.verbose:
+                        print("Gene {0} not found in strain {1}".format(id, self.strain))
+                    continue
                 if id:
                     if id not in self.sorted_mats.keys():
                         self.sorted_mats[id] = []
@@ -259,6 +273,7 @@ class Feature_To_Gene_And_Protein:
             else:
                 self.accs[acc]['date'] = 'unknown'
 
+
     def get_organism(self):
         for acc in self.accs.keys():
             if 'organism' in self.accs[acc]['annotations'].keys():
@@ -266,12 +281,14 @@ class Feature_To_Gene_And_Protein:
             else:
                 self.accs[acc]['organism'] = 'unknown'
 
+
     def get_location(self, feat):
         for acc in self.accs.keys():
             if 'organism' in self.accs[acc]['annotations'].keys():
                 self.accs[acc]['organism'] = self.accs[acc]['annotations']['organism']
             else:
                 self.accs[acc]['organism'] = 'unknown'
+
 
     def create_objects(self):
         '''

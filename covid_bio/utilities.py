@@ -84,3 +84,4 @@ def read_variants():
     with open(y) as file:
         variants = yaml.load(file, Loader=yaml.FullLoader)
     return variants
+
