@@ -23,8 +23,6 @@ parser.add_argument('-f', default='gb', dest='format', help="Input and output fo
 parser.add_argument('-e', default=EMAIL, dest='email', help="Email for Entrez")
 parser.add_argument('-min_len', default=25000, type=int, help="Minimum length")
 parser.add_argument('-max_len', type=int, help="Maximum length")
-parser.add_argument('-split', default=True, help="Split into separate files")
-parser.add_argument('-no-split', dest='split', action='store_false', help="Create one 'taxid' file")
 parser.add_argument('-verbose', action='store_true', help="Verbose")
 parser.add_argument('-retmax', default=10000, type=int, help="Entrez retmax")
 parser.add_argument('-chunk', default=500, type=int, help="eFetch batch size")
@@ -37,7 +35,7 @@ args = parser.parse_args()
 
 def main():
     entrez = DownloadGbByTaxid(args.email, args.strain, args.format, args.min_len, args.max_len,
-                                args.split, args.recurse, args.verbose, args.retmax,
+                                args.recurse, args.verbose, args.retmax,
                                 args.chunk, args.api_key, args.json, args.fetch, args.cov_dir,
                                 args.date_filter)
     entrez.search()
@@ -48,14 +46,13 @@ def main():
 
 class DownloadGbByTaxid:
 
-    def __init__(self, email, strain, format, min_len, max_len, split, recurse, verbose, retmax,
+    def __init__(self, email, strain, format, min_len, max_len, recurse, verbose, retmax,
                  chunk, api_key, json, fetch, cov_dir, date_filter):
         self.email = email
         self.strain = strain
         self.format = format
         self.min_len = min_len
         self.max_len = max_len
-        self.split = split
         self.recurse = recurse
         self.verbose = verbose
         self.retmax = retmax
@@ -160,22 +157,17 @@ class DownloadGbByTaxid:
         self.records = filtered
 
     def write(self):
-        if self.split:
-            for record in self.records:
-                seqfile = os.path.join(self.cov_dir, record.name + '.' + self.format)
-                if self.verbose:
-                    print("Writing {}".format(seqfile))
-                SeqIO.write(record, seqfile, self.format)
-                if self.json:
-                    from utilities import make_genome_json
-                    genome_json = make_genome_json(record.name)
-                    with open(record.name + '.json', 'w') as out:
-                        out.write(genome_json)
-        else:
-            seqfile = os.path.join(self.cov_dir, 'taxid-' + str(self.taxid) + '.' + self.format)
+        for record in self.records:
+            seqfile = os.path.join(
+                self.cov_dir, record.name + '.' + self.format)
             if self.verbose:
                 print("Writing {}".format(seqfile))
-            SeqIO.write(self.records, seqfile, self.format)
+            SeqIO.write(record, seqfile, self.format)
+            if self.json:
+                from utilities import make_genome_json
+                genome_json = make_genome_json(record.name)
+                with open(record.name + '.json', 'w') as out:
+                    out.write(genome_json)
 
 
 if __name__ == "__main__":
