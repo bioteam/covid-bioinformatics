@@ -11,11 +11,13 @@ from Bio import SeqIO
 from vars import COV_DIR, EMAIL
 from utilities import read_strains
 
-# NCBI Taxonomy ids:
-# 333387: single record for testing
-# 2697049: Severe acute respiratory syndrome coronavirus 2
-# 694009 (parent of 2697049): Severe acute respiratory syndrome-related coronavirus
-# https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=694009
+'''
+NCBI Taxonomy ids:
+333387: single record for testing
+2697049: Severe acute respiratory syndrome coronavirus 2
+694009 (parent of 2697049): Severe acute respiratory syndrome-related coronavirus
+https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=694009
+'''
 parser = argparse.ArgumentParser()
 parser.add_argument('-strain', default='COV2', dest='strain', help="Strain name")
 parser.add_argument('-r', default=True, dest='recurse', help="Recursive retrieval of child tax IDs", type=bool)
@@ -66,7 +68,7 @@ class DownloadGbByTaxid:
         self.records = []
         if not self.api_key and 'NCBI_API_KEY' in os.environ.keys():
             self.api_key = os.environ['NCBI_API_KEY']
-        # Get information about the specific strain (e.g. MERS, COV2)
+        # Get details about the specific strain (e.g. MERS, COV2)
         strains = read_strains()
         self.taxid = strains[self.strain]['taxid']
         if self.date_filter:

@@ -17,8 +17,6 @@ from utilities import read_strains
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-f', default='fasta', dest='format', help="Output format")
-parser.add_argument('-split', default=False, dest='split', help="Split into separate files")
-parser.add_argument('-no-split', action='store_false', dest='split', help="Create one file")
 parser.add_argument('-analyze', default=False, action='store_true', help="Parse files without file creation")
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
 parser.add_argument('-json', default=False, action='store_true', help="Create JSON for Gen3")
@@ -67,7 +65,7 @@ qualifiers:
 
 
 def main():
-    extractor = Feature_To_Gene_And_Protein(args.format, args.split, args.analyze, 
+    extractor = Feature_To_Gene_And_Protein(args.format, args.analyze, 
         args.verbose, args.json, args.cov_dir, args.host_filter, args.strain, args.files)
     extractor.read()
     extractor.standardize()
@@ -79,9 +77,8 @@ def main():
 class Feature_To_Gene_And_Protein:
     from utilities import make_sequence_json
 
-    def __init__(self, seq_format, split, analyze, verbose, json, cov_dir, host_filter, strain, files):
+    def __init__(self, seq_format, analyze, verbose, json, cov_dir, host_filter, strain, files):
         self.seq_format = seq_format
-        self.split = split
         # Do not write to any files
         self.analyze = analyze
         self.verbose = verbose
@@ -373,36 +370,27 @@ class Feature_To_Gene_And_Protein:
     def write(self):
         if self.analyze:
             return
-        if self.split:
-            return
-            # for acc in self.accs:
-            #     for feat in self.accs[acc]:
-            #         seqfile = acc + '.' + self.seq_format
-            # SeqIO.write(record, seqfile, self.seq_format)
-            # seqfile = record + '-CDS' + '.' + self.seq_format
-            # SeqIO.write(seqs, seqfile, self.seq_format)
-        else:
-            for name in self.feats.keys():
-                aaseqfile = os.path.join(self.cov_dir, name + '-aa.fa')
-                ntseqfile = os.path.join(self.cov_dir, name + '-nt.fa')
-                aahandle = open(aaseqfile, "w")
-                nthandle = open(ntseqfile, "w")
-                for feat in self.feats[name].keys():
-                    SeqIO.write(self.feats[name][feat]['aa'], aahandle, self.seq_format)
-                    SeqIO.write(self.feats[name][feat]['nt'], nthandle, self.seq_format)
+        for name in self.feats.keys():
+            aaseqfile = os.path.join(self.cov_dir, name + '-aa.fa')
+            ntseqfile = os.path.join(self.cov_dir, name + '-nt.fa')
+            aahandle = open(aaseqfile, "w")
+            nthandle = open(ntseqfile, "w")
+            for feat in self.feats[name].keys():
+                SeqIO.write(self.feats[name][feat]['aa'], aahandle, self.seq_format)
+                SeqIO.write(self.feats[name][feat]['nt'], nthandle, self.seq_format)
                 aahandle.close()
                 nthandle.close()
-                if self.make_json and 'invalid' not in name:
-                    # No JSON for invalid sequences
-                    aafile = os.path.join(self.cov_dir, name + '-aa-fasta.json')
-                    ntfile = os.path.join(self.cov_dir, name + '-nt-fasta.json')
-                    aahandle = open(aafile, "w")
-                    nthandle = open(ntfile, "w")
-                    for feat in self.feats[name].keys():
-                        aahandle.write(self.json[name][feat]['aa'])
-                        nthandle.write(self.json[name][feat]['nt'])
-                    aahandle.close()
-                    nthandle.close()
+            if self.make_json and 'invalid' not in name:
+                # No JSON for invalid sequences
+                aafile = os.path.join(self.cov_dir, name + '-aa-fasta.json')
+                ntfile = os.path.join(self.cov_dir, name + '-nt-fasta.json')
+                aahandle = open(aafile, "w")
+                nthandle = open(ntfile, "w")
+                for feat in self.feats[name].keys():
+                    aahandle.write(self.json[name][feat]['aa'])
+                    nthandle.write(self.json[name][feat]['nt'])
+                aahandle.close()
+                nthandle.close()
 
 if __name__ == "__main__":
     main()
