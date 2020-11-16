@@ -9,7 +9,7 @@ import numpy
 from Bio import SearchIO
 from Bio import Entrez
 from Bio import SeqIO
-from vars import COV_DIR, EMAIL
+from vars import PARENT_DIR, EMAIL
 
 
 parser = argparse.ArgumentParser()
@@ -19,9 +19,9 @@ parser.add_argument('-align', default=False, action='store_true', help="Align hi
 parser.add_argument('-taxfilter', default=None, help="Exclude clade using NCBI clade name")
 parser.add_argument('-lexfilter', default=None, help="Exclude clade using search string")
 parser.add_argument('-chunk', default=10, help="Number of ids to send to Elink")
-parser.add_argument('-cov_dir', default=COV_DIR, help="Destination directory")
 parser.add_argument('-email', default=EMAIL, help="Email for Entrez")
 parser.add_argument('-api_key', help="Entrez API key")
+parser.add_argument('-strain', default='COV2', dest='strain', help="Strain name")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
@@ -31,7 +31,7 @@ args = parser.parse_args()
 
 def main():
     query = Parse_Hmmsearch(args.verbose, args.download, args.align, args.taxfilter, 
-        args.lexfilter, args.chunk, args.cov_dir, args.email, args.api_key, args.files)
+        args.lexfilter, args.chunk, args.cov_dir, args.email, args.api_key, args.strain, args.files)
     for f in query.files:
         pids, fname = query.parse(f)
         if pids == None or pids == []:
@@ -44,7 +44,7 @@ def main():
 
 class Parse_Hmmsearch:
 
-    def __init__(self, verbose, download, align, taxfilter, lexfilter, chunk, cov_dir, email, api_key, files):
+    def __init__(self, verbose, download, align, taxfilter, lexfilter, chunk, cov_dir, email, api_key, strain, files):
         self.verbose = verbose
         self.download = download
         self.align = align
@@ -54,7 +54,9 @@ class Parse_Hmmsearch:
         self.cov_dir = cov_dir
         self.email = email
         self.api_key = api_key
+        self.strain = strain
         self.files = files
+        self.cov_dir = os.path.join(PARENT_DIR, self.strain)
         if not self.api_key and 'NCBI_API_KEY' in os.environ.keys():
             self.api_key = os.environ['NCBI_API_KEY']
 

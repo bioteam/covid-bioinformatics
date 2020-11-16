@@ -11,7 +11,8 @@ from Bio import SearchIO
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.Alphabet import IUPAC
-from vars import COV_DIR
+from vars import PARENT_DIR
+from utilities import read_strains
 
 '''
 Annotate COV GenBank files using a collection of HMMs. Example BED files showing genes:
@@ -27,13 +28,13 @@ BED Format (https://m.ensembl.org/info/website/upload/bed.html)
 parser = argparse.ArgumentParser()
 parser.add_argument('-verbose', action='store_true', help="Verbose")
 parser.add_argument('-rfam_file', default='cov_allvirus.cm', help="Rfam covariance model file")
-parser.add_argument('-cov_dir', default=COV_DIR, help="Destination directory")
+parser.add_argument('-strain', default='COV2', dest='strain', help="Strain name")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
 
 def main():
-    annotator = Annotate_With_Hmms(args.verbose, args.rfam_file, args.cov_dir, args.files)
+    annotator = Annotate_With_Hmms(args.verbose, args.rfam_file, args.strain, args.files)
     for file in annotator.files:
         gb = annotator.write_fasta(file)
         annotator.find_genes(gb)
@@ -46,16 +47,14 @@ class Annotate_With_Hmms:
     '''
     Create tracks for genes using HMMs ('genes'), Rfam hits ('rfam'), tmhmm predictions ('tms')
     '''
-    def __init__(self, verbose, rfam_file, cov_dir, files):
+    def __init__(self, verbose, rfam_file, strain, files):
         self.verbose = verbose
         self.rfam_file = rfam_file
-        self.cov_dir = cov_dir
+        self.strain = strain
         self.files = files
-        # COV2 HMMs - note that ORF9b is removed
-        self.cov_proteins = ['ORF1a', 'ORF1ab', 'S', 'E', 'M', 'N',
-                            'NS1', 'NS2', 'NS3', 'NS4', 'NS5', 'NS6', 'NS7', 'NS8', 'NS9',
-                            'NS10', 'NS11', 'NS12', 'NS13', 'NS14', 'NS15', 'NS16',
-                            'ORF3a', 'ORF6', 'ORF7a', 'ORF7b', 'ORF8', 'ORF10']
+        self.cov_dir = os.path.join(PARENT_DIR, self.strain)
+        strains = read_strains()
+        self.cov_proteins = strains[self.strain]['genes']
         # Text for BED files
         self.beds = dict()
         # Gene positions on given genome

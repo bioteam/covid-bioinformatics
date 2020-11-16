@@ -8,7 +8,7 @@ import tempfile
 import subprocess
 from Bio import AlignIO
 from Bio import SeqIO
-from vars import COV_DIR
+from vars import PARENT_DIR
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
@@ -17,7 +17,7 @@ parser.add_argument('-hmmbuilder', default='hmmbuild', help="HMM build applicati
 parser.add_argument('-skip', default='', help="Do not align")
 parser.add_argument('-json', action='store_true', help="Create JSON for Gen3")
 parser.add_argument('-maf', action='store_true', help="Create additional MAF format alignments")
-parser.add_argument('-cov_dir', default=COV_DIR, help="Destination directory")
+parser.add_argument('-strain', default='COV2', dest='strain', help="Strain name")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
@@ -27,7 +27,7 @@ args = parser.parse_args()
 
 def main():
     builder = Seqs_To_Aligns_And_Hmms(args.verbose, args.aligner, args.hmmbuilder, args.skip, 
-        args.json, args.maf, args.cov_dir, args.files)
+        args.json, args.maf, args.strain, args.files)
     for f in builder.files:
         if not os.path.isfile(f):
             if builder.verbose:
@@ -46,14 +46,15 @@ def main():
 
 
 class Seqs_To_Aligns_And_Hmms:
-    def __init__(self, verbose, aligner, hmmbuild, skip, json, maf, cov_dir, files):
+    def __init__(self, verbose, aligner, hmmbuild, skip, json, maf, strain, files):
         self.verbose = verbose
         self.aligner = aligner
         self.hmmbuild = hmmbuild
         self.skip = skip
         self.make_json = json
         self.maf = maf
-        self.cov_dir = cov_dir
+        self.strain = strain
+        self.cov_dir = os.path.join(PARENT_DIR, self.strain)
         self.files = files
 
     def read(self, path):
