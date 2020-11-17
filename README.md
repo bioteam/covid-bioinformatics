@@ -15,8 +15,7 @@ for SARS, MERS, and COV2 so that collections are strain-specific.
 
 The COV genes and proteins are parsed from the GenBank files as features and assigned standard names based on 
 their *product* or *mat_peptide* tags. Possible synonyms for these standard names are listed in *cov_dictionary.yaml*. A
-QC step compares all the COV protein sequences to expected lengths listed in the *cov_length_variants.yaml* file, and
-sequences that do not match expected lengths are not included in sequence files, alignments, or HMMs.
+QC step compares all the COV protein sequences to expected lengths listed in the *cov_length_variants.yaml* file.
 
 
 # requirements

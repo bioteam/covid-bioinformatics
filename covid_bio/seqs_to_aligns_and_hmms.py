@@ -4,7 +4,6 @@ import argparse
 import sys
 import os
 import re
-import tempfile
 import subprocess
 from Bio import AlignIO
 from Bio import SeqIO
@@ -57,6 +56,9 @@ class Seqs_To_Aligns_And_Hmms:
         self.cov_dir = os.path.join(PARENT_DIR, self.strain)
         self.files = files
 
+    '''
+    Read FASTA file, return array of unique sequences.
+    '''
     def read(self, path):
         seqs = []
         try:
@@ -87,6 +89,9 @@ class Seqs_To_Aligns_And_Hmms:
             d[seq_string] = record
         return list(d.values())
 
+    '''
+    Get list of sequences and a name, create sequence file (*.fa) and an alignment (*.fasta)
+    '''
     def make_align(self, seqs, name):
         align_name = os.path.join(self.cov_dir, name + '.fasta')
         if os.path.exists(align_name) and os.stat(align_name).st_size > 0:
@@ -99,13 +104,13 @@ class Seqs_To_Aligns_And_Hmms:
                     align_name]
             subprocess.run(cmd, check=True)
         else:
-            seqfile = tempfile.NamedTemporaryFile('w', delete=False)
-            SeqIO.write(seqs, seqfile.name, 'fasta')
+            seqfile = name + '-nr.fa'
+            SeqIO.write(seqs, seqfile, 'fasta')
             if self.verbose:
-                print("Alignment input sequence file: {}".format(seqfile.name))
+                print("Alignment input sequence file: {}".format(seqfile))
             # out_filename is used to redirect the STDOUT to file
             # when self.aligner is "mafft" and it requires redirect to file
-            cmd, out_filename = self.make_align_cmd(seqfile.name, align_name)
+            cmd, out_filename = self.make_align_cmd(seqfile, align_name)
             if self.verbose:
                 print("Alignment command is '{}'".format(cmd))
             try:
