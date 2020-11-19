@@ -380,8 +380,8 @@ class Feature_To_Gene_And_Protein:
             for feat in self.feats[name].keys():
                 SeqIO.write(self.feats[name][feat]['aa'], aahandle, self.seq_format)
                 SeqIO.write(self.feats[name][feat]['nt'], nthandle, self.seq_format)
-                aahandle.close()
-                nthandle.close()
+            aahandle.close()
+            nthandle.close()
             if self.make_json and 'invalid' not in name:
                 # No JSON for invalid sequences
                 aafile = os.path.join(self.cov_dir, name + '-aa-fasta.json')
