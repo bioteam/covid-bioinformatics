@@ -20,6 +20,7 @@ parser.add_argument('-f', default='fasta', dest='format', help="Output format")
 parser.add_argument('-analyze', default=False, action='store_true', help="Parse files without file creation")
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
 parser.add_argument('-json', default=False, action='store_true', help="Create JSON for Gen3")
+parser.add_argument('-cov_dir', help="Location for all strain-specific files")
 parser.add_argument('-host_filter', help="Host name to filter")
 parser.add_argument('-s, -strain', default='COV2', dest='strain', help="Strain name")
 parser.add_argument('files', nargs='+', help='File names')
@@ -86,7 +87,8 @@ class Feature_To_Gene_And_Protein:
         self.host_filter = host_filter
         self.strain = strain
         self.files = files
-        self.cov_dir = os.path.join(PARENT_DIR, self.strain)
+        if not self.cov_dir:
+            self.cov_dir = os.path.join(PARENT_DIR, self.strain)
         # Initial collection of all features keyed by accession
         self.accs = dict()
         # Features sorted by standard gene/protein names

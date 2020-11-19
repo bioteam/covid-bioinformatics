@@ -17,6 +17,7 @@ parser.add_argument('-skip', default='', help="Do not align")
 parser.add_argument('-json', action='store_true', help="Create JSON for Gen3")
 parser.add_argument('-maf', action='store_true', help="Create additional MAF format alignments")
 parser.add_argument('-strain', default='COV2', dest='strain', help="Strain name")
+parser.add_argument('-cov_dir', help="Location for all strain-specific files")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
@@ -26,7 +27,7 @@ args = parser.parse_args()
 
 def main():
     builder = Seqs_To_Aligns_And_Hmms(args.verbose, args.aligner, args.hmmbuilder, args.skip, 
-        args.json, args.maf, args.strain, args.files)
+        args.json, args.maf, args.strain, args.cov_dir, args.files)
     for f in builder.files:
         if not os.path.isfile(f):
             if builder.verbose:
@@ -45,7 +46,7 @@ def main():
 
 
 class Seqs_To_Aligns_And_Hmms:
-    def __init__(self, verbose, aligner, hmmbuild, skip, json, maf, strain, files):
+    def __init__(self, verbose, aligner, hmmbuild, skip, json, maf, strain, cov_dir, files):
         self.verbose = verbose
         self.aligner = aligner
         self.hmmbuild = hmmbuild
@@ -53,7 +54,9 @@ class Seqs_To_Aligns_And_Hmms:
         self.make_json = json
         self.maf = maf
         self.strain = strain
-        self.cov_dir = os.path.join(PARENT_DIR, self.strain)
+        self.cov_dir = cov_dir
+        if not self.cov_dir:
+            self.cov_dir = os.path.join(PARENT_DIR, self.strain)
         self.files = files
 
     '''

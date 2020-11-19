@@ -32,13 +32,14 @@ parser.add_argument('-json', action='store_true', help="Create JSON for Gen3")
 parser.add_argument('-no-fetch', action='store_false', dest='fetch', help="Do not download")
 parser.add_argument('-strain', default='COV2', dest='strain', help="Strain name")
 parser.add_argument('-date_filter', action='store_true', help="Filter by years in cov_strains.yaml")
+parser.add_argument('-cov_dir', help="Location for all strain-specific files")
 args = parser.parse_args()
 
 def main():
     entrez = DownloadGbByTaxid(args.email, args.format, args.min_len, args.max_len,
                                 args.recurse, args.verbose, args.retmax,
                                 args.chunk, args.api_key, args.json, args.fetch, args.strain,
-                                args.date_filter)
+                                args.date_filter, args.cov_dir)
     entrez.search()
     entrez.efetch()
     entrez.filter()
@@ -48,7 +49,7 @@ def main():
 class DownloadGbByTaxid:
 
     def __init__(self, email, format, min_len, max_len, recurse, verbose, retmax,
-                 chunk, api_key, json, fetch, strain, date_filter):
+                 chunk, api_key, json, fetch, strain, date_filter, cov_dir):
         self.email = email
         self.strain = strain
         self.format = format
@@ -63,11 +64,13 @@ class DownloadGbByTaxid:
         self.json = json
         self.strain = strain
         self.date_filter = date_filter
+        self.cov_dir = cov_dir
         self.nt_ids = []
         self.records = []
         if not self.api_key and 'NCBI_API_KEY' in os.environ.keys():
             self.api_key = os.environ['NCBI_API_KEY']
-        self.cov_dir = os.path.join(PARENT_DIR, self.strain)
+        if not self.cov_dir:
+            self.cov_dir = os.path.join(PARENT_DIR, self.strain)
         # Get details about the specific strain (e.g. MERS, COV2)
         strains = read_strains()
         self.taxid = strains[self.strain]['taxid']
