@@ -93,7 +93,8 @@ class Seqs_To_Aligns_And_Hmms:
         return list(d.values())
 
     '''
-    Get list of sequences and a name, create sequence file (*.fa) and an alignment (*.fasta)
+    Get list of unique sequences and a name, create sequence file (*.fa) 
+    and an alignment (*.fasta)
     '''
     def make_align(self, seqs, name):
         align_name = os.path.join(self.cov_dir, name + '.fasta')
@@ -107,7 +108,7 @@ class Seqs_To_Aligns_And_Hmms:
                     align_name]
             subprocess.run(cmd, check=True)
         else:
-            seqfile = name + '-nr.fa'
+            seqfile = os.path.join(self.cov_dir, name + '-nr.fa')
             SeqIO.write(seqs, seqfile, 'fasta')
             if self.verbose:
                 print("Alignment input sequence file: {}".format(seqfile))
