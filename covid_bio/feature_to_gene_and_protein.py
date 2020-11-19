@@ -22,7 +22,7 @@ parser.add_argument('-verbose', default=False, action='store_true', help="Verbos
 parser.add_argument('-json', default=False, action='store_true', help="Create JSON for Gen3")
 parser.add_argument('-cov_dir', help="Location for all strain-specific files")
 parser.add_argument('-host_filter', help="Host name to filter")
-parser.add_argument('-s, -strain', default='COV2', dest='strain', help="Strain name")
+parser.add_argument('-strain', default='COV2', dest='strain', help="Strain name")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
