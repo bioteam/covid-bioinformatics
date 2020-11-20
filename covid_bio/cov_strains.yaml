@@ -5,6 +5,7 @@ COV2:
     - 2019
     - 2020
   host: Homo sapiens
+  # 28 genes
   genes:
     - ORF1ab
     - ORF1a

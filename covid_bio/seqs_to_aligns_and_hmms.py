@@ -100,12 +100,16 @@ class Seqs_To_Aligns_And_Hmms:
         align_name = os.path.join(self.cov_dir, name + '.fasta')
         if os.path.exists(align_name) and os.stat(align_name).st_size > 0:
             return
-
         # Most aligners will reject a file with a single sequence so just copy
+        # to make both the 'nr' file and the alignment file
         if len(seqs) == 1:
             cmd = ['cp', 
                     os.path.join(self.cov_dir, name + '.fa'), 
                     align_name]
+            subprocess.run(cmd, check=True)
+            cmd = ['cp', 
+                    os.path.join(self.cov_dir, name + '.fa'), 
+                    os.path.join(self.cov_dir, name + '-nr.fa')]
             subprocess.run(cmd, check=True)
         else:
             seqfile = os.path.join(self.cov_dir, name + '-nr.fa')
