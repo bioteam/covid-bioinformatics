@@ -1,0 +1,4 @@
+---
+# Defaults to $HOME, see utilities.py
+PARENT_DIR:
+EMAIL: self@organization.net

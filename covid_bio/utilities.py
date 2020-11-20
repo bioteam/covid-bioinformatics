@@ -85,3 +85,10 @@ def read_variants():
         variants = yaml.load(file, Loader=yaml.FullLoader)
     return variants
 
+
+def read_config():
+    from pathlib import Path
+    y = os.path.dirname(os.path.abspath(__file__)) + '/config.yaml'
+    with open(y) as file:
+        config = yaml.load(file, Loader=yaml.FullLoader)
+    home = str(Path.home())
