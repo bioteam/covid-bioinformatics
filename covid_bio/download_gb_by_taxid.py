@@ -8,8 +8,7 @@ import numpy
 import yaml
 from Bio import Entrez
 from Bio import SeqIO
-from vars import PARENT_DIR, EMAIL
-from utilities import read_strains
+from utilities import read_strains, read_config
 
 '''
 NCBI Taxonomy ids:
@@ -21,7 +20,7 @@ https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=694009
 parser = argparse.ArgumentParser()
 parser.add_argument('-r', default=True, dest='recurse', help="Recursive retrieval of child tax IDs", type=bool)
 parser.add_argument('-f', default='gb', dest='format', help="Input and output format")
-parser.add_argument('-e', default=EMAIL, dest='email', help="Email for Entrez")
+parser.add_argument('-email', help="Email for Entrez")
 parser.add_argument('-min_len', default=25000, type=int, help="Minimum length")
 parser.add_argument('-max_len', type=int, help="Maximum length")
 parser.add_argument('-verbose', action='store_true', help="Verbose")
@@ -30,16 +29,16 @@ parser.add_argument('-chunk', default=500, type=int, help="eFetch batch size")
 parser.add_argument('-api_key', help="Entrez API key")
 parser.add_argument('-json', action='store_true', help="Create JSON for Gen3")
 parser.add_argument('-no-fetch', action='store_false', dest='fetch', help="Do not download")
-parser.add_argument('-strain', default='COV2', dest='strain', help="Strain name")
+parser.add_argument('-strain', help="Strain name")
 parser.add_argument('-date_filter', action='store_true', help="Filter by years in cov_strains.yaml")
-parser.add_argument('-cov_dir', help="Location for all strain-specific files")
+parser.add_argument('-data_dir', help="Location for all strain-specific files")
 args = parser.parse_args()
 
 def main():
     entrez = DownloadGbByTaxid(args.email, args.format, args.min_len, args.max_len,
                                 args.recurse, args.verbose, args.retmax,
                                 args.chunk, args.api_key, args.json, args.fetch, args.strain,
-                                args.date_filter, args.cov_dir)
+                                args.date_filter, args.data_dir)
     entrez.search()
     entrez.efetch()
     entrez.filter()
@@ -49,9 +48,11 @@ def main():
 class DownloadGbByTaxid:
 
     def __init__(self, email, format, min_len, max_len, recurse, verbose, retmax,
-                 chunk, api_key, json, fetch, strain, date_filter, cov_dir):
-        self.email = email
-        self.strain = strain
+                 chunk, api_key, json, fetch, strain, date_filter, data_dir):
+        config = read_config()
+        self.email = email if email else config['EMAIL']
+        self.strain = strain if strain else config['STRAIN']
+        self.data_dir = data_dir if data_dir else config['DATA_DIR']
         self.format = format
         self.min_len = min_len
         self.max_len = max_len
@@ -62,15 +63,12 @@ class DownloadGbByTaxid:
         self.api_key = api_key
         self.fetch = fetch
         self.json = json
-        self.strain = strain
         self.date_filter = date_filter
-        self.cov_dir = cov_dir
         self.nt_ids = []
         self.records = []
         if not self.api_key and 'NCBI_API_KEY' in os.environ.keys():
             self.api_key = os.environ['NCBI_API_KEY']
-        if not self.cov_dir:
-            self.cov_dir = os.path.join(PARENT_DIR, self.strain)
+        self.cov_dir = os.path.join(self.data_dir, self.strain)
         # Get details about the specific strain (e.g. MERS, COV2)
         strains = read_strains()
         self.taxid = strains[self.strain]['taxid']

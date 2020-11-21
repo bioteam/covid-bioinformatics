@@ -9,10 +9,7 @@ from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import IUPAC
-from vars import PARENT_DIR
-from utilities import read_synonyms
-from utilities import read_variants
-from utilities import read_strains
+from utilities import read_synonyms, read_variants, read_strains, read_config
 
 
 parser = argparse.ArgumentParser()
@@ -20,9 +17,9 @@ parser.add_argument('-f', default='fasta', dest='format', help="Output format")
 parser.add_argument('-analyze', default=False, action='store_true', help="Parse files without file creation")
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
 parser.add_argument('-json', default=False, action='store_true', help="Create JSON for Gen3")
-parser.add_argument('-cov_dir', help="Location for all strain-specific files")
+parser.add_argument('-data_dir', help="Location for all strain-specific files")
 parser.add_argument('-host_filter', help="Host name to filter")
-parser.add_argument('-strain', default='COV2', dest='strain', help="Strain name")
+parser.add_argument('-strain', help="Strain name")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
@@ -66,7 +63,7 @@ qualifiers:
 
 def main():
     extractor = Feature_To_Gene_And_Protein(args.format, args.analyze, 
-        args.verbose, args.json, args.cov_dir, args.host_filter, args.strain, args.files)
+        args.verbose, args.json, args.data_dir, args.host_filter, args.strain, args.files)
     extractor.read()
     extractor.standardize()
     extractor.create_objects()
@@ -77,18 +74,18 @@ def main():
 class Feature_To_Gene_And_Protein:
     from utilities import make_sequence_json
 
-    def __init__(self, seq_format, analyze, verbose, json, cov_dir, host_filter, strain, files):
+    def __init__(self, seq_format, analyze, verbose, json, data_dir, host_filter, strain, files):
+        config = read_config()
+        self.strain = strain if strain else config['STRAIN']
+        self.data_dir = data_dir if data_dir else config['DATA_DIR']
         self.seq_format = seq_format
         # Do not write to any files
         self.analyze = analyze
         self.verbose = verbose
         self.make_json = json
-        self.cov_dir = cov_dir
         self.host_filter = host_filter
-        self.strain = strain
         self.files = files
-        if not self.cov_dir:
-            self.cov_dir = os.path.join(PARENT_DIR, self.strain)
+        self.cov_dir = os.path.join(self.data_dir, self.strain)
         # Initial collection of all features keyed by accession
         self.accs = dict()
         # Features sorted by standard gene/protein names

@@ -1,4 +1,8 @@
 ---
-# Defaults to $HOME, see utilities.py
-PARENT_DIR:
+# Create strain-specific directors in DATA_DIR, defaults
+# to current working direcotory, see utilities.py
+DATA_DIR:
+# Used for eUtils queries and downloads
 EMAIL: self@organization.net
+# default is COV2, see cov_strains.yaml for other options
+STRAIN: COV2

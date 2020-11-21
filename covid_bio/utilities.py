@@ -87,8 +87,9 @@ def read_variants():
 
 
 def read_config():
-    from pathlib import Path
     y = os.path.dirname(os.path.abspath(__file__)) + '/config.yaml'
     with open(y) as file:
         config = yaml.load(file, Loader=yaml.FullLoader)
-    home = str(Path.home())
+    if not config['DATA_DIR']:
+        config['DATA_DIR'] = os.getcwd()
+    return config
