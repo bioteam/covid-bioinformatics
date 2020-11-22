@@ -16,7 +16,7 @@ while getopts ":h:f:e:" opt
      esac
 done
 
-if [[ $fasta == FALSE || $hmms == FALSE ]]
+if [ $fasta == FALSE || $hmms == FALSE ]
 then
     echo "Usage: $0 -f <fasta file> -h '<HMM files>' [-e <e value>]"
     exit
@@ -36,13 +36,18 @@ do
         exit
     fi
 
-    
+    hmmfile=basename($hmm)
+    if [ $hmmfile == 'ORF1a-aa.hmm' || $hmmfile == 'ORF1ab-aa.hmm' ]
+    then
+	continue
+    fi    
+
     base=$( echo $hmm | cut -d '.' -f 1 )
     out=${base}${UNDERSCORE}${fasta}.tblout
     if [ ! -f $out ]
     then
         echo HMM: $hmm Fasta: $fasta
-        if [[ $evalue == FALSE ]]
+        if [ $evalue == FALSE ]
         then
             cmd="hmmsearch --noali --tblout $out $hmm $fasta"
         else
