@@ -1,4 +1,0 @@
-biopython
-numpy
-PyYAML
-tmhmm.py
