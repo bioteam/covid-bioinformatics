@@ -12,7 +12,7 @@ from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.Alphabet import IUPAC
 from vars import PARENT_DIR
-from utilities import read_strains
+from utilities import read_strains, read_config
 
 '''
 Annotate COV GenBank files using a collection of HMMs. Example BED files showing genes:
@@ -28,14 +28,14 @@ BED Format (https://m.ensembl.org/info/website/upload/bed.html)
 parser = argparse.ArgumentParser()
 parser.add_argument('-verbose', action='store_true', help="Verbose")
 parser.add_argument('-rfam_file', default='cov_allvirus.cm', help="Rfam covariance model file")
-parser.add_argument('-strain', default='COV2', dest='strain', help="Strain name")
-parser.add_argument('-cov_dir', help="Location for all strain-specific files")
+parser.add_argument('-strain', help="Strain name")
+parser.add_argument('-data_dir', help="Location for all strain-specific directories")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
 
 def main():
-    annotator = Annotate_With_Hmms(args.verbose, args.rfam_file, args.strain, args.cov_dir, args.files)
+    annotator = Annotate_With_Hmms(args.verbose, args.rfam_file, args.strain, args.data_dir, args.files)
     for file in annotator.files:
         gb = annotator.write_fasta(file)
         annotator.find_genes(gb)
@@ -48,14 +48,15 @@ class Annotate_With_Hmms:
     '''
     Create tracks for genes using HMMs ('genes'), Rfam hits ('rfam'), tmhmm predictions ('tms')
     '''
-    def __init__(self, verbose, rfam_file, strain, cov_dir, files):
+    def __init__(self, verbose, rfam_file, strain, data_dir, files):
         self.verbose = verbose
         self.rfam_file = rfam_file
         self.strain = strain
-        self.cov_dir = cov_dir
+        self.data_dir = data_dir
         self.files = files
-        if not self.cov_dir:
-            self.cov_dir = os.path.join(PARENT_DIR, self.strain)
+        self.cov_dir = os.path.join(self.data_dir, self.strain)
+        if not os.path.isdir(self.cov_dir):
+            sys.exit("Directory {} does not exist".format(self.cov_dir))
         strains = read_strains()
         self.cov_proteins = strains[self.strain]['genes']
         # Text for BED files
