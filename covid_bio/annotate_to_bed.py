@@ -49,10 +49,11 @@ class Annotate_With_Hmms:
     Create tracks for genes using HMMs ('genes'), Rfam hits ('rfam'), tmhmm predictions ('tms')
     '''
     def __init__(self, verbose, rfam_file, strain, data_dir, files):
+        config = read_config()
+        self.strain = strain if strain else config['STRAIN']
+        self.data_dir = data_dir if data_dir else config['DATA_DIR']
         self.verbose = verbose
         self.rfam_file = rfam_file
-        self.strain = strain
-        self.data_dir = data_dir
         self.files = files
         self.cov_dir = os.path.join(self.data_dir, self.strain)
         if not os.path.isdir(self.cov_dir):
