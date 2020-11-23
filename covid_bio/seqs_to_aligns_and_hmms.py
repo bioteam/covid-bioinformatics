@@ -17,7 +17,7 @@ parser.add_argument('-skip', default='', help="Do not align")
 parser.add_argument('-json', action='store_true', help="Create JSON for Gen3")
 parser.add_argument('-maf', action='store_true', help="Create additional MAF format alignments")
 parser.add_argument('-strain', help="Strain name")
-parser.add_argument('-data_dir', help="Location for all strain-specific files")
+parser.add_argument('-data_dir', help="Location for all strain-specific directories")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
@@ -57,6 +57,8 @@ class Seqs_To_Aligns_And_Hmms:
         self.make_json = json
         self.maf = maf
         self.cov_dir = os.path.join(self.data_dir, self.strain)
+        if not os.path.isdir(self.cov_dir):
+            sys.exit("Directory {} does not exist".format(self.cov_dir))
         self.files = files
 
     '''

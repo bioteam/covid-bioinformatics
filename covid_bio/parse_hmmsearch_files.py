@@ -19,7 +19,7 @@ parser.add_argument('-align', default=False, action='store_true', help="Align hi
 parser.add_argument('-taxfilter', default=None, help="Exclude clade using NCBI clade name")
 parser.add_argument('-lexfilter', default=None, help="Exclude clade using search string")
 parser.add_argument('-chunk', default=10, help="Number of ids to send to Elink")
-parser.add_argument('-data_dir', help="Location for all strain-specific files")
+parser.add_argument('-data_dir', help="Location for all strain-specific directories")
 parser.add_argument('-email', help="Email for Entrez")
 parser.add_argument('-api_key', help="Entrez API key")
 parser.add_argument('-strain', help="Strain name")
@@ -59,6 +59,8 @@ class Parse_Hmmsearch:
         self.api_key = api_key
         self.files = files
         self.cov_dir = os.path.join(self.data_dir, self.strain)
+        if not os.path.isdir(self.cov_dir):
+            sys.exit("Directory {} does not exist".format(self.cov_dir))
         if not self.api_key and 'NCBI_API_KEY' in os.environ.keys():
             self.api_key = os.environ['NCBI_API_KEY']
 

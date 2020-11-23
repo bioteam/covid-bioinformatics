@@ -17,7 +17,7 @@ parser.add_argument('-f', default='fasta', dest='format', help="Output format")
 parser.add_argument('-analyze', default=False, action='store_true', help="Parse files without file creation")
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
 parser.add_argument('-json', default=False, action='store_true', help="Create JSON for Gen3")
-parser.add_argument('-data_dir', help="Location for all strain-specific files")
+parser.add_argument('-data_dir', help="Location for all strain-specific directories")
 parser.add_argument('-host_filter', help="Host name to filter")
 parser.add_argument('-strain', help="Strain name")
 parser.add_argument('files', nargs='+', help='File names')
@@ -86,6 +86,8 @@ class Feature_To_Gene_And_Protein:
         self.host_filter = host_filter
         self.files = files
         self.cov_dir = os.path.join(self.data_dir, self.strain)
+        if not os.path.isdir(self.cov_dir):
+            sys.exit("Directory {} does not exist".format(self.cov_dir))
         # Initial collection of all features keyed by accession
         self.accs = dict()
         # Features sorted by standard gene/protein names

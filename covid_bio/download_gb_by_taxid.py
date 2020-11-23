@@ -31,7 +31,7 @@ parser.add_argument('-json', action='store_true', help="Create JSON for Gen3")
 parser.add_argument('-no-fetch', action='store_false', dest='fetch', help="Do not download")
 parser.add_argument('-strain', help="Strain name")
 parser.add_argument('-date_filter', action='store_true', help="Filter by years in cov_strains.yaml")
-parser.add_argument('-data_dir', help="Location for all strain-specific files")
+parser.add_argument('-data_dir', help="Location for all strain-specific directories")
 args = parser.parse_args()
 
 def main():
@@ -69,6 +69,8 @@ class DownloadGbByTaxid:
         if not self.api_key and 'NCBI_API_KEY' in os.environ.keys():
             self.api_key = os.environ['NCBI_API_KEY']
         self.cov_dir = os.path.join(self.data_dir, self.strain)
+        if not os.path.isdir(self.cov_dir):
+            sys.exit("Directory {} does not exist".format(self.cov_dir))
         # Get details about the specific strain (e.g. MERS, COV2)
         strains = read_strains()
         self.taxid = strains[self.strain]['taxid']
