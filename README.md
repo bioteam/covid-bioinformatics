@@ -6,6 +6,7 @@ sequences and create BED files for genome visualization. A *cov_strains* file de
 for SARS, MERS, and COV2 so that collections are strain-specific.
 
 # example usage
+* `mkdir COV2`
 * `./download_gb_by_taxid.py`
 * `./feature_to_gene_and_protein.py COV2/*.gb`
 * `./seqs_to_aligns_and_hmms.py COV2/*.fa`
