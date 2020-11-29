@@ -29,8 +29,9 @@ QC step compares all the COV protein sequences to expected lengths listed in the
 
 # output directory
 The code is capable of creating large numbers of files. In order to keep these files organized you can specify 
-a directory with `-data_dir` that should contain strain-specific directories (i.e. *COV2, SARS, MERS*). The 
-data dir defaults to the current directory, and the default strain is *COV2*.
+a directory with `-data_dir` that should contain strain-specific directories (i.e. *COV2, SARS, MERS*), and the
+code will write all files to the strain-specific directory. The data dir defaults to the current directory, and 
+the default strain is *COV2*.
 
 # file formats created
 * GenBank sequence: `.gb`
