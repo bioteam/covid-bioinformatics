@@ -138,14 +138,14 @@ class Fast_Uniprot_Parser:
         # Initialize array of arrays
         matrix = [None] * (len(self.data.keys()) + 1)
         # Create header line
-        header = []
+        header = list()
         header.extend(['PID', 'Sequence'])
         header.extend(goterms)
         header.extend(keggterms)
         matrix[0] = header
 
         for colindex, pid in enumerate(self.data.keys(), start=1):
-            arr = []
+            arr = list()
             arr.extend([pid, self.data[pid]['SQ']])
             for goterm in goterms:
                 if 'GO' in self.data[pid].keys() and goterm in self.data[pid]['GO']:

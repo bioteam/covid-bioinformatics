@@ -95,8 +95,8 @@ class Parse_Hmmsearch:
         Entrez.api_key = self.api_key
         # Split the list of ids into "batches" of ids for Entrez
         num_chunks = len(pids)/int(self.chunk) + 1
-        taxarray = []
-        errorarray =[]
+        taxarray = list()
+        errorarray = list()
         for id_chunk in numpy.array_split(numpy.array(pids), num_chunks):
             # Some protein ids do not have taxonomy ids according to Elink
             try:

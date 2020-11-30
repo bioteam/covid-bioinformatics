@@ -11,7 +11,6 @@ from Bio import SearchIO
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.Alphabet import IUPAC
-from vars import PARENT_DIR
 from utilities import read_strains, read_config
 
 '''
@@ -172,7 +171,7 @@ class Annotate_With_Hmms:
         '''
         Predict TM regions using tmhmm.py
         '''
-        self.beds[gb.id]['tms'] = []
+        self.beds[gb.id]['tms'] = list()
         self.tm_positions[gb.id] = dict()
         track_line = "track name='{0} Transmembrame regions' \
                       description='tmhmm-based TM detection of COV sequence {1}' \

@@ -64,8 +64,8 @@ class DownloadGbByTaxid:
         self.fetch = fetch
         self.json = json
         self.date_filter = date_filter
-        self.nt_ids = []
-        self.records = []
+        self.nt_ids = list()
+        self.records = list()
         if not self.api_key and 'NCBI_API_KEY' in os.environ.keys():
             self.api_key = os.environ['NCBI_API_KEY']
         self.cov_dir = os.path.join(self.data_dir, self.strain)
@@ -147,7 +147,7 @@ class DownloadGbByTaxid:
                   str(self.taxid) + "':" + str(exception))
 
     def filter(self):
-        filtered = []
+        filtered = list()
         for record in self.records:
             # Minimum length requirement
             if self.min_len:

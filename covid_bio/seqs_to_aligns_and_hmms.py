@@ -65,7 +65,7 @@ class Seqs_To_Aligns_And_Hmms:
     Read FASTA file, return array of unique sequences.
     '''
     def read(self, path):
-        seqs = []
+        seqs = list()
         try:
             if self.verbose:
                 print("Reading Fasta file: {}".format(path))
@@ -168,7 +168,6 @@ class Seqs_To_Aligns_And_Hmms:
         hmm_name = os.path.join(self.cov_dir, name + '.hmm')
         if os.path.exists(hmm_name) and os.stat(hmm_name).st_size > 0:
             return
-
         if self.verbose:
             print("{0} input file is '{1}'".format(self.hmmbuild, name))
         # Either --amino or --dna
