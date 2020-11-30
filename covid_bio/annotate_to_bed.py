@@ -173,9 +173,10 @@ class Annotate_With_Hmms:
         Predict TM regions using tmhmm.py
         '''
         self.beds[gb.id]['tms'] = []
+        self.tm_positions[gb.id] = dict()
         track_line = "track name='{0} Transmembrame regions' \
-                        description='tmhmm-based TM detection of COV sequence {1}' \
-                        itemRgb='on'".format(gb.id,gb.id)
+                      description='tmhmm-based TM detection of COV sequence {1}' \
+                      nitemRgb='on'".format(gb.id,gb.id)
         self.beds[gb.id]['tms'].append(track_line)
         for protein in self.protein_strs[gb.id]:
             # Do not analyze polyprotein
@@ -219,11 +220,11 @@ class Annotate_With_Hmms:
             self.tm_positions[gb.id][protein].append((m.start(), m.end()))
 
     def translate_orf(self, ntstr, protein, gb):
-        """
+        '''
         COV2 ORF1ab contains a -1 frameshift so any translation has to handle this.
         To do: confirm that this approach works for all COV. Possible this method
         has to use an Rfam match rather than simple string search and replace.
-        """
+        '''
         noframeshift = 'TTAAACGGG'
         frameshift =   'TTAAACCGGG'
         aastr = self.translate(ntstr)
