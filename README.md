@@ -43,8 +43,3 @@ the default strain is *COV2*.
 * HMMER profile HMM: `.hmm`
 * hmmsearch table: `.tblout`
 * BED track file: `.bed`
-
-
-# to do
-* HMM-based annotation and QC
-* Visualization (e.g. for [IGV](https://igvteam.github.io/igv-webapp/fileFormats.html))
