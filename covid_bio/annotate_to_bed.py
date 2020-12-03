@@ -230,13 +230,17 @@ class Annotate_With_Hmms:
         if '*' in aastr:
             if self.verbose:
                 print("Stop codon found in {0} {1}".format(gb.id, protein))
-            if len(re.findall(noframeshift, ntstr)) == 1:
+            # Number of 'slip sequences' found
+            numslips = len(re.findall(noframeshift, ntstr))
+            if numslips == 1:
                 if self.verbose:
-                    print("Found 1 'slip sequence' in {0} {1}".format(gb.id, protein))
+                    print("Found 1 'slip sequence' in {0}-{1}".format(protein,gb.id))
                 ntstr = ntstr.replace(noframeshift, frameshift)
                 aastr = self.translate(ntstr)
-            else:
-                sys.exit("More than 1 'slip sequence' found in {0} {1}".format(gb.id, protein))
+            elif numslips > 1:
+                sys.exit("More than 1 'slip sequence' found in {0}-{1}".format(protein,gb.id))
+            elif numslips == 0:
+                sys.exit("No 'slip sequence' found in {0}-{1}".format(protein,gb.id))
         if '*' in aastr:
             sys.exit("Stop codon found in {0} {1}: {2}".format(gb.id, protein, aastr))
         return aastr
