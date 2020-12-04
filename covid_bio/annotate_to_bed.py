@@ -57,8 +57,10 @@ class Annotate_With_Hmms:
         self.cov_dir = os.path.join(self.data_dir, self.strain)
         if not os.path.isdir(self.cov_dir):
             sys.exit("Directory {} does not exist".format(self.cov_dir))
+        # Get strain-specific information
         strains = read_strains()
         self.cov_proteins = strains[self.strain]['genes']
+        self.slip_sequence = strains[self.strain]['slip_sequence']
         # Text for BED files
         self.beds = dict()
         # Gene positions on given genome
@@ -220,22 +222,21 @@ class Annotate_With_Hmms:
 
     def translate_orf(self, ntstr, protein, gb):
         '''
-        COV2 ORF1ab contains a -1 frameshift so any translation has to handle this.
-        To do: confirm that this approach works for all COV. Possible this method
-        has to use an Rfam match rather than simple string search and replace.
+        COV ORF1ab contains a -1 PRF (programmed ribosomal frameshift) so any translation
+        has to handle this and use the frameshifted ORF. Slip sequences contain the location
+        of the PRF. The frameshift replaces C with CC within the slip sequence.
         '''
-        noframeshift = 'TTAAACGGG'
-        frameshift =   'TTAAACCGGG'
         aastr = self.translate(ntstr)
         if '*' in aastr:
             if self.verbose:
                 print("Stop codon found in {0} {1}".format(gb.id, protein))
             # Number of 'slip sequences' found
-            numslips = len(re.findall(noframeshift, ntstr))
+            numslips = len(re.findall(self.slip_sequence, ntstr))
             if numslips == 1:
                 if self.verbose:
                     print("Found 1 'slip sequence' in {0}-{1}".format(protein,gb.id))
-                ntstr = ntstr.replace(noframeshift, frameshift)
+                frameshift = self.slip_sequence.replace('C','CC')
+                ntstr = ntstr.replace(self.slip_sequence, frameshift)
                 aastr = self.translate(ntstr)
             elif numslips > 1:
                 sys.exit("More than 1 'slip sequence' found in {0}-{1}".format(protein,gb.id))
