@@ -14,7 +14,7 @@ from Bio.Alphabet import IUPAC
 from utilities import read_strains, read_config
 
 '''
-Annotate COV GenBank files using a collection of HMMs. Example BED files showing genes:
+Annotate COV GenBank files using a collection of HMMs and applications. Example BED files showing genes:
 
 track name='NC_045512.2' description='HMM-based annotation of COV sequence NC_045512.2' itemRgb='on'
 NC_045512.2	265	13483	ORF1a	17560.1	+	264	267	66,123,245			
@@ -91,8 +91,8 @@ class Annotate_With_Hmms:
         self.beds[gb.id]['genes'] = []
         self.gene_positions[gb.id] = dict()
         trackline = "track name='{0} genes' \
-                    description='HMM-based gene detection of COV sequence {1}' \
-                    itemRgb='on'".format(gb.id, gb.id)
+                     description='HMM-based gene detection of COV sequence {1}' \
+                     itemRgb='on'".format(gb.id, gb.id)
         self.beds[gb.id]['genes'].append(trackline)
         for protein in self.cov_proteins:
             hit = self.run_hmmsearch(gb.id, protein)

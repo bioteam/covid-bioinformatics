@@ -1,7 +1,7 @@
 ---
 COV2:
   taxid: 2697049
-  slip_sequence: UUUUUAAACGGG
+  slip_sequence: TTTTTAAACGGG
   years:
     - 2019
     - 2020
@@ -39,7 +39,7 @@ COV2:
     - ORF10
 SARS:
   taxid: 694009
-  slip_sequence: UUUUUAAACGGG
+  slip_sequence: TTTTTAAACGGG
   years:
     - 2002
     - 2003
@@ -77,7 +77,8 @@ SARS:
     - N
 MERS:
   taxid: 1335626
-  slip_sequence: UUUUUAAACGAG
+  # different from SARS, COV2
+  slip_sequence: TTTTTAAACGAG
   minlen: 25000
   years:
     - 2012
