@@ -5,14 +5,16 @@
 fasta=FALSE
 hmms=FALSE
 evalue=FALSE
+app=hmmsearch
 UNDERSCORE='_'
 
-while getopts ":h:f:e:" opt
+while getopts ":h:f:e:a:" opt
    do
      case $opt in
         h ) hmms=$OPTARG;;
         f ) fasta=$OPTARG;;
         e ) evalue=$OPTARG;;
+        a ) app=$OPTARG;;
      esac
 done
 
@@ -39,23 +41,23 @@ do
     hmmfile=basename($hmm)
     if [ $hmmfile == 'ORF1a-aa.hmm' || $hmmfile == 'ORF1ab-aa.hmm' ]
     then
-	continue
+	    continue
     fi    
 
     base=$( echo $hmm | cut -d '.' -f 1 )
-    out=${base}${UNDERSCORE}${fasta}.tblout
+    out=${base}${UNDERSCORE}${fasta}-${app}.tblout
     if [ ! -f $out ]
     then
         echo HMM: $hmm Fasta: $fasta
         if [ $evalue == FALSE ]
         then
-            cmd="hmmsearch --noali --tblout $out $hmm $fasta"
+            cmd="$app --noali --tblout $out $hmm $fasta"
         else
-            cmd="hmmsearch --noali -E $evalue --tblout $out $hmm $fasta"
+            cmd="$app --noali -E $evalue --tblout $out $hmm $fasta"
         fi
-	    echo Command is $cmd
+	    echo Command is \"$cmd\"
         $cmd
-        echo Output is $out
+        echo Output is \"$out\"
     else
 	    echo File $out exists
     fi

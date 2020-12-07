@@ -80,11 +80,11 @@ class Seqs_To_Aligns_And_Hmms:
 
     def remove_dups(self, records, filename):
         d = dict()
-        # Do not put sequences containing "X" or "N" in alignments
+        # Do not put sequences containing 'X', 'N', or '*' in alignments
         if '-aa' in filename:
-            invalid = re.compile(r'[xX]')
+            invalid = re.compile(r'[xX*]')
         elif '-nt' in filename:
-            invalid = re.compile(r'[xXnN]')
+            invalid = re.compile(r'[xXnN*]')
         else:
             sys.exit("Cannot determine sequence type in {}".format(filename))
         for record in records:

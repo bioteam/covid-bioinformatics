@@ -29,7 +29,7 @@ do
     if [ ! -f $out ]
     then
         cmd="hmmemit -c -o $out $hmm"
-	    echo Command is '$cmd'
+	    echo Command is "$cmd"
         $cmd
     fi
 done

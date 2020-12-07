@@ -12,8 +12,8 @@ the expected genes for *SARS, MERS*, and *COV2* so that collections are strain-s
 * `./seqs_to_aligns_and_hmms.py COV2/*.fa`
 
 The COV genes and proteins are parsed from the GenBank files as features and assigned standard names based on 
-their *product* or *mat_peptide* tags. Possible synonyms for these standard names are listed in *cov_dictionary.yaml*. A
-QC step compares all the COV protein sequences to expected lengths listed in the *cov_length_variants.yaml* file.
+their *product* or *mat_peptide* tags. Possible synonyms for these standard names are listed in *cov_features.yaml*.
+A QC step compares all the COV protein sequences to expected lengths listed in the *cov_length_variants.yaml* file.
 
 # requirements
 * Python3 and packages, including [Biopython](https://biopython.org/)
