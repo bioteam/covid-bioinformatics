@@ -6,7 +6,7 @@ import os
 import tempfile
 import subprocess
 import re
-import tmhmm
+import pyTMHMM
 from Bio import SearchIO
 from Bio import SeqIO
 from Bio.Seq import Seq
@@ -45,7 +45,7 @@ def main():
 
 class Annotate_With_Hmms:
     '''
-    Create tracks for genes using HMMs ('genes'), Rfam hits ('rfam'), tmhmm predictions ('tms')
+    Create tracks for genes using HMMs ('genes'), Rfam hits ('rfam'), pyTMHMM predictions ('tms')
     '''
     def __init__(self, verbose, rfam_file, strain, data_dir, files):
         config = read_config()
@@ -171,19 +171,19 @@ class Annotate_With_Hmms:
 
     def find_tms(self, gb):
         '''
-        Predict TM regions using tmhmm.py
+        Predict TM regions using pyTMHMM
         '''
         self.beds[gb.id]['tms'] = list()
         self.tm_positions[gb.id] = dict()
         track_line = "track name='{0} Transmembrame regions' \
-                      description='tmhmm-based TM detection of COV sequence {1}' \
+                      description='pyTMHMM-based TM detection of COV sequence {1}' \
                       nitemRgb='on'".format(gb.id,gb.id)
         self.beds[gb.id]['tms'].append(track_line)
         for protein in self.protein_strs[gb.id]:
             # Do not analyze polyprotein
             if 'ORF1a' in protein:
                 continue
-            self.run_tmhmm(self.protein_strs[gb.id][protein], protein, gb)
+            self.run_pyTMHMM(self.protein_strs[gb.id][protein], protein, gb)
             if protein in self.tm_positions[gb.id].keys():
                 for tm in self.tm_positions[gb.id][protein]:
                     # Get gene coordinates for a given genome
@@ -200,8 +200,8 @@ class Annotate_With_Hmms:
         '''
         return (3 * num) + self.gene_positions[gb.id][protein][0]
 
-    def run_tmhmm(self, aastr, protein, gb):
-        tm_annotation, _ = tmhmm.predict(aastr)
+    def run_pyTMHMM(self, aastr, protein, gb):
+        tm_annotation, _ = pyTMHMM.predict(aastr)
         if 'M' not in tm_annotation:
             return None
         self.parse_annotation(tm_annotation, protein, gb)
