@@ -1,6 +1,6 @@
 ---
 # Create strain-specific directors in DATA_DIR, defaults
-# to current working direcotory, see utilities.py
+# to current working directory, see utilities.py
 DATA_DIR:
 # Used for eUtils queries and downloads
 EMAIL: self@organization.net

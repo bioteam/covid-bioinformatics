@@ -133,12 +133,15 @@ class Seqs_To_Aligns_And_Hmms:
                 print("Error running '{}': ".format(self.aligner) + str(exception))
 
     def make_maf(self, name):
-        # Create additional Maf format alignment if needed
+        '''
+        Create additional Maf format alignment if needed
+        '''
         if self.maf:
             AlignIO.convert(os.path.join(self.cov_dir, name + '.fasta'),
                             'fasta',
                             os.path.join(self.cov_dir, name + '.maf'),
-                            'maf', alphabet=None)
+                            'maf',
+                            alphabet=None)
 
     def make_align_cmd(self, infile, align_name):
         '''
