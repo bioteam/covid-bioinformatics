@@ -20,18 +20,18 @@ A QC step compares all the COV protein sequences to expected lengths listed in t
 * Sequence aligner ([muscle](https://drive5.com/muscle/), or [clustalo](http://www.clustal.org/omega/), or [mafft](https://mafft.cbrc.jp/alignment/software/))
 * [HMMER 3.3](http://hmmer.org)
 * To make BED files:
-    * [Infernal](http://eddylab.org/infernal/) and [RFAM COV](https://xfam.wordpress.com/2020/04/27/rfam-coronavirus-release/)
-    * [tmhmm.py](https://github.com/dansondergaard/tmhmm.py)
+    * [Infernal](http://eddylab.org/infernal/) and [RFAM COV](https://xfam.wordpress.com/2020/04/27/rfam-coronavirus-release/) for RNA motif prediction
+    * [pyTMHMM](https://github.com/bosborne/pyTMHMM) for trans-membrane region prediction
 
 # recommended for best performance
 * Get an [NCBI API key](https://ncbiinsights.ncbi.nlm.nih.gov/2017/11/02/new-api-keys-for-the-e-utilities/)
 * Pass the key as a command-line argument or configure as an `env` variable (e.g. `export NCBI_API_KEY=8cc3fffffff2b4444492e68a8167aaaa08`)
 
 # output directory
-The code is capable of creating large numbers of files. In order to keep these files organized you can specify 
-a directory with `-data_dir` that should contain strain-specific directories (i.e. *COV2, SARS, MERS*), and the
-code will write all files to the strain-specific directory. The data dir defaults to the current directory, and 
-the default strain is *COV2*.
+The code is capable of creating large numbers of files. In order to keep these files organized you should specify 
+a directory with `-data_dir` that is strain-specific (i.e. *COV2, SARS, MERS*), and the
+code will write all files to the strain-specific directory as needed. The data dir location is the current directory
+by default, and the default strain is *COV2*.
 
 # file formats created
 * GenBank sequence: `.gb`
