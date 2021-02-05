@@ -140,8 +140,7 @@ class Seqs_To_Aligns_And_Hmms:
             AlignIO.convert(os.path.join(self.cov_dir, name + '.fasta'),
                             'fasta',
                             os.path.join(self.cov_dir, name + '.maf'),
-                            'maf',
-                            alphabet=None)
+                            'maf')
 
     def make_align_cmd(self, infile, align_name):
         '''
