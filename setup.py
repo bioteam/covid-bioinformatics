@@ -1,6 +1,6 @@
 from setuptools import setup
 
-requirements = ['biopython', 'numpy', 'PyYAML', 'tmhmm.py']
+requirements = ['biopython', 'numpy', 'PyYAML', 'pyTMHMM']
 
 setup(
     name='covid_bio',
