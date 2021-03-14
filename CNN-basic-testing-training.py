@@ -1,4 +1,6 @@
-conda install pytorch torchvision -c pytorch
+#!/usr/bin/env python3
+
+#conda install pytorch torchvision -c pytorch
 
 import torch
 import torchvision 
