@@ -123,20 +123,25 @@ def test():
     test_loss, correct, len(test_loader.dataset),
     100. * correct / len(test_loader.dataset)))
 
+# plot loop
+def plot():
+  #plot the training curve
+  fig = plt.figure()
+  plt.plot(train_counter, train_losses, color='blue')
+  plt.scatter(test_counter, test_losses, color='red')
+  plt.legend(['Train Loss', 'Test Loss'], loc='upper right')
+  plt.xlabel('number of training examples seen')
+  plt.ylabel('negative log likelihood loss')
+  fig
+
+
 #Run the training 
 test()
 for epoch in range(1, n_epochs + 1):
   train(epoch)
   test()
 
-#plot the training curve
-fig = plt.figure()
-plt.plot(train_counter, train_losses, color='blue')
-plt.scatter(test_counter, test_losses, color='red')
-plt.legend(['Train Loss', 'Test Loss'], loc='upper right')
-plt.xlabel('number of training examples seen')
-plt.ylabel('negative log likelihood loss')
-fig
+plot()
 
 #compare examples to model output
 with torch.no_grad():
@@ -163,13 +168,7 @@ for i in range(1,4):
   train(i)
   test()
 
-fig = plt.figure()
-plt.plot(train_counter, train_losses, color='blue')
-plt.scatter(test_counter, test_losses, color='red')
-plt.legend(['Train Loss', 'Test Loss'], loc='upper right')
-plt.xlabel('number of training examples seen')
-plt.ylabel('negative log likelihood loss')
-fig
+plot()
 
 #New set of network and optimizers 
 continued_network = Net()
@@ -180,13 +179,7 @@ for i in range(1,4):
   train(i)
   test()
 
-fig = plt.figure()
-plt.plot(train_counter, train_losses, color='blue')
-plt.scatter(test_counter, test_losses, color='red')
-plt.legend(['Train Loss', 'Test Loss'], loc='upper right')
-plt.xlabel('number of training examples seen')
-plt.ylabel('negative log likelihood loss')
-fig
+plot()
 #SGD is the best optmizer for this problem. 
 
 #adjust hyperparemeters minibatch size 
@@ -211,14 +204,7 @@ for epoch in range(1, n_epochs + 1):
   train(epoch)
   test()
 
-#plot the training curve
-fig = plt.figure()
-plt.plot(train_counter, train_losses, color='blue')
-plt.scatter(test_counter, test_losses, color='red')
-plt.legend(['Train Loss', 'Test Loss'], loc='upper right')
-plt.xlabel('number of training examples seen')
-plt.ylabel('negative log likelihood loss')
-fig
+plot()
 
 #adjust hyperparemeters minibatch size 
 n_epochs = 10
@@ -242,14 +228,7 @@ for epoch in range(1, n_epochs + 1):
   train(epoch)
   test()
 
-#plot the training curve
-fig = plt.figure()
-plt.plot(train_counter, train_losses, color='blue')
-plt.scatter(test_counter, test_losses, color='red')
-plt.legend(['Train Loss', 'Test Loss'], loc='upper right')
-plt.xlabel('number of training examples seen')
-plt.ylabel('negative log likelihood loss')
-fig
+plot()
 
 #adjust hyperparemeters minibatch size 
 n_epochs = 10
@@ -273,14 +252,7 @@ for epoch in range(1, n_epochs + 1):
   train(epoch)
   test()
 
-#plot the training curve
-fig = plt.figure()
-plt.plot(train_counter, train_losses, color='blue')
-plt.scatter(test_counter, test_losses, color='red')
-plt.legend(['Train Loss', 'Test Loss'], loc='upper right')
-plt.xlabel('number of training examples seen')
-plt.ylabel('negative log likelihood loss')
-fig
+plot()
 
 #adjust hyperparemeters minibatch size 
 n_epochs = 10
@@ -304,14 +276,7 @@ for epoch in range(1, n_epochs + 1):
   train(epoch)
   test()
 
-#plot the training curve
-fig = plt.figure()
-plt.plot(train_counter, train_losses, color='blue')
-plt.scatter(test_counter, test_losses, color='red')
-plt.legend(['Train Loss', 'Test Loss'], loc='upper right')
-plt.xlabel('number of training examples seen')
-plt.ylabel('negative log likelihood loss')
-fig
+plot()
 
 #Larger minibatch runs faster, however, this doesn't necessarily mean better performance
 
@@ -337,14 +302,7 @@ for epoch in range(1, n_epochs + 1):
   train(epoch)
   test()
 
-#plot the training curve
-fig = plt.figure()
-plt.plot(train_counter, train_losses, color='blue')
-plt.scatter(test_counter, test_losses, color='red')
-plt.legend(['Train Loss', 'Test Loss'], loc='upper right')
-plt.xlabel('number of training examples seen')
-plt.ylabel('negative log likelihood loss')
-fig
+plot()
 
 #adjust hyperparemeters learning rate 
 n_epochs = 10
@@ -367,14 +325,7 @@ for epoch in range(1, n_epochs + 1):
   train(epoch)
   test()
 
-#plot the training curve
-fig = plt.figure()
-plt.plot(train_counter, train_losses, color='blue')
-plt.scatter(test_counter, test_losses, color='red')
-plt.legend(['Train Loss', 'Test Loss'], loc='upper right')
-plt.xlabel('number of training examples seen')
-plt.ylabel('negative log likelihood loss')
-fig
+plot()
 
 #adjust hyperparemeters learning rate 
 n_epochs = 10
@@ -398,14 +349,7 @@ for epoch in range(1, n_epochs + 1):
   train(epoch)
   test()
 
-#plot the training curve
-fig = plt.figure()
-plt.plot(train_counter, train_losses, color='blue')
-plt.scatter(test_counter, test_losses, color='red')
-plt.legend(['Train Loss', 'Test Loss'], loc='upper right')
-plt.xlabel('number of training examples seen')
-plt.ylabel('negative log likelihood loss')
-fig
+plot()
 
 #adjust hyperparemeters learning rate 
 n_epochs = 10
@@ -429,14 +373,7 @@ for epoch in range(1, n_epochs + 1):
   train(epoch)
   test()
 
-#plot the training curve
-fig = plt.figure()
-plt.plot(train_counter, train_losses, color='blue')
-plt.scatter(test_counter, test_losses, color='red')
-plt.legend(['Train Loss', 'Test Loss'], loc='upper right')
-plt.xlabel('number of training examples seen')
-plt.ylabel('negative log likelihood loss')
-fig
+plot()
 
 #Learning Rate of 0.01 performs best 
 
