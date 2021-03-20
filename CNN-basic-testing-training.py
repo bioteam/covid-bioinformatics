@@ -2,8 +2,12 @@
 
 #conda install pytorch torchvision -c pytorch
 
+import torch.optim as optim
+import torch.nn.functional as F
+import torch.nn as nn
+import matplotlib.pyplot as plt
 import torch
-import torchvision 
+import torchvision
 
 #prepare hyperparameters
 n_epochs = 10
@@ -19,35 +23,34 @@ torch.manual_seed(random_seed)
 
 #load the data set
 train_loader = torch.utils.data.DataLoader(
-  torchvision.datasets.MNIST('./data', train=True, download=True,
-                             transform=torchvision.transforms.Compose([
-                               torchvision.transforms.ToTensor(),
-                               torchvision.transforms.Normalize(
-                                 (0.1307,), (0.3081,))
-                             ])),
-  batch_size=batch_size_train, shuffle=True)
+    torchvision.datasets.MNIST('./data', train=True, download=True,
+                               transform=torchvision.transforms.Compose([
+                                   torchvision.transforms.ToTensor(),
+                                   torchvision.transforms.Normalize(
+                                       (0.1307,), (0.3081,))
+                               ])),
+    batch_size=batch_size_train, shuffle=True)
 
 test_loader = torch.utils.data.DataLoader(
-  torchvision.datasets.MNIST('./data', train=False, download=True,
-                             transform=torchvision.transforms.Compose([
-                               torchvision.transforms.ToTensor(),
-                               torchvision.transforms.Normalize(
-                                 (0.1307,), (0.3081,))
-                             ])),
-  batch_size=batch_size_test, shuffle=True)
+    torchvision.datasets.MNIST('./data', train=False, download=True,
+                               transform=torchvision.transforms.Compose([
+                                   torchvision.transforms.ToTensor(),
+                                   torchvision.transforms.Normalize(
+                                       (0.1307,), (0.3081,))
+                               ])),
+    batch_size=batch_size_test, shuffle=True)
 
-#content of one test data batch 
+#content of one test data batch
 examples = enumerate(test_loader)
 batch_idx, (example_data, example_targets) = next(examples)
 
 example_data.shape
 
 #Plot test data batch
-import matplotlib.pyplot as plt
 
 fig = plt.figure()
 for i in range(6):
-  plt.subplot(2,3,i+1)
+  plt.subplot(2, 3, i+1)
   plt.tight_layout()
   plt.imshow(example_data[i][0], cmap='gray', interpolation='none')
   plt.title("Ground Truth: {}".format(example_targets[i]))
@@ -55,11 +58,9 @@ for i in range(6):
   plt.yticks([])
 fig
 
-import torch.nn as nn
-import torch.nn.functional as F
-import torch.optim as optim
 
 #building the network
+
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
@@ -78,6 +79,7 @@ class Net(nn.Module):
         x = self.fc2(x)
         return F.log_softmax(x)
 
+
 #initialze the network and optimizer
 network = Net()
 optimizer = optim.SGD(network.parameters(), lr=learning_rate,
@@ -90,6 +92,8 @@ test_losses = []
 test_counter = [i*len(train_loader.dataset) for i in range(n_epochs + 1)]
 
 #Train the model
+
+
 def train(epoch):
   network.train()
   for batch_idx, (data, target) in enumerate(train_loader):
@@ -100,11 +104,11 @@ def train(epoch):
     optimizer.step()
     if batch_idx % log_interval == 0:
       print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
-        epoch, batch_idx * len(data), len(train_loader.dataset),
-        100. * batch_idx / len(train_loader), loss.item()))
+          epoch, batch_idx * len(data), len(train_loader.dataset),
+          100. * batch_idx / len(train_loader), loss.item()))
       train_losses.append(loss.item())
       train_counter.append(
-        (batch_idx*50) + ((epoch-1)*len(train_loader.dataset)))
+          (batch_idx*50) + ((epoch-1)*len(train_loader.dataset)))
 
 #test loop
 def test():
@@ -120,8 +124,8 @@ def test():
   test_loss /= len(test_loader.dataset)
   test_losses.append(test_loss)
   print('\nTest set: Avg. loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
-    test_loss, correct, len(test_loader.dataset),
-    100. * correct / len(test_loader.dataset)))
+      test_loss, correct, len(test_loader.dataset),
+      100. * correct / len(test_loader.dataset)))
 
 # plot loop
 def plot():
@@ -135,7 +139,7 @@ def plot():
   fig
 
 
-#Run the training 
+#Run the training
 test()
 for epoch in range(1, n_epochs + 1):
   train(epoch)
@@ -150,39 +154,39 @@ with torch.no_grad():
 #compare examples to model output
 fig = plt.figure()
 for i in range(6):
-  plt.subplot(2,3,i+1)
+  plt.subplot(2, 3, i+1)
   plt.tight_layout()
   plt.imshow(example_data[i][0], cmap='gray', interpolation='none')
   plt.title("Prediction: {}".format(
-    output.data.max(1, keepdim=True)[1][i].item()))
+      output.data.max(1, keepdim=True)[1][i].item()))
   plt.xticks([])
   plt.yticks([])
 fig
 
-#New set of network and optimizers 
+#New set of network and optimizers
 continued_network = Net()
 continued_optimizer = optim.Adam(network.parameters(), lr=learning_rate)
 
-for i in range(1,4):
+for i in range(1, 4):
   test_counter.append(i*len(train_loader.dataset))
   train(i)
   test()
 
 plot()
 
-#New set of network and optimizers 
+#New set of network and optimizers
 continued_network = Net()
 continued_optimizer = optim.RMSprop(network.parameters(), lr=learning_rate)
 
-for i in range(1,4):
+for i in range(1, 4):
   test_counter.append(i*len(train_loader.dataset))
   train(i)
   test()
 
 plot()
-#SGD is the best optmizer for this problem. 
+#SGD is the best optmizer for this problem.
 
-#adjust hyperparemeters minibatch size 
+#adjust hyperparemeters minibatch size
 n_epochs = 10
 batch_size_train = 1
 batch_size_test = 1000
@@ -206,7 +210,7 @@ for epoch in range(1, n_epochs + 1):
 
 plot()
 
-#adjust hyperparemeters minibatch size 
+#adjust hyperparemeters minibatch size
 n_epochs = 10
 batch_size_train = 100
 batch_size_test = 1000
@@ -230,7 +234,7 @@ for epoch in range(1, n_epochs + 1):
 
 plot()
 
-#adjust hyperparemeters minibatch size 
+#adjust hyperparemeters minibatch size
 n_epochs = 10
 batch_size_train = 1000
 batch_size_test = 1000
@@ -254,7 +258,7 @@ for epoch in range(1, n_epochs + 1):
 
 plot()
 
-#adjust hyperparemeters minibatch size 
+#adjust hyperparemeters minibatch size
 n_epochs = 10
 batch_size_train = 10000
 batch_size_test = 1000
@@ -304,7 +308,7 @@ for epoch in range(1, n_epochs + 1):
 
 plot()
 
-#adjust hyperparemeters learning rate 
+#adjust hyperparemeters learning rate
 n_epochs = 10
 batch_size_train = 50
 batch_size_test = 1000
@@ -327,7 +331,7 @@ for epoch in range(1, n_epochs + 1):
 
 plot()
 
-#adjust hyperparemeters learning rate 
+#adjust hyperparemeters learning rate
 n_epochs = 10
 batch_size_train = 50
 batch_size_test = 1000
@@ -351,7 +355,7 @@ for epoch in range(1, n_epochs + 1):
 
 plot()
 
-#adjust hyperparemeters learning rate 
+#adjust hyperparemeters learning rate
 n_epochs = 10
 batch_size_train = 50
 batch_size_test = 1000
@@ -375,7 +379,6 @@ for epoch in range(1, n_epochs + 1):
 
 plot()
 
-#Learning Rate of 0.01 performs best 
+#Learning Rate of 0.01 performs best
 
 #NN has some issues but pretty good
-
