@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-#conda install pytorch torchvision -c pytorch
-
 import torch.optim as optim
 import torch.nn.functional as F
 import torch.nn as nn
@@ -11,12 +9,11 @@ import torchvision
 
 #prepare hyperparameters
 n_epochs = 10
-batch_size_train = 50
 batch_size_test = 1000
+batch_size_train = 50
 learning_rate = 0.01
 momentum = 0.5
 log_interval = 10
-
 random_seed = 1
 torch.backends.cudnn.enabled = False
 torch.manual_seed(random_seed)
@@ -187,15 +184,8 @@ plot()
 #SGD is the best optmizer for this problem.
 
 #adjust hyperparemeters minibatch size
-n_epochs = 10
 batch_size_train = 1
-batch_size_test = 1000
 learning_rate = 0.01
-momentum = 0.5
-log_interval = 10
-
-random_seed = 1
-torch.backends.cudnn.enabled = False
 torch.manual_seed(random_seed)
 
 #initialze the network and optimizer
@@ -211,15 +201,8 @@ for epoch in range(1, n_epochs + 1):
 plot()
 
 #adjust hyperparemeters minibatch size
-n_epochs = 10
 batch_size_train = 100
-batch_size_test = 1000
 learning_rate = 0.01
-momentum = 0.5
-log_interval = 10
-
-random_seed = 1
-torch.backends.cudnn.enabled = False
 torch.manual_seed(random_seed)
 
 #initialze the network and optimizer
@@ -235,15 +218,8 @@ for epoch in range(1, n_epochs + 1):
 plot()
 
 #adjust hyperparemeters minibatch size
-n_epochs = 10
 batch_size_train = 1000
-batch_size_test = 1000
 learning_rate = 0.01
-momentum = 0.5
-log_interval = 10
-
-random_seed = 1
-torch.backends.cudnn.enabled = False
 torch.manual_seed(random_seed)
 
 #initialze the network and optimizer
@@ -259,15 +235,8 @@ for epoch in range(1, n_epochs + 1):
 plot()
 
 #adjust hyperparemeters minibatch size
-n_epochs = 10
 batch_size_train = 10000
-batch_size_test = 1000
 learning_rate = 0.01
-momentum = 0.5
-log_interval = 10
-
-random_seed = 1
-torch.backends.cudnn.enabled = False
 torch.manual_seed(random_seed)
 
 #initialze the network and optimizer
@@ -285,15 +254,8 @@ plot()
 #Larger minibatch runs faster, however, this doesn't necessarily mean better performance
 
 #adjust hyperparemeters learning rate
-n_epochs = 10
 batch_size_train = 50
-batch_size_test = 1000
 learning_rate = 0.1
-momentum = 0.5
-log_interval = 10
-
-random_seed = 1
-torch.backends.cudnn.enabled = False
 torch.manual_seed(random_seed)
 
 #initialze the network and optimizer
@@ -309,15 +271,8 @@ for epoch in range(1, n_epochs + 1):
 plot()
 
 #adjust hyperparemeters learning rate
-n_epochs = 10
 batch_size_train = 50
-batch_size_test = 1000
 learning_rate = 0.01
-momentum = 0.5
-log_interval = 10
-
-random_seed = 1
-torch.backends.cudnn.enabled = False
 torch.manual_seed(random_seed)
 
 #initialze the network and optimizer
@@ -332,15 +287,8 @@ for epoch in range(1, n_epochs + 1):
 plot()
 
 #adjust hyperparemeters learning rate
-n_epochs = 10
 batch_size_train = 50
-batch_size_test = 1000
 learning_rate = 0.001
-momentum = 0.5
-log_interval = 10
-
-random_seed = 1
-torch.backends.cudnn.enabled = False
 torch.manual_seed(random_seed)
 
 #initialze the network and optimizer
@@ -356,15 +304,8 @@ for epoch in range(1, n_epochs + 1):
 plot()
 
 #adjust hyperparemeters learning rate
-n_epochs = 10
 batch_size_train = 50
-batch_size_test = 1000
 learning_rate = 0.0001
-momentum = 0.5
-log_interval = 10
-
-random_seed = 1
-torch.backends.cudnn.enabled = False
 torch.manual_seed(random_seed)
 
 #initialze the network and optimizer
