@@ -57,7 +57,6 @@ fig
 
 
 #building the network
-
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
@@ -179,8 +178,8 @@ for i in range(1, 4):
   test()
 
 plot()
-#SGD is the best optmizer for this problem.
 
+#SGD is the best optmizer for this problem.
 #adjust hyperparemeters minibatch size
 batch_size_train = 1
 learning_rate = 0.01
@@ -191,11 +190,12 @@ network = Net()
 optimizer = optim.SGD(network.parameters(), lr=learning_rate,
                       momentum=momentum)
 
+# issue: test() increments test_losses, but test_counter stays the same
 test()
 for epoch in range(1, n_epochs + 1):
   train(epoch)
   test()
-
+# error, test_losses longer than test_counter
 plot()
 
 #adjust hyperparemeters minibatch size
@@ -250,7 +250,6 @@ for epoch in range(1, n_epochs + 1):
 plot()
 
 #Larger minibatch runs faster, however, this doesn't necessarily mean better performance
-
 #adjust hyperparemeters learning rate
 batch_size_train = 50
 learning_rate = 0.1
