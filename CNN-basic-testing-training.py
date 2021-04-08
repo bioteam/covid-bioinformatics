@@ -88,6 +88,8 @@ test_losses = []
 test_counter = [i*len(train_loader.dataset) for i in range(n_epochs + 1)]
 
 #Train the model
+
+
 def train(epoch):
   network.train()
   for batch_idx, (data, target) in enumerate(train_loader):
@@ -105,6 +107,8 @@ def train(epoch):
           (batch_idx*50) + ((epoch-1)*len(train_loader.dataset)))
 
 #test loop
+
+#This function does not increment test_counter
 def test():
   network.eval()
   test_loss = 0
@@ -122,6 +126,8 @@ def test():
       100. * correct / len(test_loader.dataset)))
 
 # plot loop
+
+
 def plot():
   #plot the training curve
   fig = plt.figure()
