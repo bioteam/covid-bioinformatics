@@ -126,8 +126,6 @@ def test():
       100. * correct / len(test_loader.dataset)))
 
 # plot loop
-
-
 def plot():
   #plot the training curve
   fig = plt.figure()
