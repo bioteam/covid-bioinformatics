@@ -121,6 +121,7 @@ def test():
       correct += pred.eq(target.data.view_as(pred)).sum()
   test_loss /= len(test_loader.dataset)
   test_losses.append(test_loss)
+  test_counter.append(i*len(test_loader.dataset))
   print('\nTest set: Avg. loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
       test_loss, correct, len(test_loader.dataset),
       100. * correct / len(test_loader.dataset)))
@@ -166,7 +167,6 @@ continued_network = Net()
 continued_optimizer = optim.Adam(network.parameters(), lr=learning_rate)
 
 for i in range(1, 4):
-  test_counter.append(i*len(train_loader.dataset))
   train(i)
   test()
 
@@ -177,7 +177,6 @@ continued_network = Net()
 continued_optimizer = optim.RMSprop(network.parameters(), lr=learning_rate)
 
 for i in range(1, 4):
-  test_counter.append(i*len(train_loader.dataset))
   train(i)
   test()
 
@@ -194,12 +193,11 @@ network = Net()
 optimizer = optim.SGD(network.parameters(), lr=learning_rate,
                       momentum=momentum)
 
-# issue: test() increments test_losses, but test_counter stays the same
 test()
 for epoch in range(1, n_epochs + 1):
   train(epoch)
   test()
-# error, test_losses longer than test_counter
+# error
 plot()
 
 #adjust hyperparemeters minibatch size
