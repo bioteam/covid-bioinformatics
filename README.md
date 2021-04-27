@@ -1,19 +1,21 @@
 # covid-bioinformatics
-Software tools to collect and analyze Coronavirus sequences, including code that extracts gene and protein
-sequences from COV (Coronavirus) genome files downloaded from NCBI, and creates gene and protein-specific 
-sequence collections, alignments, and Hidden Markov Models (HMMs). The HMMs can be used to annotate COV
-sequences and create BED files for genome visualization. The code uses the *cov_strains.yaml* file that lists 
-the expected genes for *SARS, MERS*, and *COV2* so that collections are strain-specific.
+Software tools to collect and analyze Coronavirus (COV) sequences, including code that extracts gene and protein
+sequences from COV genomes from GenBank, and creates gene and protein-specific 
+sequence collections, alignments, and Hidden Markov Models (HMMs) for protein and nucleotide COV sequences.
+The code uses the [cov_strains.yaml](https://github.com/bioteam/covid-bioinformatics/blob/master/covid_bio/cov_strains.yaml) file that lists the expected genes for *SARS, MERS*, and *COV2* so that collections are strain-specific.
+
+Code is included that annotates COV genomes using the nucleotide HMMs, [pyTMHMM](https://github.com/bosborne/pyTMHMM),
+and [Infernal](http://eddylab.org/infernal/) for RNA motif prediction and creates BED files for genome visualization. 
 
 # example usage
 * `mkdir COV2`
 * `./download_gb_by_taxid.py`
 * `./feature_to_gene_and_protein.py COV2/*.gb`
 * `./seqs_to_aligns_and_hmms.py COV2/*.fa`
+* `./annotate_to_bed.py -rfam_file ../COV2/cov_allvirus.cm COV2/NC_045512.2.gb` 
 
 The COV genes and proteins are parsed from the GenBank files as features and assigned standard names based on 
-their *product* or *mat_peptide* tags. Possible synonyms for these standard names are listed in *cov_features.yaml*.
-A QC step compares all the COV protein sequences to expected lengths listed in the *cov_length_variants.yaml* file.
+their *product* or *mat_peptide* tags. Possible synonyms for these standard names are listed in [cov_features.yaml](https://github.com/bioteam/covid-bioinformatics/blob/master/covid_bio/cov_features.yaml). A QC step compares the COV sequences to expected lengths listed in the [cov_length_variants.yaml](https://github.com/bioteam/covid-bioinformatics/blob/master/covid_bio/cov_length_variants.yaml) file.
 
 # requirements
 * Python3 and packages, including [Biopython](https://biopython.org/)
