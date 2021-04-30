@@ -10,7 +10,6 @@ import pyTMHMM
 from Bio import SearchIO
 from Bio import SeqIO
 from Bio.Seq import Seq
-from Bio.Alphabet import IUPAC
 from utilities import read_strains, read_config
 
 '''
@@ -247,7 +246,7 @@ class Annotate_With_Hmms:
         return aastr
 
     def translate(self, ntstr):
-        aaseq = Seq(ntstr, IUPAC.unambiguous_dna).translate(to_stop=False)
+        aaseq = Seq(ntstr).translate(to_stop=False)
         # Remove trailing '*'
         return str(aaseq)[:-1]
 
