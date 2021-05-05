@@ -8,7 +8,6 @@ import yaml
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
-from Bio.Alphabet import IUPAC
 from utilities import read_synonyms, read_variants, read_strains, read_config
 
 
@@ -303,13 +302,13 @@ class Feature_To_Gene_And_Protein:
                 acc = feat.id.split('-')[1]
                 # nt
                 ntseq = feat.extract(self.accs[acc]['seq'])
-                nt = SeqRecord(Seq(ntseq, IUPAC.ambiguous_dna),
+                nt = SeqRecord(Seq(ntseq),
                                   id=feat.id,
                                   description=self.make_desc(feat, ntseq, 'nt'))
                 self.feats[name][feat.id]['nt'] = nt
                 # aa
                 aaseq = feat.qualifiers["translation"][0]
-                aa = SeqRecord(Seq(aaseq, IUPAC.extended_protein),
+                aa = SeqRecord(Seq(aaseq),
                                   id=feat.id,
                                   description=self.make_desc(feat, aaseq, 'aa'))
                 self.feats[name][feat.id]['aa'] = aa
@@ -329,13 +328,13 @@ class Feature_To_Gene_And_Protein:
                 acc = feat.id.split('-')[1]
                 # nt
                 ntseq = feat.extract(self.accs[acc]['seq'])
-                nt = SeqRecord(Seq(ntseq, IUPAC.ambiguous_dna),
+                nt = SeqRecord(Seq(ntseq),
                                   id=feat.id,
                                   description=self.make_desc(feat, ntseq, 'nt'))
                 self.feats[name][feat.id]['nt'] = nt
                 # aa
                 aaseq = str(nt.translate().seq)
-                aa = SeqRecord(Seq(aaseq, IUPAC.extended_protein),
+                aa = SeqRecord(Seq(aaseq),
                                   id=feat.id,
                                   description=self.make_desc(feat, aaseq, 'aa'))
                 self.feats[name][feat.id]['aa'] = aa
