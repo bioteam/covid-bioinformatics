@@ -15,8 +15,10 @@ parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
 '''
+./fast_uniprot_parser.py -matrix -output uniprot_sprot_viruses.mat uniprot_sprot_viruses.dat
+
 This code makes a 2-D matrix of protein ids, protein sequences, GO, and KEGG terms. The number
-of terms will vary by sequence. This is a very sparse matrix.
+of terms will vary by sequence but this is a very sparse matrix with many 0's.
 
 Example mini-matrix:
 
@@ -71,6 +73,8 @@ SQ   SEQUENCE   225 AA;  25107 MW;  3BD60B1CA8C7D7F5 CRC64;
      SSLAALVALK YHIKDIFTIL GAAIIIILAE YVVLPYQRQY NIVDGIGLPL LLLGFFILYQ
      VFSVPNPSTP TGVMVPKPED EWDIEMAPLN HRDRQVPESE LENVK
 //
+
+Taxonomic divisions in Uniprot: https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/taxonomic_divisions/README
 '''
 
 def main():
