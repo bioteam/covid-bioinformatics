@@ -15,7 +15,8 @@ parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
 '''
-This code makes a 2-D matrix of protein ids, protein sequences, GO, and KEGG terms.
+This code makes a 2-D matrix of protein ids, protein sequences, GO, and KEGG terms. The number
+of terms will vary by sequence.
 
 Example mini-matrix:
 
