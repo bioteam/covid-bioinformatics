@@ -15,6 +15,15 @@ parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
 '''
+This code makes a 2-D matrix of protein ids, protein sequences, GO, and KEGG terms.
+
+Example mini-matrix:
+
+PID,Sequence,GO:123,GO:456,GO:789,vg:123,vg:456
+A1,MAK,0,1,0,0,0
+B2,MLY,0,0,1,0,0
+C3,MAF,1,0,0,0,0
+
 Example Uniprot file:
 
 ID   022L_IIV3               Reviewed;         225 AA.
@@ -61,13 +70,6 @@ SQ   SEQUENCE   225 AA;  25107 MW;  3BD60B1CA8C7D7F5 CRC64;
      SSLAALVALK YHIKDIFTIL GAAIIIILAE YVVLPYQRQY NIVDGIGLPL LLLGFFILYQ
      VFSVPNPSTP TGVMVPKPED EWDIEMAPLN HRDRQVPESE LENVK
 //
-
-Example mini-matrix:
-
-PID,Sequence,GO:123,GO:456,GO:789,vg:123,vg:456
-A1,MAK,0,1,0,0,0
-B2,MLY,0,0,1,0,0
-C3,MAF,1,0,0,0,0
 '''
 
 def main():
