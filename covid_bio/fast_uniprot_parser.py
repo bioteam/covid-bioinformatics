@@ -19,7 +19,7 @@ args = parser.parse_args()
 
 This code makes a 2-D matrix of protein ids, protein sequences, GO, and KEGG term occurences. 
 The number of terms will vary by sequence and this will be a very sparse matrix with some 1's 
-("has term") many 0's ("does not have term").
+("has term") and many 0's ("does not have term").
 
 Example mini-matrix:
 
