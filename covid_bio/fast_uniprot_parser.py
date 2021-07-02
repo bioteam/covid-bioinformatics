@@ -17,30 +17,28 @@ args = parser.parse_args()
 '''
 ./fast_uniprot_parser.py -matrix -output uniprot_sprot_viruses.mat uniprot_sprot_viruses.dat
 
-This code makes a 2-D matrix of protein ids, protein sequences, GO, and KEGG terms. The number
-of terms will vary by sequence but this is a very sparse matrix with many 0's.
+This code makes a 2-D matrix of protein ids, protein sequences, GO, and KEGG term occurences. 
+The number of terms will vary by sequence and this will be a very sparse matrix with some 1's 
+("has term") many 0's ("does not have term").
 
 Example mini-matrix:
 
 PID,Sequence,GO:123,GO:456,GO:789,vg:123,vg:456
-A1,MAK,0,1,0,0,0
-B2,MLY,0,0,1,0,0
-C3,MAF,1,0,0,0,0
+022L_IIV3,MAK,0,1,0,0,0
+022L_IIV4,MLY,0,0,1,0,0
+022L_IIV5,MAF,1,0,0,0,0
 
 Example Uniprot file:
 
 ID   022L_IIV3               Reviewed;         225 AA.
 AC   Q197D8;
-DT   16-JUN-2009, integrated into UniProtKB/Swiss-Prot.
 DT   11-JUL-2006, sequence version 1.
-DT   22-APR-2020, entry version 33.
 DE   RecName: Full=Transmembrane protein 022L;
 GN   ORFNames=IIV3-022L;
 OS   Invertebrate iridescent virus 3 (IIV-3) (Mosquito iridescent virus).
 OC   Viruses; Iridoviridae; Betairidovirinae; Chloriridovirus.
 OX   NCBI_TaxID=345201;
 OH   NCBI_TaxID=7163; Aedes vexans (Inland floodwater mosquito) (Culex vexans).
-OH   NCBI_TaxID=42431; Culex territans.
 RN   [1]
 RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA].
 RX   PubMed=16912294; DOI=10.1128/jvi.00464-06;
