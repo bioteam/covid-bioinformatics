@@ -5,28 +5,29 @@ import sys
 import os
 import re
 import itertools
+from ifeatpro_utils import run_ifeatpro
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
 parser.add_argument('-matrix', default=False, action='store_true', help="Make matrix for ChemProp")
-parser.add_argument('-output', default='uniprot_sprot.mat', help="Output matrix file")
+parser.add_argument('-output', help="Output matrix file")
 parser.add_argument('-delimiter', default=',', help="Field delimiter")
+parser.add_argument('-features', default='paac,ctriad', help="Names of feature vectors, comma-delimited")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
 '''
-./fast_uniprot_parser.py -matrix -output uniprot_sprot_viruses.mat uniprot_sprot_viruses.dat
+./fast_uniprot_parser.py -matrix uniprot_sprot_viruses.dat
 
-This code makes a 2-D matrix of protein ids, protein sequences, GO, and KEGG term occurences. 
-The number of terms will vary by sequence and this will be a very sparse matrix with some 1's 
-("has term") and many 0's ("does not have term").
+This code makes a 2-D matrix of protein ids, protein sequences, GO, KEGG term occurences, and 
+protein feature vectors. The number of terms will vary by sequence and this will be a very sparse matrix 
+with some 1's ("has term") and many 0's ("does not have term"). The name of the feature vector is in 
+the header. Example mini-matrix:
 
-Example mini-matrix:
-
-PID,Sequence,GO:123,GO:456,GO:789,vg:123,vg:456
-022L_IIV3,MAK,0,1,0,0,0
-022L_IIV4,MLY,0,0,1,0,0
-022L_IIV5,MAF,1,0,0,0,0
+PID,Sequence,GO:123,GO:456,GO:789,vg:123,vg:456,paac,paac,paac
+022L_IIV3, MAKALTYYCCK, 0, 1, 0, 0, 0, 4.56, 0.0, 3.0
+022L_IIV4, MLYlTYMRGGLCGVDKR, 0, 0, 1, 0, 0, 2.56, 7.0, 0.0
+022L_IIV5, MAFYTWMCLVVL, 1, 0, 0, 0, 0, 0.56, 0.0, 0.0
 
 Example Uniprot file:
 
@@ -76,7 +77,7 @@ Taxonomic divisions in Uniprot: https://ftp.uniprot.org/pub/databases/uniprot/cu
 '''
 
 def main():
-    extractor = Fast_Uniprot_Parser(args.verbose, args.matrix, args.output, args.delimiter, args.files)
+    extractor = Fast_Uniprot_Parser(args.verbose, args.matrix, args.output, args.delimiter, args.features, args.files)
     extractor.read()
     if extractor.matrix:
         extractor.make_matrix()
@@ -84,15 +85,20 @@ def main():
 
 class Fast_Uniprot_Parser:
 
-    def __init__(self, verbose, matrix, output, delimiter, files):
+    def __init__(self, verbose, matrix, output, delimiter, features, files):
         self.verbose = verbose
         self.matrix = matrix
         self.output = output
         self.delimiter = delimiter
         self.files = files
+        self.features = features.split(',')
         self.data = dict()
 
     def read(self):
+        '''
+        Create 2-D 'data' matrix where key is the PID and the values
+        is an array where element 0 is the sequence and subsequent elements
+        '''
         paths = [f for f in self.files if os.path.isfile(f)]
         for path in paths:
             with open(path, 'r') as f:
@@ -131,8 +137,8 @@ class Fast_Uniprot_Parser:
                         if 'SQ' in data.keys():
                             data['SQ'] = ''.join(data['SQ'])
                             self.data[pid] = data
-                    if self.verbose and linenum % 10000 == 0:
-                        print("Line {}".format(linenum))
+                    # if self.verbose and linenum % 10000 == 0:
+                    #     print("Line {}".format(linenum))
 
     def make_matrix(self):
         '''
@@ -148,7 +154,10 @@ class Fast_Uniprot_Parser:
         header.extend(goterms)
         header.extend(keggterms)
         matrix[0] = header
+        if self.verbose:
+            print("Header: {}".format(header))
 
+        # Create matrix of 1's and 0's for terms
         for colindex, pid in enumerate(self.data.keys(), start=1):
             arr = list()
             arr.extend([pid, self.data[pid]['SQ']])
@@ -162,17 +171,23 @@ class Fast_Uniprot_Parser:
                     arr.append('1')
                 else:
                     arr.append('0')
-            if self.verbose:
-                print("Row: {}".format(arr))
             matrix[colindex] = arr
+
+        # Calculate feature vectors
+        for feature in self.features:
+            for colindex, pid in enumerate(self.data.keys(), start=1):
+                feat_vector = run_ifeatpro(feature, self.data[pid]['SQ'], pid)
+                matrix[colindex].extend(feat_vector)
+            matrix[0].extend([feature for x in feat_vector])
+
         self.matrix = matrix
 
     def parse_terms(self, ontology):
         ''' Return unique, sorted set of terms
         >>> data
-        {3: {'GO': [5, 9]}, 5: {'KEGG': [7, 4]}}
+        {029L_FRG3G: {'GO': ['GO:123', 'GO:456']}, 087A_FG3H: {'KEGG': ['vg:123', 'vg:456']}}
         >>> [ ids.get('GO') for ids in [trms for trms in data.values() ]]
-        [[5, 9], None]  
+        [['GO:123', 'GO:456'], None]  
         '''
         # Array of arrays of all terms plus None
         terms = [ gids.get(ontology) for gids in [pids for pids in self.data.values() ]]
@@ -185,12 +200,15 @@ class Fast_Uniprot_Parser:
         return terms
 
     def write_matrix(self):
+        if not self.output:
+            self.output = os.path.basename(self.files[0]).split('.')[0] + '.mat'
         with open(self.output, "w") as out:
             if self.verbose:
                 print("Writing matrix file {}".format(self.output))
             for line in self.matrix:
                 l = self.delimiter.join(line) + "\n"
                 out.write(l)
+
 
 if __name__ == "__main__":
     main()
