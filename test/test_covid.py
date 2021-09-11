@@ -9,7 +9,7 @@ from covidbio.mash_utils import make_nr
 
 class TestCOVID(unittest.TestCase):
     '''
-    Input fasta has seven entries, output has six entries
+    Input fasta has seven entries, "nr" output has six entries
     '''
     outfile = 'cysprot-nr.fa'
     
