@@ -77,7 +77,7 @@ SARS:
     - N
 MERS:
   taxid: 1335626
-  # different from SARS, COV2
+  # different from SARS, COV2:
   slip_sequence: TTTTTAAACGAG
   minlen: 25000
   years:

@@ -8,7 +8,7 @@ import yaml
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
-from utilities import read_synonyms, read_variants, read_strains, read_config
+from covidbio.utilities import read_synonyms, read_variants, read_strains, read_config
 
 
 parser = argparse.ArgumentParser()

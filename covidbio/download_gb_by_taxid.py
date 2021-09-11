@@ -8,7 +8,7 @@ import numpy
 import yaml
 from Bio import Entrez
 from Bio import SeqIO
-from utilities import read_strains, read_config
+from covidbio.utilities import read_strains, read_config
 
 '''
 NCBI Taxonomy ids:

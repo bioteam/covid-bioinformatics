@@ -9,7 +9,7 @@ import numpy
 from Bio import SearchIO
 from Bio import Entrez
 from Bio import SeqIO
-from utilities import read_config
+from covidbio.utilities import read_config
 
 
 parser = argparse.ArgumentParser()

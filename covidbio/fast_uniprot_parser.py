@@ -5,7 +5,7 @@ import sys
 import os
 import re
 import itertools
-from ifeatpro_utils import run_ifeatpro
+from covidbio.ifeatpro_utils import run_ifeatpro
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")

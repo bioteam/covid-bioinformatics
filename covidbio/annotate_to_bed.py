@@ -10,7 +10,7 @@ import pyTMHMM
 from Bio import SearchIO
 from Bio import SeqIO
 from Bio.Seq import Seq
-from utilities import read_strains, read_config
+from covidbio.utilities import read_strains, read_config
 
 '''
 Annotate COV GenBank files using a collection of HMMs and applications. Example BED files showing genes:
