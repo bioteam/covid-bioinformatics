@@ -5,6 +5,11 @@ import subprocess
 import os
 from Bio import SeqIO
 
+'''
+Use the mash application to do pairwise sequence comparision using 
+kmers, and use similarity data to identify closely related sequences 
+which can be removed to create an "nr" file.
+'''
 def make_nr(fname, informat='fasta', threshold=0.1):
     results = run_mash(fname)
     # Arbitrarily pick first of sorted pair of ids and ignore sequence compared to itself
