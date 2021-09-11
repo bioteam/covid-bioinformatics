@@ -7,13 +7,13 @@ from Bio import SeqIO
 
 def make_nr(fname, informat='fasta', threshold=0.1):
     results = run_mash(fname)
-    # Arbitrarily pick first of sorted pair of ids
-    skip = set([sorted([e[0], e[1]])[0] for e in results if float(e[2]) < threshold])
+    # Arbitrarily pick first of sorted pair of ids and ignore sequence compared to itself
+    skip = set([sorted([e[0], e[1]])[0] for e in results if float(e[2]) < threshold and e[0] != e[1]])
     # For example, input is viruses.dat, output is viruses-nr.fa
-    aahandle = open(os.path.basename(fname).split('.')[0] + '-nr.fa', 'w')
-    for seq in SeqIO.parse(fname, informat):
-        if seq.id not in skip:
-            SeqIO.write(seq, aahandle, 'fasta')
+    with open(os.path.basename(fname).split('.')[0] + '-nr.fa', 'w') as out:
+        for seq in SeqIO.parse(fname, informat):
+            if seq.id not in skip:
+                SeqIO.write(seq, out, 'fasta')
 
 '''
 mash results example:
