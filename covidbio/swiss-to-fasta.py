@@ -7,7 +7,7 @@ from Bio import SearchIO
 from Bio import SeqIO
 from Bio.Seq import Seq
 
-from covidbio.utilities import read_strains, read_config
+#from covidbio.utilities import read_strains, read_config
 
 #short script to convert swissprot to fasta
 
