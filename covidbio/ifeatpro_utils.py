@@ -6,6 +6,7 @@ from ifeatpro.features import get_feature
 
 def run_ifeatpro(feature, seqstr, pid):
     tmpfasta = tempfile.NamedTemporaryFile()
+    # Write fasta file
     with open(tmpfasta.name, 'w') as f:
         f.write(">" + pid + "\n" + seqstr)
     tmpdir = tempfile.TemporaryDirectory()

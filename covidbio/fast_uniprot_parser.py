@@ -10,7 +10,7 @@ from covidbio.ifeatpro_utils import run_ifeatpro
 parser = argparse.ArgumentParser()
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
 parser.add_argument('-matrix', default=False, action='store_true', help="Make matrix for ChemProp")
-parser.add_argument('-output', help="Output matrix file")
+parser.add_argument('-moutput', help="Output matrix file")
 parser.add_argument('-delimiter', default=',', help="Field delimiter")
 parser.add_argument('-features', default='paac,ctriad', help="Names of feature vectors, comma-delimited")
 parser.add_argument('files', nargs='+', help='File names')
@@ -19,10 +19,10 @@ args = parser.parse_args()
 '''
 ./fast_uniprot_parser.py -matrix uniprot_sprot_viruses.dat
 
-This code makes a 2-D matrix of protein ids, protein sequences, GO, KEGG term occurences, and 
-protein feature vectors. The number of terms will vary by sequence and this will be a very sparse matrix 
-with some 1's ("has term") and many 0's ("does not have term"). The name of the feature vector is in 
-the header. Example mini-matrix:
+This code makes a 2-D matrix of protein ids, protein sequences, GO, KEGG term occurences, 
+and protein feature vectors. The number of terms will vary by sequence and this will be a 
+very sparse matrix with some 1's ("has term") and many 0's ("does not have term"). The 
+name of the feature vector is in the header. Example mini-matrix:
 
 PID,Sequence,GO:123,GO:456,GO:789,vg:123,vg:456,paac,paac,paac
 022L_IIV3, MAKALTYYCCK, 0, 1, 0, 0, 0, 4.56, 0.0, 3.0
