@@ -98,6 +98,9 @@ class Fast_Uniprot_Parser:
         '''
         Create 2-D 'data' matrix where key is the PID and the values
         is an array where element 0 is the sequence and subsequent elements
+
+        All data for a given protein entry is stored in self.data[pid],
+        where "pid" is the Uniprot id, e.g. "022L_IIV3".
         '''
         paths = [f for f in self.files if os.path.isfile(f)]
         for path in paths:
