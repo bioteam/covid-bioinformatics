@@ -99,9 +99,6 @@ class Fast_Uniprot_Parser:
         Data for a given protein entry is stored in the self.data[pid] dict, 
         where "pid" is the Uniprot id, e.g. "022L_IIV3". This includes GO terms 
         ('GO' key), KEGG ('KEGG' key), and sequence ('SQ' key).
-
-        Create 2-D 'data' matrix where key is the PID and the values
-        is an array where element 0 is the sequence and subsequent elements
         '''
         paths = [f for f in self.files if os.path.isfile(f)]
         for path in paths:
@@ -148,15 +145,13 @@ class Fast_Uniprot_Parser:
         '''
         Create delimited matrix
         '''
-        goterms = self.parse_terms('GO')
-        keggterms = self.parse_terms('KEGG')
         # Initialize array of arrays
         matrix = [None] * (len(self.data.keys()) + 1)
         # Create header line
         header = list()
         header.extend(['PID', 'Sequence'])
-        header.extend(goterms)
-        header.extend(keggterms)
+        header.extend(self.get_terms('GO'))
+        header.extend(self.get_terms('KEGG'))
         matrix[0] = header
         if self.verbose:
             print("Header: {}".format(header))
@@ -186,8 +181,8 @@ class Fast_Uniprot_Parser:
 
         self.matrix = matrix
 
-    def parse_terms(self, ontology):
-        ''' Return unique, sorted set of terms
+    def get_terms(self, ontology):
+        ''' Return unique, sorted set of terms for a single ontology
         >>> data
         {029L_FRG3G: {'GO': ['GO:123', 'GO:456']}, 087A_FG3H: {'KEGG': ['vg:123', 'vg:456']}}
         >>> [ ids.get('GO') for ids in [trms for trms in data.values() ]]
