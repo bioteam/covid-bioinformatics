@@ -96,7 +96,7 @@ class Fast_Uniprot_Parser:
 
     def read(self):
         '''
-        All data for a given protein entry is stored in self.data[pid],
+        Data for a given protein entry is stored in the self.data[pid] dict, 
         where "pid" is the Uniprot id, e.g. "022L_IIV3". This includes GO terms 
         ('GO' key), KEGG ('KEGG' key), and sequence ('SQ' key).
 
