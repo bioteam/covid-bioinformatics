@@ -1,0 +1,3 @@
+biopython==1.79
+ifeatpro==0.0.3
+numpy==1.21.2
