@@ -4,6 +4,13 @@ import os
 import tempfile
 from ifeatpro.features import get_feature
 
+'''
+Returns a single array or "feature vector" using ifeatpro given:
+
+- Feature name, e.g. 'ctriad'
+- Protein sequence as string, e.g. 'MAVKLSSTTRD'
+- Protein id, e.g. 'ARAB_ABC5'
+'''
 def run_ifeatpro(feature, seqstr, pid):
     tmpfasta = tempfile.NamedTemporaryFile()
     # Write fasta file
