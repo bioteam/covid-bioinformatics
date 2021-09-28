@@ -55,7 +55,6 @@ def convert_to_deepred_input_format(output_dir):
 
 
 def generate_features(protein_seqs, feature_type, output_dir):
-
     with tempfile.NamedTemporaryFile(mode="w") as tmp:
         for protein_id, seq in protein_seqs.items():
             tmp.write(f">{protein_id}")
