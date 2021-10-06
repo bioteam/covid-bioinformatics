@@ -51,7 +51,8 @@ def convert_to_deepred_input_format(output_dir, protein_seqs, feature_type):
     with open(output_dir + "/" + "dataset.txt", "w") as output_file:
         for protein_id, seq in protein_seqs.items():
             feature_vec = run_ifeatpro(feature_type, seq, protein_id)
-            # Write single line for each protein
+            # Write tab-delimited line for each protein with protein id followed by feature vector
+            output_file.write('\t'.join([protein_id, '\t'.join(arr)]))
 
 
 if __name__ == "__main__":
