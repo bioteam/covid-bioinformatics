@@ -1,9 +1,10 @@
 import os
 import sys
-import tempfile
+parentdir = os.path.dirname(__file__)
+sys.path.insert(0,parentdir)
 
 from Bio import SeqIO
-from ifeatpro.features import get_feature
+from ifeatpro_utils import run_ifeatpro
 from pathlib import Path
 
 
@@ -41,31 +42,15 @@ def build_dataset(fasta_file_path, go_annots_path, feature_type, output_dir):
             print(f"No record found in FASTA for protein: {protein}")
 
     print(f"INFO: Protein to seq dictionary has {len(protein_seqs)} proteins")
-    # Generate feature file
-    generate_features(protein_seqs, feature_type, output_dir)
 
-    convert_to_deepred_input_format(output_dir)
+    convert_to_deepred_input_format(output_dir, protein_seqs, feature_type)
 
 
-def convert_to_deepred_input_format(output_dir):
-    with open(output_dir + "/" + "ctriad.csv", "r") as input_file:
-        with open(output_dir + "/" + "dataset.txt", "w") as output_file:
-            for line in input_file.readlines():
-                output_file.write(line.replace(",", "\t"))
-
-
-def generate_features(protein_seqs, feature_type, output_dir):
-    with tempfile.NamedTemporaryFile(mode="w") as tmp:
+def convert_to_deepred_input_format(output_dir, protein_seqs, feature_type):
+    with open(output_dir + "/" + "dataset.txt", "w") as output_file:
         for protein_id, seq in protein_seqs.items():
-            tmp.write(f">{protein_id}")
-           # print(protein_id)
-            tmp.write("\n")
-            tmp.write(seq)
-            tmp.write("\n")
-            # Make sure we finish writing to disk before proceeding to avoid read/write race condition (get_feature() might read too soon)
-            tmp.flush()
-          #  print(seq)
-        get_feature(tmp.name, feature_type, output_dir)
+            feature_vec = run_ifeatpro(feature_type, seq, protein_id)
+            # Write single line for each protein
 
 
 if __name__ == "__main__":
