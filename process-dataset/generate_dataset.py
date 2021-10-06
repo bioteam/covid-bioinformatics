@@ -1,5 +1,6 @@
 import os
 import sys
+import argparse
 parentdir = os.path.dirname(__file__)
 sys.path.insert(0,parentdir)
 
@@ -55,13 +56,12 @@ def convert_to_deepred_input_format(output_dir, protein_seqs, feature_type):
 
 if __name__ == "__main__":
 
-    if len(sys.argv) != 5:
-        print("Usage: python3 generate_dataset.py <path/to/fasta/file> <path/to/annotations/dir> <feature type> <path/to/output/dir>")
-        exit(1)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-verbose', action='store_true', help="Verbose")
+    parser.add_argument('-fasta_file_path', help="Fasta file path")
+    parser.add_argument('-go_annots_path', help="GO annotations path")
+    parser.add_argument('-feature_type', default='ctriad', help="Feature type")
+    parser.add_argument('-output_dir', help='Output directory')
+    args = parser.parse_args()
 
-    fasta_file_path = sys.argv[1]
-    go_annots_path = sys.argv[2]
-    feature_type = sys.argv[3]
-    output_dir = sys.argv[4]
-
-    build_dataset(fasta_file_path, go_annots_path, feature_type, output_dir)
+    build_dataset(args.fasta_file_path, args.go_annots_path, args.feature_type, args.output_dir)
