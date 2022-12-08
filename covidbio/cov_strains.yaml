@@ -5,6 +5,8 @@ COV2:
   years:
     - 2019
     - 2020
+    - 2021
+    - 2022
   host:
     - Homo sapiens
   # 28 genes
