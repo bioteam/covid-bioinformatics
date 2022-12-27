@@ -19,8 +19,10 @@ their *product* or *mat_peptide* tags. Possible synonyms for these standard name
 
 # requirements
 * Python3 and packages, including [Biopython](https://biopython.org/)
-* Sequence aligner ([muscle](https://drive5.com/muscle/), or [clustalo](http://www.clustal.org/omega/), or [mafft](https://mafft.cbrc.jp/alignment/software/))
+* A sequence aligner, [muscle](https://drive5.com/muscle/), or [clustalo](http://www.clustal.org/omega/), or [mafft](https://mafft.cbrc.jp/alignment/software/)) (default: `clustalo`)
 * [HMMER 3.3](http://hmmer.org)
+
+# optional
 * To make BED files:
     * [Infernal](http://eddylab.org/infernal/) and [RFAM COV](https://xfam.wordpress.com/2020/04/27/rfam-coronavirus-release/) for RNA motif prediction
     * [pyTMHMM](https://github.com/bosborne/pyTMHMM) for trans-membrane region prediction
