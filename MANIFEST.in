@@ -1,0 +1,4 @@
+include covidbio/config.yaml
+include covidbio/cov_length_variants.yaml
+include covidbio/cov_strains.yaml
+include covidbio/cov_features.yaml
