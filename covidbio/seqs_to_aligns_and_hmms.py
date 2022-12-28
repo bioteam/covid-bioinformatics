@@ -63,14 +63,13 @@ class Seqs_To_Aligns_And_Hmms:
         self.files = files
 
     '''
-    Read FASTA file, return array of unique sequences.
+    Read one FASTA file, return array of unique sequences.
     '''
     def read(self, path):
         seqs = list()
         try:
             if self.verbose:
                 print("Reading Fasta file: {}".format(path))
-            # Each one of these is a multiple fasta file
             for fa in SeqIO.parse(path, "fasta"):
                 seqs.append(fa)
             seqs = self.remove_dups(seqs, os.path.basename(path))
@@ -114,7 +113,7 @@ class Seqs_To_Aligns_And_Hmms:
             tmpfasta = tempfile.NamedTemporaryFile()
             SeqIO.write(seqs, tmpfasta.name, 'fasta')
             if self.verbose:
-                print("Alignment input sequence file: {}".format(tmpfasta.name))
+                print("Alignment input file: {0}".format(tmpfasta.name))
             # out_filename is used to redirect the STDOUT to file
             # when self.aligner is "mafft" and it requires redirect to file
             cmd, out_filename = self.make_align_cmd(tmpfasta.name, align_name)
