@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
 import argparse
-import sys
 import os
 import re
 import subprocess
+import sys
 import tempfile
 from Bio import AlignIO
 from Bio import SeqIO
@@ -72,7 +72,6 @@ class Seqs_To_Aligns_And_Hmms:
                 print("Reading Fasta file: {}".format(path))
             for fa in SeqIO.parse(path, "fasta"):
                 seqs.append(fa)
-            seqs = self.remove_dups(seqs, os.path.basename(path))
         except (RuntimeError) as exception: 
             print("Error parsing sequences in '" +
                 str(path) + "':" + str(exception))
@@ -95,8 +94,8 @@ class Seqs_To_Aligns_And_Hmms:
         return list(d.values())
 
     '''
-    Get list of unique sequences and a name, create temporary input file and
-    make an alignment (*.fasta)
+    Make a list of unique sequences, create temporary input file and
+    make the alignment (*.fasta)
     '''
     def make_align(self, seqs, name):
         align_name = os.path.join(self.cov_dir, name + '.fasta')
@@ -105,22 +104,21 @@ class Seqs_To_Aligns_And_Hmms:
                 print("Alignment file {} already exists".format(align_name))
             return
         # Most aligners will reject a file with a single sequence so
-        # just duplicate the *fa file to make the alignment *fasta file
+        # duplicate the *fa file to make the alignment *fasta file
         if len(seqs) == 1:
             cmd = ['cp', 
                     os.path.join(self.cov_dir, name + '.fa'), 
                     align_name]
             subprocess.run(cmd, check=True)
         else:
+            seqs = self.remove_dups(seqs, os.path.basename(path))
             tmpfasta = tempfile.NamedTemporaryFile()
             SeqIO.write(seqs, tmpfasta.name, 'fasta')
-            if self.verbose:
-                print("Alignment input file: {0}".format(tmpfasta.name))
             # out_filename is used to redirect the STDOUT to file
             # when self.aligner is "mafft" and it requires redirect to file
             cmd, out_filename = self.make_align_cmd(tmpfasta.name, align_name)
             if self.verbose:
-                print("Alignment command is '{}'".format(cmd))
+                print("{0} command: '{1}'".format(self.aligner, cmd))
             try:
                 if out_filename:
                     with open(out_filename, "w") as f:
@@ -128,7 +126,7 @@ class Seqs_To_Aligns_And_Hmms:
                 else:
                     subprocess.run(cmd, check=True)
             except (subprocess.CalledProcessError) as exception:
-                print("Error running '{}': ".format(self.aligner) + str(exception))
+                print("Error running '{}': ".format(cmd) + str(exception))
 
     def make_maf(self, name):
         '''
@@ -170,16 +168,16 @@ class Seqs_To_Aligns_And_Hmms:
             if self.verbose:
                 print("HMM file {} already exists".format(hmm_name))
             return
-        if self.verbose:
-            print("{0} input file is '{1}'".format(self.hmmbuild, name))
         # Either --amino or --dna
         opt = '--amino' if '-aa' in name else '--dna'
+        cmd = [self.hmmbuild, 
+                opt, 
+                hmm_name, 
+                os.path.join(self.cov_dir, name + '.fasta')]
+        if self.verbose:
+            print("{0} command: {1}".format(self.hmmbuild, cmd))
         try:
-            subprocess.run([self.hmmbuild, 
-                            opt, 
-                            hmm_name, 
-                            os.path.join(self.cov_dir, name + '.fasta')],
-                            check=True)
+            subprocess.run(cmd, check=True)
         except (subprocess.CalledProcessError) as exception:
             print("Error running {}: ".format(self.hmmbuild) + str(exception))
 
