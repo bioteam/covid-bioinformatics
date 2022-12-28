@@ -115,9 +115,10 @@ class Seqs_To_Aligns_And_Hmms:
             subprocess.run(cmd, check=True)
         else:
             seqfile = os.path.join(self.cov_dir, name + '-nr.fa')
-            SeqIO.write(seqs, seqfile, 'fasta')
-            if self.verbose:
-                print("Alignment input sequence file: {}".format(seqfile))
+            if not os.path.exists(seqfile):
+                SeqIO.write(seqs, seqfile, 'fasta')
+                if self.verbose:
+                    print("Alignment input sequence file: {}".format(seqfile))
             # out_filename is used to redirect the STDOUT to file
             # when self.aligner is "mafft" and it requires redirect to file
             cmd, out_filename = self.make_align_cmd(seqfile, align_name)
