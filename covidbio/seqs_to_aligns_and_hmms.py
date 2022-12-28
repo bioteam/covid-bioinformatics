@@ -63,7 +63,7 @@ class Seqs_To_Aligns_And_Hmms:
         self.files = files
 
     '''
-    Read one FASTA file, return array of unique sequences.
+    Read one *fa file, return array of unique sequences.
     '''
     def read(self, path):
         seqs = list()
@@ -101,9 +101,11 @@ class Seqs_To_Aligns_And_Hmms:
     def make_align(self, seqs, name):
         align_name = os.path.join(self.cov_dir, name + '.fasta')
         if os.path.exists(align_name) and os.stat(align_name).st_size > 0:
+            if self.verbose:
+                print("Alignment file {} already exists".format(align_name))
             return
         # Most aligners will reject a file with a single sequence so
-        # duplicate the *fa file to make the alignment file
+        # just duplicate the *fa file to make the alignment *fasta file
         if len(seqs) == 1:
             cmd = ['cp', 
                     os.path.join(self.cov_dir, name + '.fa'), 
@@ -165,6 +167,8 @@ class Seqs_To_Aligns_And_Hmms:
     def make_hmm(self, name):
         hmm_name = os.path.join(self.cov_dir, name + '.hmm')
         if os.path.exists(hmm_name) and os.stat(hmm_name).st_size > 0:
+            if self.verbose:
+                print("HMM file {} already exists".format(hmm_name))
             return
         if self.verbose:
             print("{0} input file is '{1}'".format(self.hmmbuild, name))
