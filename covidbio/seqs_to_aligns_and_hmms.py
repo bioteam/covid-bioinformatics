@@ -5,6 +5,7 @@ import sys
 import os
 import re
 import subprocess
+import tempfile
 from Bio import AlignIO
 from Bio import SeqIO
 from covidbio.utilities import read_config
@@ -95,33 +96,28 @@ class Seqs_To_Aligns_And_Hmms:
         return list(d.values())
 
     '''
-    Get list of unique sequences and a name, create sequence file (*.fa) 
-    and an alignment (*.fasta)
+    Get list of unique sequences and a name, create temporary input file and
+    make an alignment (*.fasta)
     '''
     def make_align(self, seqs, name):
         align_name = os.path.join(self.cov_dir, name + '.fasta')
         if os.path.exists(align_name) and os.stat(align_name).st_size > 0:
             return
-        # Most aligners will reject a file with a single sequence so just copy
-        # to make both the 'nr' file and the alignment file
+        # Most aligners will reject a file with a single sequence so
+        # duplicate the *fa file to make the alignment file
         if len(seqs) == 1:
             cmd = ['cp', 
                     os.path.join(self.cov_dir, name + '.fa'), 
                     align_name]
             subprocess.run(cmd, check=True)
-            cmd = ['cp', 
-                    os.path.join(self.cov_dir, name + '.fa'), 
-                    os.path.join(self.cov_dir, name + '-nr.fa')]
-            subprocess.run(cmd, check=True)
         else:
-            seqfile = os.path.join(self.cov_dir, name + '-nr.fa')
-            if not os.path.exists(seqfile):
-                SeqIO.write(seqs, seqfile, 'fasta')
-                if self.verbose:
-                    print("Alignment input sequence file: {}".format(seqfile))
+            tmpfasta = tempfile.NamedTemporaryFile()
+            SeqIO.write(seqs, tmpfasta.name, 'fasta')
+            if self.verbose:
+                print("Alignment input sequence file: {}".format(tmpfasta.name))
             # out_filename is used to redirect the STDOUT to file
             # when self.aligner is "mafft" and it requires redirect to file
-            cmd, out_filename = self.make_align_cmd(seqfile, align_name)
+            cmd, out_filename = self.make_align_cmd(tmpfasta.name, align_name)
             if self.verbose:
                 print("Alignment command is '{}'".format(cmd))
             try:
@@ -165,7 +161,7 @@ class Seqs_To_Aligns_And_Hmms:
         elif self.aligner == 'clustalo':
             return [self.aligner, '-i', infile, '-o', align_name, '--outfmt=fasta'], None
         else:
-            sys.exit("No command for aligner {}".format(self.aligner))
+            sys.exit("Cannot make command for unknown aligner {}".format(self.aligner))
 
     def make_hmm(self, name):
         hmm_name = os.path.join(self.cov_dir, name + '.hmm')
