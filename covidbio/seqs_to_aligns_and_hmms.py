@@ -111,7 +111,7 @@ class Seqs_To_Aligns_And_Hmms:
                     align_name]
             subprocess.run(cmd, check=True)
         else:
-            seqs = self.remove_dups(seqs, os.path.basename(path))
+            seqs = self.remove_dups(seqs, name)
             tmpfasta = tempfile.NamedTemporaryFile()
             SeqIO.write(seqs, tmpfasta.name, 'fasta')
             # out_filename is used to redirect the STDOUT to file
