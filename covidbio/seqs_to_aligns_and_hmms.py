@@ -10,15 +10,17 @@ from Bio import AlignIO
 from Bio import SeqIO
 from covidbio.utilities import read_config
 
+config = read_config()
+
 parser = argparse.ArgumentParser()
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
 parser.add_argument('-aligner', default='clustalo', help="Alignment application")
 parser.add_argument('-hmmbuilder', default='hmmbuild', help="HMM build application")
-parser.add_argument('-skip', default='', help="Do not align")
+parser.add_argument('-skip', default='invalid', help="Do not align")
 parser.add_argument('-json', action='store_true', help="Create JSON for Gen3")
 parser.add_argument('-maf', action='store_true', help="Create additional MAF format alignments")
-parser.add_argument('-strain', help="Strain name")
-parser.add_argument('-data_dir', help="Location for all strain-specific directories")
+parser.add_argument('-strain', help="Strain name", default=config['STRAIN'])
+parser.add_argument('-data_dir', help="Location for strain-specific directories", default=config['DATA_DIR'])
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
@@ -35,12 +37,11 @@ def main():
                 print('{0} is not a file'.format(f))
             continue
         name = os.path.basename(f).split('.')[0]
-        if name in builder.skip or 'invalid' in name:
+        if name in builder.skip:
             if builder.verbose:
                 print('Skipping {0}'.format(f))
             continue
-        seqs = builder.read(f)
-        builder.make_align(seqs, name)
+        builder.make_align(f, name)
         builder.make_maf(name)
         builder.make_hmm(name)
         builder.write_json(name)
@@ -48,9 +49,8 @@ def main():
 
 class Seqs_To_Aligns_And_Hmms:
     def __init__(self, verbose, aligner, hmmbuild, skip, json, maf, strain, data_dir, files):
-        config = read_config()
-        self.strain = strain if strain else config['STRAIN']
-        self.data_dir = data_dir if data_dir else config['DATA_DIR']
+        self.strain = strain
+        self.data_dir = data_dir
         self.verbose = verbose
         self.aligner = aligner
         self.hmmbuild = hmmbuild
@@ -58,51 +58,21 @@ class Seqs_To_Aligns_And_Hmms:
         self.make_json = json
         self.maf = maf
         self.cov_dir = os.path.join(self.data_dir, self.strain)
+        self.files = files
         if not os.path.isdir(self.cov_dir):
             sys.exit("Directory {} does not exist".format(self.cov_dir))
-        self.files = files
-
-    '''
-    Read one *fa file, return array of unique sequences.
-    '''
-    def read(self, path):
-        seqs = list()
-        try:
-            if self.verbose:
-                print("Reading Fasta file: {}".format(path))
-            for fa in SeqIO.parse(path, "fasta"):
-                seqs.append(fa)
-        except (RuntimeError) as exception: 
-            print("Error parsing sequences in '" +
-                str(path) + "':" + str(exception))
-        return seqs
-
-    def remove_dups(self, records, filename):
-        d = dict()
-        # Do not put sequences containing 'X', 'N', or '*' in alignments
-        if '-aa' in filename:
-            invalid = re.compile(r'[xX*]')
-        elif '-nt' in filename:
-            invalid = re.compile(r'[xXnN*]')
-        else:
-            sys.exit("Cannot determine sequence type in {}".format(filename))
-        for record in records:
-            seq_string = str(record.seq)
-            if re.search(invalid, seq_string):
-                continue
-            d[seq_string] = record
-        return list(d.values())
 
     '''
     Make a list of unique sequences, create temporary input file and
     make the alignment (*.fasta)
     '''
-    def make_align(self, seqs, name):
+    def make_align(self, f, name):
         align_name = os.path.join(self.cov_dir, name + '.fasta')
         if os.path.exists(align_name) and os.stat(align_name).st_size > 0:
             if self.verbose:
                 print("Alignment file {} already exists".format(align_name))
             return
+        seqs = self.read(f)
         # Most aligners will reject a file with a single sequence so
         # duplicate the *fa file to make the alignment *fasta file
         if len(seqs) == 1:
@@ -127,6 +97,35 @@ class Seqs_To_Aligns_And_Hmms:
                     subprocess.run(cmd, check=True)
             except (subprocess.CalledProcessError) as exception:
                 print("Error running '{}': ".format(cmd) + str(exception))
+
+    '''
+    Read one *fa file, return array of unique sequences.
+    '''
+    def read(self, path):
+        try:
+            if self.verbose:
+                print("Reading Fasta file: {}".format(path))
+            seqs = list(SeqIO.parse(path, "fasta")
+        except (RuntimeError) as exception: 
+            print("Error parsing sequences in '" +
+                str(path) + "':" + str(exception))
+        return seqs
+
+    def remove_dups(self, records, filename):
+        d = dict()
+        # Do not put sequences containing 'X', 'N', or '*' in alignments
+        if '-aa' in filename:
+            invalid = re.compile(r'[xX*]')
+        elif '-nt' in filename:
+            invalid = re.compile(r'[xXnN*]')
+        else:
+            sys.exit("Cannot determine sequence type in {}".format(filename))
+        for record in records:
+            seq_string = str(record.seq)
+            if re.search(invalid, seq_string):
+                continue
+            d[seq_string] = record
+        return list(d.values())
 
     def make_maf(self, name):
         '''
