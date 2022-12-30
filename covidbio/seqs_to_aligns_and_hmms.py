@@ -32,7 +32,7 @@ def main():
     builder = Seqs_To_Aligns_And_Hmms(args.verbose, args.aligner, args.hmmbuilder, args.skip, 
         args.json, args.maf, args.strain, args.data_dir, args.files)
     for f in builder.files:
-        if not self.is_file(f):
+        if self.not_file(f):
             continue
         name = os.path.basename(f).split('.')[0]
         if self.should_skip(name):
@@ -134,11 +134,11 @@ class Seqs_To_Aligns_And_Hmms:
                     print('Skipping {0}'.format(f))
                 return True
 
-    def is_file(self, f):
+    def not_file(self, f):
         if not os.path.isfile(f):
             if self.verbose:
                 print('{0} is not a file'.format(f))
-            return False
+            return True
 
     def make_maf(self, name):
         '''
