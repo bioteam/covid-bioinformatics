@@ -23,11 +23,13 @@ NC_045512.2	29557	29674	ORF10	123.3	+	29556	29559	66,123,245
 BED Format (https://m.ensembl.org/info/website/upload/bed.html)
 '''
 
+config = read_config()
+
 parser = argparse.ArgumentParser()
 parser.add_argument('-verbose', action='store_true', help="Verbose")
 parser.add_argument('-rfam_file', default='cov_allvirus.cm', help="Rfam covariance model file")
-parser.add_argument('-strain', help="Strain name")
-parser.add_argument('-data_dir', help="Location for all strain-specific directories")
+parser.add_argument('-strain', default=config['STRAIN'], help="Strain name")
+parser.add_argument('-data_dir', default=config['DATA_DIR'], help="Location for all strain-specific directories")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
@@ -47,9 +49,8 @@ class Annotate_With_Hmms:
     Create tracks for genes using HMMs ('genes'), Rfam hits ('rfam'), pyTMHMM predictions ('tms')
     '''
     def __init__(self, verbose, rfam_file, strain, data_dir, files):
-        config = read_config()
-        self.strain = strain if strain else config['STRAIN']
-        self.data_dir = data_dir if data_dir else config['DATA_DIR']
+        self.strain = strain
+        self.data_dir = data_dir
         self.verbose = verbose
         self.rfam_file = rfam_file
         self.files = files

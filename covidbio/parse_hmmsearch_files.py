@@ -11,6 +11,7 @@ from Bio import Entrez
 from Bio import SeqIO
 from covidbio.utilities import read_config
 
+config = read_config()
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
@@ -19,10 +20,10 @@ parser.add_argument('-align', default=False, action='store_true', help="Align hi
 parser.add_argument('-taxfilter', default=None, help="Exclude clade using NCBI clade name")
 parser.add_argument('-lexfilter', default=None, help="Exclude clade using search string")
 parser.add_argument('-chunk', default=10, help="Number of ids to send to Elink")
-parser.add_argument('-data_dir', help="Location for all strain-specific directories")
-parser.add_argument('-email', help="Email for Entrez")
+parser.add_argument('-data_dir', default=config['DATA_DIR'], help="Location for all strain-specific directories")
+parser.add_argument('-email', default=config['EMAIL'], help="Email for Entrez")
 parser.add_argument('-api_key', help="Entrez API key")
-parser.add_argument('-strain', help="Strain name")
+parser.add_argument('-strain', default=config['STRAIN'], help="Strain name")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
@@ -46,10 +47,9 @@ def main():
 class Parse_Hmmsearch:
 
     def __init__(self, verbose, download, align, taxfilter, lexfilter, chunk, data_dir, email, api_key, strain, files):
-        config = read_config()
-        self.email = email if email else config['EMAIL']
-        self.strain = strain if strain else config['STRAIN']
-        self.data_dir = data_dir if data_dir else config['DATA_DIR']
+        self.email = email
+        self.strain = strain
+        self.data_dir = data_dir
         self.verbose = verbose
         self.download = download
         self.align = align

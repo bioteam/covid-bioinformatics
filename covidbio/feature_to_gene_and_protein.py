@@ -10,15 +10,16 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from covidbio.utilities import read_synonyms, read_variants, read_strains, read_config
 
+config = read_config()
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-f', default='fasta', dest='format', help="Output format")
 parser.add_argument('-analyze', default=False, action='store_true', help="Parse files without file creation")
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
 parser.add_argument('-json', default=False, action='store_true', help="Create JSON for Gen3")
-parser.add_argument('-data_dir', help="Location for all strain-specific directories")
+parser.add_argument('-data_dir', default=config['DATA_DIR'], help="Location for all strain-specific directories")
 parser.add_argument('-host_filter', help="Host name to filter")
-parser.add_argument('-strain', help="Strain name")
+parser.add_argument('-strain', default=config['STRAIN'], help="Strain name")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
@@ -74,9 +75,8 @@ class Feature_To_Gene_And_Protein:
     from utilities import make_sequence_json
 
     def __init__(self, seq_format, analyze, verbose, json, data_dir, host_filter, strain, files):
-        config = read_config()
-        self.strain = strain if strain else config['STRAIN']
-        self.data_dir = data_dir if data_dir else config['DATA_DIR']
+        self.strain = strain
+        self.data_dir = data_dir
         self.seq_format = seq_format
         # Do not write to any files
         self.analyze = analyze
