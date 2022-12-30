@@ -16,7 +16,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
 parser.add_argument('-aligner', default='clustalo', help="Alignment application")
 parser.add_argument('-hmmbuilder', default='hmmbuild', help="HMM build application")
-parser.add_argument('-skip', default='invalid', help="Do not align if filename contains string")
+parser.add_argument('-skip', default=['invalid'], nargs='+', help="Do not align if filename contains string")
 parser.add_argument('-json', action='store_true', help="Create JSON for Gen3")
 parser.add_argument('-maf', action='store_true', help="Create additional MAF format alignments")
 parser.add_argument('-strain', help="Strain name", default=config['STRAIN'])
@@ -32,14 +32,10 @@ def main():
     builder = Seqs_To_Aligns_And_Hmms(args.verbose, args.aligner, args.hmmbuilder, args.skip, 
         args.json, args.maf, args.strain, args.data_dir, args.files)
     for f in builder.files:
-        if not os.path.isfile(f):
-            if builder.verbose:
-                print('{0} is not a file'.format(f))
+        if not self.is_file(f):
             continue
         name = os.path.basename(f).split('.')[0]
-        if name in builder.skip:
-            if builder.verbose:
-                print('Skipping {0}'.format(f))
+        if self.should_skip(name):
             continue
         builder.make_align(f, name)
         builder.make_maf(name)
@@ -68,9 +64,7 @@ class Seqs_To_Aligns_And_Hmms:
     '''
     def make_align(self, f, name):
         align_name = os.path.join(self.cov_dir, name + '.fasta')
-        if os.path.exists(align_name) and os.stat(align_name).st_size > 0:
-            if self.verbose:
-                print("Alignment file {} already exists".format(align_name))
+        if self.file_exists(align_name):
             return
         seqs = self.read(f)
         # Most aligners will reject a file with a single sequence so
@@ -127,6 +121,25 @@ class Seqs_To_Aligns_And_Hmms:
             d[seq_string] = record
         return list(d.values())
 
+    def file_exists(self, f):
+        if os.path.exists(f) and os.stat(f).st_size > 0:
+            if self.verbose:
+                print("File {} already exists".format(f))
+            return True
+
+    def should_skip(self, f):
+        for str in builder.skip:
+            if str in f:
+                if self.verbose:
+                    print('Skipping {0}'.format(f))
+                return True
+
+    def is_file(self, f):
+        if not os.path.isfile(f):
+            if self.verbose:
+                print('{0} is not a file'.format(f))
+            return False
+
     def make_maf(self, name):
         '''
         Create additional Maf format alignment if needed
@@ -157,15 +170,13 @@ class Seqs_To_Aligns_And_Hmms:
         elif self.aligner == 'mafft':
             return [self.aligner, '--quiet', '--auto', infile], align_name
         elif self.aligner == 'clustalo':
-            return [self.aligner, '-i', infile, '-o', align_name, '--outfmt=fasta'], None
+            return [self.aligner, '-i', infile, '-o', align_name, '--outfmt=fasta', '--auto'], None
         else:
             sys.exit("Cannot make command for unknown aligner {}".format(self.aligner))
 
     def make_hmm(self, name):
         hmm_name = os.path.join(self.cov_dir, name + '.hmm')
-        if os.path.exists(hmm_name) and os.stat(hmm_name).st_size > 0:
-            if self.verbose:
-                print("HMM file {} already exists".format(hmm_name))
+        if self.file_exists(hmm_name):
             return
         # Either --amino or --dna
         opt = '--amino' if '-aa' in name else '--dna'
