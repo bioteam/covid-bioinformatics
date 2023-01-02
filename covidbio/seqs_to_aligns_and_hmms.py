@@ -13,24 +13,51 @@ from covidbio.utilities import read_config
 config = read_config()
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
-parser.add_argument('-aligner', default='clustalo', help="Alignment application")
-parser.add_argument('-hmmbuilder', default='hmmbuild', help="HMM build application")
-parser.add_argument('-skip', default=['invalid'], nargs='+', help="Do not align if filename contains string")
-parser.add_argument('-json', action='store_true', help="Create JSON for Gen3")
-parser.add_argument('-maf', action='store_true', help="Create additional MAF format alignments")
-parser.add_argument('-strain', help="Strain name", default=config['STRAIN'])
-parser.add_argument('-data_dir', help="Location for strain-specific directories", default=config['DATA_DIR'])
-parser.add_argument('files', nargs='+', help='File names')
+parser.add_argument(
+    "-verbose", default=False, action="store_true", help="Verbose"
+)
+parser.add_argument(
+    "-aligner", default="clustalo", help="Alignment application"
+)
+parser.add_argument(
+    "-hmmbuilder", default="hmmbuild", help="HMM build application"
+)
+parser.add_argument(
+    "-skip",
+    default=["invalid"],
+    nargs="+",
+    help="Do not align if filename contains string",
+)
+parser.add_argument("-json", action="store_true", help="Create JSON for Gen3")
+parser.add_argument(
+    "-maf", action="store_true", help="Create additional MAF format alignments"
+)
+parser.add_argument("-strain", help="Strain name", default=config["STRAIN"])
+parser.add_argument(
+    "-data_dir",
+    help="Location for strain-specific directories",
+    default=config["DATA_DIR"],
+)
+parser.add_argument("files", nargs="+", help="File names")
 args = parser.parse_args()
 
-'''
+"""
 
-'''
+"""
+
 
 def main():
-    builder = Seqs_To_Aligns_And_Hmms(args.verbose, args.aligner, args.hmmbuilder, args.skip, 
-        args.json, args.maf, args.strain, args.data_dir, args.files)
+    builder = Seqs_To_Aligns_And_Hmms(
+        args.verbose,
+        args.aligner,
+        args.hmmbuilder,
+        args.skip,
+        args.json,
+        args.maf,
+        args.strain,
+        args.data_dir,
+        args.files,
+    )
     for f in builder.files:
         if builder.not_file(f):
             continue
@@ -44,7 +71,10 @@ def main():
 
 
 class Seqs_To_Aligns_And_Hmms:
-    def __init__(self, verbose, aligner, hmmbuild, skip, json, maf, strain, data_dir, files):
+    def __init__(
+        self, verbose, aligner, hmmbuild, skip,
+        json, maf, strain, data_dir, files
+    ):
         self.strain = strain
         self.data_dir = data_dir
         self.verbose = verbose
@@ -58,26 +88,25 @@ class Seqs_To_Aligns_And_Hmms:
         if not os.path.isdir(self.cov_dir):
             sys.exit("Directory {} does not exist".format(self.cov_dir))
 
-    '''
+    """
     Make a list of unique sequences, create temporary input file and
     make the alignment (*.fasta)
-    '''
+    """
+
     def make_align(self, f, name):
-        align_name = os.path.join(self.cov_dir, name + '.fasta')
+        align_name = os.path.join(self.cov_dir, name + ".fasta")
         if self.file_exists(align_name):
             return
         seqs = self.read(f)
         # Most aligners will reject a file with a single sequence so
         # duplicate the *fa file to make the alignment *fasta file
         if len(seqs) == 1:
-            cmd = ['cp', 
-                    os.path.join(self.cov_dir, name + '.fa'), 
-                    align_name]
+            cmd = ["cp", os.path.join(self.cov_dir, name + ".fa"), align_name]
             subprocess.run(cmd, check=True)
         else:
             seqs = self.remove_dups(seqs, name)
             tmpfasta = tempfile.NamedTemporaryFile()
-            SeqIO.write(seqs, tmpfasta.name, 'fasta')
+            SeqIO.write(seqs, tmpfasta.name, "fasta")
             # out_filename is used to redirect the STDOUT to file
             # when self.aligner is "mafft" and it requires redirect to file
             cmd, out_filename = self.make_align_cmd(tmpfasta.name, align_name)
@@ -92,26 +121,32 @@ class Seqs_To_Aligns_And_Hmms:
             except (subprocess.CalledProcessError) as exception:
                 print("Error running '{}': ".format(cmd) + str(exception))
 
-    '''
+    """
     Read one *fa file, return array of unique sequences.
-    '''
+    """
+
     def read(self, path):
         try:
             if self.verbose:
                 print("Reading Fasta file: {}".format(path))
             seqs = list(SeqIO.parse(path, "fasta"))
+<<<<<<< HEAD
         except (RuntimeError) as exception: 
             print("Error parsing sequences in '" +
                 str(path) + "':" + str(exception))
+=======
+        except (RuntimeError) as exception:
+            print("Error parsing sequences in '" + str(path) + "':" + str(exception))
+>>>>>>> 1a13f133f4974df8e04890b5ad5fe7fbe363a028
         return seqs
 
     def remove_dups(self, records, filename):
         d = dict()
         # Do not put sequences containing 'X', 'N', or '*' in alignments
-        if '-aa' in filename:
-            invalid = re.compile(r'[xX*]')
-        elif '-nt' in filename:
-            invalid = re.compile(r'[xXnN*]')
+        if "-aa" in filename:
+            invalid = re.compile(r"[xX*]")
+        elif "-nt" in filename:
+            invalid = re.compile(r"[xXnN*]")
         else:
             sys.exit("Cannot determine sequence type in {}".format(filename))
         for record in records:
@@ -131,27 +166,29 @@ class Seqs_To_Aligns_And_Hmms:
         for str in self.skip:
             if str in f:
                 if self.verbose:
-                    print('Skipping {0}'.format(f))
+                    print("Skipping {0}".format(f))
                 return True
 
     def not_file(self, f):
         if not os.path.isfile(f):
             if self.verbose:
-                print('{0} is not a file'.format(f))
+                print("{0} is not a file".format(f))
             return True
 
     def make_maf(self, name):
-        '''
+        """
         Create additional Maf format alignment if needed
-        '''
+        """
         if self.maf:
-            AlignIO.convert(os.path.join(self.cov_dir, name + '.fasta'),
-                            'fasta',
-                            os.path.join(self.cov_dir, name + '.maf'),
-                            'maf')
+            AlignIO.convert(
+                os.path.join(self.cov_dir, name + ".fasta"),
+                "fasta",
+                os.path.join(self.cov_dir, name + ".maf"),
+                "maf",
+            )
 
     def make_align_cmd(self, infile, align_name):
-        '''
+        """
         time mafft --auto M-aa.fasta > M-aa.aln
             real	0m2.254s
             user	0m2.036s
@@ -164,26 +201,36 @@ class Seqs_To_Aligns_And_Hmms:
             real	0m23.045s
             user	0m18.665s
             sys	0m4.255s
-        '''
-        if self.aligner == 'muscle':
-            return [self.aligner, '-quiet','-in', infile, '-out', align_name], None
-        elif self.aligner == 'mafft':
-            return [self.aligner, '--quiet', '--auto', infile], align_name
-        elif self.aligner == 'clustalo':
-            return [self.aligner, '-i', infile, '-o', align_name, '--outfmt=fasta', '--auto'], None
+        """
+        if self.aligner == "muscle":
+            return [self.aligner, "-quiet", "-in", infile, "-out", align_name], None
+        elif self.aligner == "mafft":
+            return [self.aligner, "--quiet", "--auto", infile], align_name
+        elif self.aligner == "clustalo":
+            return [
+                self.aligner,
+                "-i",
+                infile,
+                "-o",
+                align_name,
+                "--outfmt=fasta",
+                "--auto",
+            ], None
         else:
             sys.exit("Cannot make command for unknown aligner {}".format(self.aligner))
 
     def make_hmm(self, name):
-        hmm_name = os.path.join(self.cov_dir, name + '.hmm')
+        hmm_name = os.path.join(self.cov_dir, name + ".hmm")
         if self.file_exists(hmm_name):
             return
-        # Either --amino or --dna
-        opt = '--amino' if '-aa' in name else '--dna'
-        cmd = [self.hmmbuild, 
-                opt, 
-                hmm_name, 
-                os.path.join(self.cov_dir, name + '.fasta')]
+        # Have to specify either --amino or --dna
+        opt = "--amino" if "-aa" in name else "--dna"
+        cmd = [
+            self.hmmbuild,
+            opt,
+            hmm_name,
+            os.path.join(self.cov_dir, name + ".fasta"),
+        ]
         if self.verbose:
             print("{0} command: {1}".format(self.hmmbuild, cmd))
         try:
@@ -195,13 +242,16 @@ class Seqs_To_Aligns_And_Hmms:
         if not self.make_json:
             return
         from utilities import make_hmm_json
+
         json = make_hmm_json(name)
-        with open(os.path.join(self.cov_dir, name + '-hmm.json'), 'w') as out:
+        with open(os.path.join(self.cov_dir, name + "-hmm.json"), "w") as out:
             out.write(json)
         from utilities import make_alignment_json
+
         json = make_alignment_json(name, self.aligner)
-        with open(os.path.join(self.cov_dir, name + '-aln.json'), 'w') as out:
+        with open(os.path.join(self.cov_dir, name + "-aln.json"), "w") as out:
             out.write(json)
+
 
 if __name__ == "__main__":
     main()

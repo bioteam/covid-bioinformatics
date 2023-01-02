@@ -10,15 +10,16 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from covidbio.utilities import read_synonyms, read_variants, read_strains, read_config
 
+config = read_config()
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-f', default='fasta', dest='format', help="Output format")
 parser.add_argument('-analyze', default=False, action='store_true', help="Parse files without file creation")
 parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
 parser.add_argument('-json', default=False, action='store_true', help="Create JSON for Gen3")
-parser.add_argument('-data_dir', help="Location for all strain-specific directories")
+parser.add_argument('-data_dir', default=config['DATA_DIR'], help="Location for all strain-specific directories")
 parser.add_argument('-host_filter', help="Host name to filter")
-parser.add_argument('-strain', help="Strain name")
+parser.add_argument('-strain', default=config['STRAIN'], help="Strain name")
 parser.add_argument('files', nargs='+', help='File names')
 args = parser.parse_args()
 
@@ -74,9 +75,8 @@ class Feature_To_Gene_And_Protein:
     from utilities import make_sequence_json
 
     def __init__(self, seq_format, analyze, verbose, json, data_dir, host_filter, strain, files):
-        config = read_config()
-        self.strain = strain if strain else config['STRAIN']
-        self.data_dir = data_dir if data_dir else config['DATA_DIR']
+        self.strain = strain
+        self.data_dir = data_dir
         self.seq_format = seq_format
         # Do not write to any files
         self.analyze = analyze
@@ -108,7 +108,7 @@ class Feature_To_Gene_And_Protein:
         Features may be incorrectly named, or named used older names, we'll call these
         "invalid". The "invalid" sequences are usually different lengths from the "valid"
         sequences and not alignable with the "valid" sequences, though they share the same name. 
-        All "valid" sequences are written to files using a standard gene name (e.g. "NS8") and all 
+        All "valid" sequences are written to files using a standard gene name (e.g. "NS8") and all
         "invalid" sequences are written to "invalid" files (e.g. "NS8-nt-invalid.fasta").
         '''
         # Copy from self.feats to an empty dict so we don't need to handle changes to self.feats
@@ -188,7 +188,7 @@ class Feature_To_Gene_And_Protein:
 
     def standardize_cds(self):
         '''
-        If we get a standard name for a feature from the synonyms list 
+        If we get a name for a feature from the synonyms list
         we rename it and sort it according to the standard name.
         '''
         for acc in self.accs:
@@ -289,7 +289,7 @@ class Feature_To_Gene_And_Protein:
 
     def create_objects(self):
         '''
-            Create SeqRecords for aa and nt that will written out as fasta.
+            Create SeqRecords for aa and nt that will be written out as fasta.
             Fasta format metadata is made up of "id" and "description".
             All other SeqRecord fields are ignored when Biopython makes fasta.
         '''

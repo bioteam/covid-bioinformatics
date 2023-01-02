@@ -17,10 +17,13 @@ NCBI Taxonomy ids:
 694009 (parent of 2697049): Severe acute respiratory syndrome-related coronavirus
 https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=694009
 '''
+
+config = read_config()
+
 parser = argparse.ArgumentParser()
 parser.add_argument('-r', default=True, dest='recurse', help="Recursive retrieval of child tax IDs", type=bool)
 parser.add_argument('-f', default='gb', dest='format', help="Input and output format")
-parser.add_argument('-email', help="Email for Entrez")
+parser.add_argument('-email', default=config['EMAIL'], help="Email for Entrez")
 parser.add_argument('-min_len', default=25000, type=int, help="Minimum length")
 parser.add_argument('-max_len', type=int, help="Maximum length")
 parser.add_argument('-verbose', action='store_true', help="Verbose")
@@ -29,9 +32,9 @@ parser.add_argument('-chunk', default=500, type=int, help="eFetch batch size")
 parser.add_argument('-api_key', help="Entrez API key")
 parser.add_argument('-json', action='store_true', help="Create JSON for Gen3")
 parser.add_argument('-no-fetch', action='store_false', dest='fetch', help="Do not download")
-parser.add_argument('-strain', help="Strain name")
+parser.add_argument('-strain', default=config['STRAIN'], help="Strain name")
 parser.add_argument('-date_filter', action='store_true', help="Filter by years in cov_strains.yaml")
-parser.add_argument('-data_dir', help="Location for all strain-specific directories")
+parser.add_argument('-data_dir', default=config['DATA_DIR'], help="Location for all strain-specific directories")
 args = parser.parse_args()
 
 def main():
@@ -49,10 +52,9 @@ class DownloadGbByTaxid:
 
     def __init__(self, email, format, min_len, max_len, recurse, verbose, retmax,
                  chunk, api_key, json, fetch, strain, date_filter, data_dir):
-        config = read_config()
-        self.email = email if email else config['EMAIL']
-        self.strain = strain if strain else config['STRAIN']
-        self.data_dir = data_dir if data_dir else config['DATA_DIR']
+        self.email = email
+        self.strain = strain
+        self.data_dir = data_dir
         self.format = format
         self.min_len = min_len
         self.max_len = max_len
