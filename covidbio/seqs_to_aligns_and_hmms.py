@@ -32,10 +32,10 @@ def main():
     builder = Seqs_To_Aligns_And_Hmms(args.verbose, args.aligner, args.hmmbuilder, args.skip, 
         args.json, args.maf, args.strain, args.data_dir, args.files)
     for f in builder.files:
-        if self.not_file(f):
+        if builder.not_file(f):
             continue
         name = os.path.basename(f).split('.')[0]
-        if self.should_skip(name):
+        if builder.should_skip(name):
             continue
         builder.make_align(f, name)
         builder.make_maf(name)
@@ -99,7 +99,7 @@ class Seqs_To_Aligns_And_Hmms:
         try:
             if self.verbose:
                 print("Reading Fasta file: {}".format(path))
-            seqs = list(SeqIO.parse(path, "fasta")
+            seqs = list(SeqIO.parse(path, "fasta"))
         except (RuntimeError) as exception: 
             print("Error parsing sequences in '" +
                 str(path) + "':" + str(exception))
@@ -128,7 +128,7 @@ class Seqs_To_Aligns_And_Hmms:
             return True
 
     def should_skip(self, f):
-        for str in builder.skip:
+        for str in self.skip:
             if str in f:
                 if self.verbose:
                     print('Skipping {0}'.format(f))
