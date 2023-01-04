@@ -149,6 +149,20 @@ ORF3a:
   - ORF3 protein
   - ORF3_protein
   - putative ORF3
+ORF3:
+  - 3
+  - 3 protein
+  - hypothetical protein orf3
+  - hypothetical protein Orf3
+  - hypothetical protein ORF3
+  - ORF3
+  - Orf3
+  - orf3
+  - orf3 protein
+  - ORF3 protein
+  - ORF3_protein
+  - putative ORF3
+  - sars3
 ORF3b:
   - 3b
   - 3b protein
@@ -163,6 +177,45 @@ ORF3b:
   - ORF3b_protein
   - putative ORF3b
   - sars3b
+ORF4a:
+  - 4a
+  - 4a protein
+  - hypothetical protein orf4a
+  - hypothetical protein ORF4a
+  - hypothetical protein ORF4a
+  - ORF4a
+  - Orf4a
+  - orf4a
+  - orf4a protein
+  - ORF4a protein
+  - ORF4a_protein
+  - putative ORF4a
+  - sars4a
+ORF4b:
+  - 4b
+  - 4b protein
+  - hypothetical protein orf4b
+  - hypothetical protein Orf4b
+  - hypothetical protein ORF4b
+  - ORF4b
+  - Orf4b
+  - orf4b
+  - orf4b protein
+  - ORF4b protein
+  - ORF4b_protein
+  - putative ORF4b
+  - sars4b
+ORF5:
+  - hypothetical protein orf5
+  - hypothetical protein Orf5
+  - hypothetical protein ORF5
+  - ORF5
+  - Orf5
+  - orf5
+  - orf5 protein
+  - ORF5 protein
+  - ORF5_protein
+  - putative ORF5
 ORF6:
   - hypothetical protein orf6
   - hypothetical protein Orf6
@@ -222,6 +275,17 @@ ORF8:
   - ORF8 protein
   - ORF8_protein
   - putative ORF8
+ORF8b:
+  - hypothetical protein orf8b
+  - hypothetical protein ORF8b
+  - hypothetical protein Orf8b
+  - ORF8b
+  - Orf8b
+  - orf8b
+  - orf8b protein
+  - ORF8b protein
+  - ORF8b_protein
+  - putative ORF8b
 ORF9b:
   - hypothetical protein orf9b
   - hypothetical protein ORF9b
