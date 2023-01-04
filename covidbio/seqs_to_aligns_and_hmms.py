@@ -59,10 +59,10 @@ def main():
         args.files,
     )
     for f in builder.files:
-        if self.not_file(f):
+        if builder.not_file(f):
             continue
-        name = os.path.basename(f).split(".")[0]
-        if self.should_skip(name):
+        name = os.path.basename(f).split('.')[0]
+        if builder.should_skip(name):
             continue
         builder.make_align(f, name)
         builder.make_maf(name)
@@ -130,8 +130,14 @@ class Seqs_To_Aligns_And_Hmms:
             if self.verbose:
                 print("Reading Fasta file: {}".format(path))
             seqs = list(SeqIO.parse(path, "fasta"))
+<<<<<<< HEAD
+        except (RuntimeError) as exception: 
+            print("Error parsing sequences in '" +
+                str(path) + "':" + str(exception))
+=======
         except (RuntimeError) as exception:
             print("Error parsing sequences in '" + str(path) + "':" + str(exception))
+>>>>>>> 1a13f133f4974df8e04890b5ad5fe7fbe363a028
         return seqs
 
     def remove_dups(self, records, filename):
@@ -157,7 +163,7 @@ class Seqs_To_Aligns_And_Hmms:
             return True
 
     def should_skip(self, f):
-        for str in builder.skip:
+        for str in self.skip:
             if str in f:
                 if self.verbose:
                     print("Skipping {0}".format(f))
