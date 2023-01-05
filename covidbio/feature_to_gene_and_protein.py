@@ -20,9 +20,7 @@ parser.add_argument(
     action="store_true",
     help="Parse files without file creation",
 )
-parser.add_argument(
-    "-verbose", default=False, action="store_true", help="Verbose"
-)
+parser.add_argument("-verbose", default=False, action="store_true", help="Verbose")
 parser.add_argument(
     "-json", default=False, action="store_true", help="Create JSON for Gen3"
 )
@@ -98,15 +96,16 @@ class Feature_To_Gene_And_Protein:
     def __init__(
         self, seq_format, analyze, verbose, json, data_dir, host_filter, strain, files
     ):
-        self.strain = strain
-        self.data_dir = data_dir
-        self.seq_format = seq_format
-        # Do not write to any files
-        self.analyze = analyze
-        self.verbose = verbose
-        self.make_json = json
-        self.host_filter = host_filter
-        self.files = files
+        (
+            self.strain,
+            self.data_dir,
+            self.seq_format,
+            self.analyze,
+            self.verbose,
+            self.make_json,
+            self.host_filter,
+            self.files,
+        ) = (strain, data_dir, seq_format, analyze, verbose, json, host_filter, files)
         self.cov_dir = os.path.join(self.data_dir, self.strain)
         if not os.path.isdir(self.cov_dir):
             sys.exit("Directory {} does not exist".format(self.cov_dir))
@@ -128,15 +127,15 @@ class Feature_To_Gene_And_Protein:
 
     def remove_invalid(self):
         """
-        Features may be incorrectly named, or named used older names, we'll 
-        call these "invalid". The "invalid" sequences are usually different 
-        lengths from the "valid" sequences and not alignable with the "valid" 
-        sequences, though they share the same name. All "valid" sequences are 
+        Features may be incorrectly named, or named used older names, we'll
+        call these "invalid". The "invalid" sequences are usually different
+        lengths from the "valid" sequences and not alignable with the "valid"
+        sequences, though they share the same name. All "valid" sequences are
         written to files using a standard gene name (e.g. "NS8") and all
-        "invalid" sequences are written to "invalid" files (e.g. 
+        "invalid" sequences are written to "invalid" files (e.g.
         "NS8-nt-invalid.fasta").
         """
-        # Copy from self.feats to an empty dict so we don't need to handle 
+        # Copy from self.feats to an empty dict so we don't need to handle
         # changes to self.feats
         feats = dict()
 
