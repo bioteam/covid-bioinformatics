@@ -13,17 +13,30 @@ from covidbio.utilities import read_synonyms, read_variants, read_strains, read_
 config = read_config()
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-f', default='fasta', dest='format', help="Output format")
-parser.add_argument('-analyze', default=False, action='store_true', help="Parse files without file creation")
-parser.add_argument('-verbose', default=False, action='store_true', help="Verbose")
-parser.add_argument('-json', default=False, action='store_true', help="Create JSON for Gen3")
-parser.add_argument('-data_dir', default=config['DATA_DIR'], help="Location for all strain-specific directories")
-parser.add_argument('-host_filter', help="Host name to filter")
-parser.add_argument('-strain', default=config['STRAIN'], help="Strain name")
-parser.add_argument('files', nargs='+', help='File names')
+parser.add_argument("-f", default="fasta", dest="format", help="Output format")
+parser.add_argument(
+    "-analyze",
+    default=False,
+    action="store_true",
+    help="Parse files without file creation",
+)
+parser.add_argument(
+    "-verbose", default=False, action="store_true", help="Verbose"
+)
+parser.add_argument(
+    "-json", default=False, action="store_true", help="Create JSON for Gen3"
+)
+parser.add_argument(
+    "-data_dir",
+    default=config["DATA_DIR"],
+    help="Location for all strain-specific directories",
+)
+parser.add_argument("-host_filter", help="Host name to filter")
+parser.add_argument("-strain", default=config["STRAIN"], help="Strain name")
+parser.add_argument("files", nargs="+", help="File names")
 args = parser.parse_args()
 
-'''
+"""
 Example SeqRecord:
 
 ID: MT123293.2
@@ -58,12 +71,20 @@ qualifiers:
     Key: product, Value: ['ORF10 protein']
     Key: protein_id, Value: ['QIE07489.1']
     Key: translation, Value: ['MGYINVFAFPFTIYSLLLCRMNSRNYIAQVDVVNFNLT']
-'''
+"""
 
 
 def main():
-    extractor = Feature_To_Gene_And_Protein(args.format, args.analyze, 
-        args.verbose, args.json, args.data_dir, args.host_filter, args.strain, args.files)
+    extractor = Feature_To_Gene_And_Protein(
+        args.format,
+        args.analyze,
+        args.verbose,
+        args.json,
+        args.data_dir,
+        args.host_filter,
+        args.strain,
+        args.files,
+    )
     extractor.read()
     extractor.standardize()
     extractor.create_objects()
@@ -74,7 +95,9 @@ def main():
 class Feature_To_Gene_And_Protein:
     from utilities import make_sequence_json
 
-    def __init__(self, seq_format, analyze, verbose, json, data_dir, host_filter, strain, files):
+    def __init__(
+        self, seq_format, analyze, verbose, json, data_dir, host_filter, strain, files
+    ):
         self.strain = strain
         self.data_dir = data_dir
         self.seq_format = seq_format
@@ -101,47 +124,59 @@ class Feature_To_Gene_And_Protein:
         self.synonyms = read_synonyms()
         self.variants = read_variants()
         strains = read_strains()
-        self.genes = strains[self.strain]['genes']
+        self.genes = strains[self.strain]["genes"]
 
     def remove_invalid(self):
-        '''
-        Features may be incorrectly named, or named used older names, we'll call these
-        "invalid". The "invalid" sequences are usually different lengths from the "valid"
-        sequences and not alignable with the "valid" sequences, though they share the same name. 
-        All "valid" sequences are written to files using a standard gene name (e.g. "NS8") and all
-        "invalid" sequences are written to "invalid" files (e.g. "NS8-nt-invalid.fasta").
-        '''
-        # Copy from self.feats to an empty dict so we don't need to handle changes to self.feats
+        """
+        Features may be incorrectly named, or named used older names, we'll 
+        call these "invalid". The "invalid" sequences are usually different 
+        lengths from the "valid" sequences and not alignable with the "valid" 
+        sequences, though they share the same name. All "valid" sequences are 
+        written to files using a standard gene name (e.g. "NS8") and all
+        "invalid" sequences are written to "invalid" files (e.g. 
+        "NS8-nt-invalid.fasta").
+        """
+        # Copy from self.feats to an empty dict so we don't need to handle 
+        # changes to self.feats
         feats = dict()
 
         for gene in self.feats:
             for feat in self.feats[gene].keys():
-                feat_len = len(self.feats[gene][feat]['aa'])
+                feat_len = len(self.feats[gene][feat]["aa"])
                 # If a given feature length is not in the right length range
-                if feat_len < self.variants[gene][0] or feat_len > self.variants[gene][1]:
+                if (
+                    feat_len < self.variants[gene][0]
+                    or feat_len > self.variants[gene][1]
+                ):
                     if self.verbose:
-                        print("'{0}' is invalid: {1} not in {2}".format(feat,
-                                    feat_len, str(self.variants[gene])))
-                    invalid = gene + '-invalid'
+                        print(
+                            "'{0}' is invalid: {1} not in {2}".format(
+                                feat, feat_len, str(self.variants[gene])
+                            )
+                        )
+                    invalid = gene + "-invalid"
                     if invalid not in feats.keys():
                         feats[invalid] = dict()
                     if feat not in feats[invalid].keys():
                         feats[invalid][feat] = dict()
                     # Copy feature
-                    feats[invalid][feat]['aa'] = self.feats[gene][feat]['aa']
-                    feats[invalid][feat]['nt'] = self.feats[gene][feat]['nt']
+                    feats[invalid][feat]["aa"] = self.feats[gene][feat]["aa"]
+                    feats[invalid][feat]["nt"] = self.feats[gene][feat]["nt"]
                 # Check that ORF1a, ORF1ab, NS1 begin with M
-                elif gene in ['ORF1a','ORF1ab','NS1'] and str(self.feats[gene][feat]['aa'].seq)[0] != 'M':
-                        if self.verbose:
-                            print("'{0}' is invalid: no M".format(feat))
-                        invalid = gene + '-invalid'
-                        if invalid not in feats.keys():
-                            feats[invalid] = dict()
-                        if feat not in feats[invalid].keys():
-                            feats[invalid][feat] = dict()
-                        # Copy feature
-                        feats[invalid][feat]['aa'] = self.feats[gene][feat]['aa']
-                        feats[invalid][feat]['nt'] = self.feats[gene][feat]['nt']
+                elif (
+                    gene in ["ORF1a", "ORF1ab", "NS1"]
+                    and str(self.feats[gene][feat]["aa"].seq)[0] != "M"
+                ):
+                    if self.verbose:
+                        print("'{0}' is invalid: no M".format(feat))
+                    invalid = gene + "-invalid"
+                    if invalid not in feats.keys():
+                        feats[invalid] = dict()
+                    if feat not in feats[invalid].keys():
+                        feats[invalid][feat] = dict()
+                    # Copy feature
+                    feats[invalid][feat]["aa"] = self.feats[gene][feat]["aa"]
+                    feats[invalid][feat]["nt"] = self.feats[gene][feat]["nt"]
                 else:
                     if gene not in feats.keys():
                         feats[gene] = dict()
@@ -155,31 +190,32 @@ class Feature_To_Gene_And_Protein:
             try:
                 gbs = [rec for rec in SeqIO.parse(path, "gb")]
             except (RuntimeError) as exception:
-                print("Error parsing sequences in '" +
-                      str(path) + "':" + str(exception))
+                print(
+                    "Error parsing sequences in '" + str(path) + "':" + str(exception)
+                )
             for gb in gbs:
                 self.accs[gb.id] = dict()
-                self.accs[gb.id]['cds'] = []
-                self.accs[gb.id]['mat_peptide'] = []
+                self.accs[gb.id]["cds"] = []
+                self.accs[gb.id]["mat_peptide"] = []
                 # Collect specific features without standard names
-                for feat in [feat for feat in gb.features]: 
-                    if feat.type == 'CDS':
-                        self.accs[gb.id]['cds'].append(feat)
-                    if feat.type == 'mat_peptide':
-                        self.accs[gb.id]['mat_peptide'].append(feat)
+                for feat in [feat for feat in gb.features]:
+                    if feat.type == "CDS":
+                        self.accs[gb.id]["cds"].append(feat)
+                    if feat.type == "mat_peptide":
+                        self.accs[gb.id]["mat_peptide"].append(feat)
                     # Get 'host' from 'source'
-                    if feat.type == 'source':
-                        self.accs[gb.id]['source'] = feat
+                    if feat.type == "source":
+                        self.accs[gb.id]["source"] = feat
                 # Collect the annotations
-                self.accs[gb.id]['annotations'] = gb.annotations
+                self.accs[gb.id]["annotations"] = gb.annotations
                 # Collect nucleotide sequence
-                self.accs[gb.id]['seq'] = str(gb.seq)
+                self.accs[gb.id]["seq"] = str(gb.seq)
 
     def standardize(self):
-        '''
+        """
         1. Look for gene and protein names in 'product'
         2. Look for matches to 'product' in the cov_dictionary
-        '''
+        """
         self.get_host()
         self.get_date()
         self.get_organism()
@@ -187,53 +223,57 @@ class Feature_To_Gene_And_Protein:
         self.standardize_mat_peptide()
 
     def standardize_cds(self):
-        '''
+        """
         If we get a name for a feature from the synonyms list
         we rename it and sort it according to the standard name.
-        '''
+        """
         for acc in self.accs:
-            for cds in self.accs[acc]['cds']:
+            for cds in self.accs[acc]["cds"]:
                 # Skip a CDS feature without a 'product' tag
-                if 'product' not in cds.qualifiers.keys():
+                if "product" not in cds.qualifiers.keys():
                     continue
                 # Skip a CDS feature without a 'translation' tag
-                if 'translation' not in cds.qualifiers.keys():
-                    continue                
+                if "translation" not in cds.qualifiers.keys():
+                    continue
                 # Skip 'hypothetical protein', 'putative protein', etc.
-                if cds.qualifiers["product"][0] in self.synonyms['SKIP']:
+                if cds.qualifiers["product"][0] in self.synonyms["SKIP"]:
                     continue
                 id = self.get_standard_name(cds.qualifiers["product"][0], acc)
                 # Skip if the gene is not found in the specific strain
                 if id not in self.genes:
                     if self.verbose:
-                        print("Gene {0} not found in strain {1}".format(id, self.strain))
+                        print(
+                            "Gene {0} not found in strain {1}".format(id, self.strain)
+                        )
                     continue
                 if id:
                     if id not in self.sorted_cds.keys():
                         self.sorted_cds[id] = []
                     # For example: "ORF1ab-GU553365.1"
-                    cds.id = id + '-' + acc
+                    cds.id = id + "-" + acc
                     self.sorted_cds[id].append(cds)
-    
+
     def standardize_mat_peptide(self):
         for acc in self.accs:
-            for pep in self.accs[acc]['mat_peptide']:
+            for pep in self.accs[acc]["mat_peptide"]:
                 # Skip a mat_peptide feature without a 'product' tag
-                if 'product' not in pep.qualifiers.keys():
+                if "product" not in pep.qualifiers.keys():
                     continue
                 # Skip 'hypothetical protein', 'putative protein', etc.
-                if pep.qualifiers["product"][0] in self.synonyms['SKIP']:
+                if pep.qualifiers["product"][0] in self.synonyms["SKIP"]:
                     continue
                 id = self.get_standard_name(pep.qualifiers["product"][0], acc)
                 # Skip if the gene is not found in the specific strain
                 if id not in self.genes:
                     if self.verbose:
-                        print("Gene {0} not found in strain {1}".format(id, self.strain))
+                        print(
+                            "Gene {0} not found in strain {1}".format(id, self.strain)
+                        )
                     continue
                 if id:
                     if id not in self.sorted_mats.keys():
                         self.sorted_mats[id] = []
-                    pep.id = id + '-' + acc
+                    pep.id = id + "-" + acc
                     self.sorted_mats[id].append(pep)
 
     def get_standard_name(self, product, acc):
@@ -252,72 +292,76 @@ class Feature_To_Gene_And_Protein:
     def get_host(self):
         # Iterate over list since we may be deleting keys
         for acc in list(self.accs):
-            if 'host' in self.accs[acc]['source'].qualifiers.keys():
-                self.accs[acc]['host'] = self.accs[acc]['source'].qualifiers['host'][0]
-            elif 'isolation_source' in self.accs[acc]['source'].qualifiers.keys():
-                self.accs[acc]['host'] = self.accs[acc]['source'].qualifiers['isolation_source'][0]
+            if "host" in self.accs[acc]["source"].qualifiers.keys():
+                self.accs[acc]["host"] = self.accs[acc]["source"].qualifiers["host"][0]
+            elif "isolation_source" in self.accs[acc]["source"].qualifiers.keys():
+                self.accs[acc]["host"] = self.accs[acc]["source"].qualifiers[
+                    "isolation_source"
+                ][0]
             else:
-                self.accs[acc]['host'] = 'unknown'
+                self.accs[acc]["host"] = "unknown"
             # Filter by host if specified
             if self.host_filter:
-                if self.host_filter not in self.accs[acc]['host']:
+                if self.host_filter not in self.accs[acc]["host"]:
                     self.accs.pop(acc)
 
     def get_date(self):
         for acc in self.accs.keys():
-            if 'date' in self.accs[acc]['annotations'].keys():
-                self.accs[acc]['date'] = self.accs[acc]['annotations']['date']
+            if "date" in self.accs[acc]["annotations"].keys():
+                self.accs[acc]["date"] = self.accs[acc]["annotations"]["date"]
             else:
-                self.accs[acc]['date'] = 'unknown'
-
+                self.accs[acc]["date"] = "unknown"
 
     def get_organism(self):
         for acc in self.accs.keys():
-            if 'organism' in self.accs[acc]['annotations'].keys():
-                self.accs[acc]['organism'] = self.accs[acc]['annotations']['organism']
+            if "organism" in self.accs[acc]["annotations"].keys():
+                self.accs[acc]["organism"] = self.accs[acc]["annotations"]["organism"]
             else:
-                self.accs[acc]['organism'] = 'unknown'
-
+                self.accs[acc]["organism"] = "unknown"
 
     def get_location(self, feat):
         for acc in self.accs.keys():
-            if 'organism' in self.accs[acc]['annotations'].keys():
-                self.accs[acc]['organism'] = self.accs[acc]['annotations']['organism']
+            if "organism" in self.accs[acc]["annotations"].keys():
+                self.accs[acc]["organism"] = self.accs[acc]["annotations"]["organism"]
             else:
-                self.accs[acc]['organism'] = 'unknown'
-
+                self.accs[acc]["organism"] = "unknown"
 
     def create_objects(self):
-        '''
-            Create SeqRecords for aa and nt that will be written out as fasta.
-            Fasta format metadata is made up of "id" and "description".
-            All other SeqRecord fields are ignored when Biopython makes fasta.
-        '''
+        """
+        Create SeqRecords for aa and nt that will be written out as fasta.
+        Fasta format metadata is made up of "id" and "description".
+        All other SeqRecord fields are ignored when Biopython makes fasta.
+        """
         for name in self.sorted_cds.keys():
             self.feats[name] = dict()
             if self.make_json:
                 self.json[name] = dict()
             for feat in self.sorted_cds[name]:
                 self.feats[name][feat.id] = dict()
-                acc = feat.id.split('-')[1]
+                acc = feat.id.split("-")[1]
                 # nt
-                ntseq = feat.extract(self.accs[acc]['seq'])
-                nt = SeqRecord(Seq(ntseq),
-                                  id=feat.id,
-                                  description=self.make_desc(feat, ntseq, 'nt'))
-                self.feats[name][feat.id]['nt'] = nt
+                ntseq = feat.extract(self.accs[acc]["seq"])
+                nt = SeqRecord(
+                    Seq(ntseq),
+                    id=feat.id,
+                    description=self.make_desc(feat, ntseq, "nt"),
+                )
+                self.feats[name][feat.id]["nt"] = nt
                 # aa
                 aaseq = feat.qualifiers["translation"][0]
-                aa = SeqRecord(Seq(aaseq),
-                                  id=feat.id,
-                                  description=self.make_desc(feat, aaseq, 'aa'))
-                self.feats[name][feat.id]['aa'] = aa
+                aa = SeqRecord(
+                    Seq(aaseq),
+                    id=feat.id,
+                    description=self.make_desc(feat, aaseq, "aa"),
+                )
+                self.feats[name][feat.id]["aa"] = aa
 
                 if self.make_json:
                     from utilities import make_sequence_json
+
                     self.json[name][feat.id] = dict()
-                    self.json[name][feat.id]['aa'] = make_sequence_json(aa, 'aa')
-                    self.json[name][feat.id]['nt'] = make_sequence_json(nt, 'nt')
+                    self.json[name][feat.id]["aa"] = make_sequence_json(aa, "aa")
+                    self.json[name][feat.id]["nt"] = make_sequence_json(nt, "nt")
 
         for name in self.sorted_mats.keys():
             self.feats[name] = dict()
@@ -325,72 +369,88 @@ class Feature_To_Gene_And_Protein:
                 self.json[name] = dict()
             for feat in self.sorted_mats[name]:
                 self.feats[name][feat.id] = dict()
-                acc = feat.id.split('-')[1]
+                acc = feat.id.split("-")[1]
                 # nt
-                ntseq = feat.extract(self.accs[acc]['seq'])
-                nt = SeqRecord(Seq(ntseq),
-                                  id=feat.id,
-                                  description=self.make_desc(feat, ntseq, 'nt'))
-                self.feats[name][feat.id]['nt'] = nt
+                ntseq = feat.extract(self.accs[acc]["seq"])
+                nt = SeqRecord(
+                    Seq(ntseq),
+                    id=feat.id,
+                    description=self.make_desc(feat, ntseq, "nt"),
+                )
+                self.feats[name][feat.id]["nt"] = nt
                 # aa
                 aaseq = str(nt.translate().seq)
-                aa = SeqRecord(Seq(aaseq),
-                                  id=feat.id,
-                                  description=self.make_desc(feat, aaseq, 'aa'))
-                self.feats[name][feat.id]['aa'] = aa
+                aa = SeqRecord(
+                    Seq(aaseq),
+                    id=feat.id,
+                    description=self.make_desc(feat, aaseq, "aa"),
+                )
+                self.feats[name][feat.id]["aa"] = aa
 
                 if self.make_json:
                     from utilities import make_sequence_json
+
                     self.json[name][feat.id] = dict()
-                    self.json[name][feat.id]['aa'] = make_sequence_json(aa, 'aa')
-                    self.json[name][feat.id]['nt'] = make_sequence_json(nt, 'nt')
+                    self.json[name][feat.id]["aa"] = make_sequence_json(aa, "aa")
+                    self.json[name][feat.id]["nt"] = make_sequence_json(nt, "nt")
 
     def make_desc(self, feat, seq, seqtype):
-        '''
-        The description will have:
+        """
+        The Fasta description will have:
         - length ('aa' or 'nt')
         - nucleotide coordinates (all features)
         - date (annotation)
         - host (source feature)
         - organism (annotation)
         - protein id (CDS feature only)
-        '''
+        """
         slen = str(len(seq)) + seqtype
-        acc = feat.id.split('-')[1]
-        loc = str(feat.location).replace(' ','').replace('join{','').replace('}','').replace('(+)','')
-        desc = " ".join([slen,
-                        loc,
-                        self.accs[acc]['date'],
-                        "host='{}'".format(self.accs[acc]['host']),
-                        "org='{}'".format(self.accs[acc]['organism']) ])
-        if 'protein_id' in feat.qualifiers.keys():
-            desc = desc + ' pid=' + feat.qualifiers["protein_id"][0]
+        acc = feat.id.split("-")[1]
+        loc = (
+            str(feat.location)
+            .replace(" ", "")
+            .replace("join{", "")
+            .replace("}", "")
+            .replace("(+)", "")
+        )
+        desc = " ".join(
+            [
+                slen,
+                loc,
+                self.accs[acc]["date"],
+                "host='{}'".format(self.accs[acc]["host"]),
+                "org='{}'".format(self.accs[acc]["organism"]),
+            ]
+        )
+        if "protein_id" in feat.qualifiers.keys():
+            desc = desc + " pid=" + feat.qualifiers["protein_id"][0]
         return desc
 
     def write(self):
         if self.analyze:
             return
         for name in self.feats.keys():
-            aaseqfile = os.path.join(self.cov_dir, name + '-aa.fa')
-            ntseqfile = os.path.join(self.cov_dir, name + '-nt.fa')
+            aaseqfile = os.path.join(self.cov_dir, name + "-aa.fa")
+            ntseqfile = os.path.join(self.cov_dir, name + "-nt.fa")
             aahandle = open(aaseqfile, "w")
             nthandle = open(ntseqfile, "w")
             for feat in self.feats[name].keys():
-                SeqIO.write(self.feats[name][feat]['aa'], aahandle, self.seq_format)
-                SeqIO.write(self.feats[name][feat]['nt'], nthandle, self.seq_format)
+                SeqIO.write(self.feats[name][feat]["aa"], aahandle, self.seq_format)
+                SeqIO.write(self.feats[name][feat]["nt"], nthandle, self.seq_format)
             aahandle.close()
             nthandle.close()
-            if self.make_json and 'invalid' not in name:
+            if self.make_json and "invalid" not in name:
                 # No JSON for invalid sequences
-                aafile = os.path.join(self.cov_dir, name + '-aa-fasta.json')
-                ntfile = os.path.join(self.cov_dir, name + '-nt-fasta.json')
+                aafile = os.path.join(self.cov_dir, name + "-aa-fasta.json")
+                ntfile = os.path.join(self.cov_dir, name + "-nt-fasta.json")
                 aahandle = open(aafile, "w")
                 nthandle = open(ntfile, "w")
                 for feat in self.feats[name].keys():
-                    aahandle.write(self.json[name][feat]['aa'])
-                    nthandle.write(self.json[name][feat]['nt'])
+                    aahandle.write(self.json[name][feat]["aa"])
+                    nthandle.write(self.json[name][feat]["nt"])
                 aahandle.close()
                 nthandle.close()
+
 
 if __name__ == "__main__":
     main()

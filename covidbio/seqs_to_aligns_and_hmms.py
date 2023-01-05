@@ -130,14 +130,9 @@ class Seqs_To_Aligns_And_Hmms:
             if self.verbose:
                 print("Reading Fasta file: {}".format(path))
             seqs = list(SeqIO.parse(path, "fasta"))
-<<<<<<< HEAD
         except (RuntimeError) as exception: 
             print("Error parsing sequences in '" +
                 str(path) + "':" + str(exception))
-=======
-        except (RuntimeError) as exception:
-            print("Error parsing sequences in '" + str(path) + "':" + str(exception))
->>>>>>> 1a13f133f4974df8e04890b5ad5fe7fbe363a028
         return seqs
 
     def remove_dups(self, records, filename):
