@@ -19,7 +19,7 @@ their *product* or *mat_peptide* tags. Possible synonyms for these standard name
 * [HMMER 3.3](http://hmmer.org)
 
 Code is included that annotates COV genomes using the nucleotide HMMs, [pyTMHMM](https://github.com/bosborne/pyTMHMM),
-and [Infernal](http://eddylab.org/infernal/) for RNA motif prediction and creates BED files for genome visualization. 
+and [Infernal](http://eddylab.org/infernal/) for RNA motif prediction and creates BED files for genome visualization.
 
 # example: annotate a COV genome by creating a BED file
 * `annotate_to_bed.py -rfam_file ../COV2/cov_allvirus.cm COV2/NC_045512.2.gb` 
